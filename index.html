@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HelioFleet</title>
+  <meta name="description" content="Positions of SDO, Solar Orbiter, Parker Solar Probe, Aditya-L1 and STEREO relative to the Sun and Earth on any date from 2010 to 2029, from JPL Horizons ephemerides.">
+  <meta name="author" content="Soumyaranjan Dash">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%230B1026'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23FFB23F'/%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%2359A8FF' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='27' r='2.5' fill='%2359A8FF'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+    try {
+      const t = localStorage.getItem('heliofleet-theme');
+      if (t) document.documentElement.dataset.theme = t;
+      else if (matchMedia('(prefers-color-scheme: light)').matches) document.documentElement.dataset.theme = 'plate';
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="brand">
+      <h1 class="wordmark">HelioFleet</h1>
+      <p class="tagline">Where the Sun-watching spacecraft are, on any date from 2010 to 2029.</p>
+    </div>
+    <div class="clock" aria-live="polite">
+      <span class="clock-date" id="clock-date">—</span>
+      <span class="clock-time" id="clock-time">—</span>
+      <span class="clock-ctx" id="clock-ctx"></span>
+    </div>
+    <div class="theme-switch" role="radiogroup" aria-label="Colour theme">
+      <button role="radio" data-theme-pick="night" title="Night">
+        <span class="sw" style="--a:#0B1026;--b:#FFB23F"></span><span class="sw-name">Night</span></button>
+      <button role="radio" data-theme-pick="eclipse" title="Totality">
+        <span class="sw" style="--a:#030304;--b:#EDE8DA"></span><span class="sw-name">Totality</span></button>
+      <button role="radio" data-theme-pick="halpha" title="H-alpha">
+        <span class="sw" style="--a:#1A0606;--b:#FF4433"></span><span class="sw-name">H-alpha</span></button>
+      <button role="radio" data-theme-pick="plate" title="Plate">
+        <span class="sw" style="--a:#E6ECF1;--b:#1F2A4A"></span><span class="sw-name">Plate</span></button>
+    </div>
+  </header>
+
+  <section class="ribbon" aria-label="Timeline">
+    <svg id="ribbon" role="slider" tabindex="0" aria-label="Date on the timeline" aria-valuemin="2010" aria-valuemax="2030"></svg>
+    <div class="ribbon-tip" id="ribbon-tip" hidden></div>
+  </section>
+
+  <main class="layout">
+    <aside class="controls">
+      <section class="panel">
+        <h2 class="panel-title">Moment</h2>
+        <label class="field">
+          <span class="field-label">Date and time (UTC)</span>
+          <input type="datetime-local" id="dt" step="60" min="2010-01-01T00:00" max="2029-12-31T00:00">
+        </label>
+        <div class="steppers" role="group" aria-label="Step the date">
+          <button data-step="-27.2753" title="Back one Carrington rotation">−1 CR</button>
+          <button data-step="-1" title="Back one day">−1 d</button>
+          <button data-step="-0.041666667" title="Back one hour">−1 h</button>
+          <button data-step="0.041666667" title="Forward one hour">+1 h</button>
+          <button data-step="1" title="Forward one day">+1 d</button>
+          <button data-step="27.2753" title="Forward one Carrington rotation">+1 CR</button>
+        </div>
+        <div class="play-row">
+          <button id="play" class="btn-primary" aria-pressed="false"><span class="play-icon" aria-hidden="true"></span><span class="play-label">Play</span></button>
+          <select id="speed" aria-label="Playback speed">
+            <option value="1">1 day / s</option>
+            <option value="7" selected>1 week / s</option>
+            <option value="30">1 month / s</option>
+            <option value="0.25">6 hours / s</option>
+          </select>
+          <button id="now" class="btn-ghost">Today</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel-title">Preset moments</h2>
+        <div class="tabs" role="tablist" id="preset-tabs"></div>
+        <div class="chips" id="preset-chips"></div>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel-title">Display</h2>
+        <div class="field">
+          <span class="field-label">Frame</span>
+          <div class="seg" data-setting="frame">
+            <button data-value="hee" title="Heliocentric Earth Ecliptic: Earth held fixed at the bottom">Earth-fixed</button>
+            <button data-value="hae" title="Inertial ecliptic of J2000: vernal equinox to the right">Inertial</button>
+          </div>
+        </div>
+        <div class="field">
+          <span class="field-label">View</span>
+          <div class="seg" data-setting="view">
+            <button data-value="top" title="Looking down from ecliptic north">From above</button>
+            <button data-value="side" title="Edge-on, ecliptic north up">Edge-on</button>
+          </div>
+        </div>
+        <div class="field">
+          <span class="field-label">Zoom</span>
+          <div class="seg" data-setting="range">
+            <button data-value="0.25">0.25 au</button>
+            <button data-value="1.15">Earth</button>
+            <button data-value="1.7">Mars</button>
+          </div>
+        </div>
+        <label class="field">
+          <span class="field-label">Spacecraft trails</span>
+          <select id="trail">
+            <option value="0">None</option>
+            <option value="15">± 15 days</option>
+            <option value="45" selected>± 45 days</option>
+            <option value="90">± 90 days</option>
+            <option value="180">± 180 days</option>
+          </select>
+        </label>
+        <label class="toggle"><input type="checkbox" id="planets" checked><span>Inner planets</span></label>
+        <label class="toggle"><input type="checkbox" id="labels" checked><span>Labels</span></label>
+        <label class="toggle"><input type="checkbox" id="spirals"><span>Parker spirals</span></label>
+        <label class="field field-range" id="wind-field">
+          <span class="field-label">Solar-wind speed <output id="wind-out">400 km/s</output></span>
+          <input type="range" id="wind" min="250" max="800" step="10" value="400">
+        </label>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel-title">Snapshot</h2>
+        <div class="export-row">
+          <button id="dl-png" class="btn-primary">Download PNG</button>
+          <button id="dl-pdf" class="btn-primary">Download PDF</button>
+        </div>
+        <button id="copy-link" class="btn-ghost wide">Copy link to this moment</button>
+      </section>
+    </aside>
+
+    <section class="stage" aria-label="Spacecraft map">
+      <div class="map-wrap" id="map-wrap">
+        <canvas id="map" aria-label="Map of spacecraft positions around the Sun"></canvas>
+        <p class="hud" id="hud"></p>
+        <figure class="inset">
+          <figcaption>Near Earth<span class="cap-extra"> · Sun up</span></figcaption>
+          <canvas id="inset" aria-label="Earth, Moon, L1 and Aditya-L1"></canvas>
+        </figure>
+        <div class="zoom" role="group" aria-label="Zoom">
+          <button id="zoom-in" aria-label="Zoom in">+</button>
+          <button id="zoom-out" aria-label="Zoom out">−</button>
+          <button id="zoom-reset" aria-label="Reset view" title="Reset view">⟲</button>
+        </div>
+        <p class="loading" id="loading">Loading ephemerides…</p>
+      </div>
+      <ul class="legend" id="legend" aria-label="Show or hide bodies"></ul>
+    </section>
+
+    <section class="readout" aria-label="Coordinates">
+      <div class="readout-head">
+        <h2 class="panel-title">Coordinates</h2>
+        <p class="readout-note">Stonyhurst heliographic (HGS) and Carrington longitudes as seen from Earth. Footpoint is where a nominal Parker spiral at the chosen wind speed meets the Sun.</p>
+      </div>
+      <div class="table-wrap">
+        <table id="table">
+          <thead>
+            <tr>
+              <th scope="col">Body</th>
+              <th scope="col" title="Distance from Sun centre">r <small>au</small></th>
+              <th scope="col" title="Stonyhurst longitude; positive is west of the Earth–Sun line">HGS lon</th>
+              <th scope="col" title="Stonyhurst latitude">HGS lat</th>
+              <th scope="col" title="Carrington longitude">Carr. lon</th>
+              <th scope="col" title="Sun-centred angle between the body and Earth">∠ Earth</th>
+              <th scope="col" title="Distance from Earth">to Earth <small>au</small></th>
+              <th scope="col" title="Stonyhurst longitude of the Parker-spiral footpoint">Footpoint</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="absent" id="absent"></p>
+    </section>
+  </main>
+
+  <footer class="colophon">
+    <p>Ephemerides from <a href="https://ssd.jpl.nasa.gov/horizons/">JPL Horizons</a>, sampled daily (Parker every 3 h) and interpolated; predictions beyond each mission's tracking data are planning trajectories. Heliographic coordinates follow the IAU solar rotation model, as in SunPy.</p>
+    <p>Made by <a href="https://sr-dash.github.io">Soumyaranjan Dash</a> · <a href="https://github.com/sr-dash/heliofleet">Source on GitHub</a></p>
+  </footer>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
