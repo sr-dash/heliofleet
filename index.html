@@ -13,7 +13,7 @@
     gtag('config', 'G-8X5BSNF3VV');
   </script>
 
-  <meta name="description" content="Interactive map of where SDO, Aditya-L1, Solar Orbiter, Parker Solar Probe and STEREO are relative to the Sun and Earth on any date from 2010 to 2029, with total solar eclipse presets, heliographic coordinates and PNG/PDF snapshots. Built from JPL Horizons ephemerides.">
+  <meta name="description" content="Interactive map of where SDO, Aditya-L1, Solar Orbiter, Parker Solar Probe and STEREO are relative to the Sun and Earth on any date since 2010, with total solar eclipse presets, heliographic coordinates and PNG/PDF snapshots. Built from JPL Horizons ephemerides.">
   <meta name="keywords" content="HelioFleet, spacecraft positions, where is STEREO, Parker Solar Probe location, Solar Orbiter location, Aditya-L1, SDO, heliophysics, solar eclipse, Stonyhurst coordinates, Carrington longitude, Parker spiral, JPL Horizons, heliospheric orbit map">
   <meta name="author" content="Soumyaranjan Dash">
   <meta name="robots" content="index, follow, max-image-preview:large">
@@ -41,7 +41,7 @@
   <meta property="og:site_name" content="Soumyaranjan Dash Portfolio">
   <meta property="og:locale" content="en_US">
   <meta property="og:title" content="HelioFleet: where the Sun-watching spacecraft are">
-  <meta property="og:description" content="SDO, Aditya-L1, Solar Orbiter, Parker Solar Probe and STEREO around the Sun and Earth on any date from 2010 to 2029, with every total solar eclipse since 2010 as a preset.">
+  <meta property="og:description" content="SDO, Aditya-L1, Solar Orbiter, Parker Solar Probe and STEREO around the Sun and Earth on any date since 2010, with every total solar eclipse since 2010 as a preset.">
   <meta property="og:url" content="https://sr-dash.github.io/heliofleet/">
   <meta property="og:image" content="https://sr-dash.github.io/heliofleet/assets/og-image.png">
   <meta property="og:image:secure_url" content="https://sr-dash.github.io/heliofleet/assets/og-image.png">
@@ -54,7 +54,7 @@
   <meta name="twitter:site" content="@soumyatheory">
   <meta name="twitter:creator" content="@soumyatheory">
   <meta name="twitter:title" content="HelioFleet: where the Sun-watching spacecraft are">
-  <meta name="twitter:description" content="SDO, Aditya-L1, Solar Orbiter, Parker Solar Probe and STEREO around the Sun and Earth on any date from 2010 to 2029.">
+  <meta name="twitter:description" content="SDO, Aditya-L1, Solar Orbiter, Parker Solar Probe and STEREO around the Sun and Earth on any date since 2010.">
   <meta name="twitter:image" content="https://sr-dash.github.io/heliofleet/assets/og-image.png">
   <meta name="twitter:image:alt" content="HelioFleet map of spacecraft around the Sun during the 8 April 2024 total solar eclipse">
 
@@ -97,7 +97,7 @@
         "name": "HelioFleet",
         "alternateName": "HelioFleet spacecraft position map",
         "url": "https://sr-dash.github.io/heliofleet/",
-        "description": "Interactive map of where SDO, Aditya-L1, Solar Orbiter, Parker Solar Probe and STEREO are relative to the Sun and Earth on any date from 2010 to 2029, with total solar eclipse presets, heliographic coordinates and PNG/PDF snapshots.",
+        "description": "Interactive map of where SDO, Aditya-L1, Solar Orbiter, Parker Solar Probe and STEREO are relative to the Sun and Earth on any date since 2010, with total solar eclipse presets, heliographic coordinates and PNG/PDF snapshots.",
         "applicationCategory": "EducationalApplication",
         "applicationSubCategory": "Heliophysics visualization",
         "operatingSystem": "Any (web browser)",
@@ -110,7 +110,7 @@
         "screenshot": "https://sr-dash.github.io/heliofleet/assets/og-image.png",
         "keywords": "spacecraft positions, heliophysics, solar eclipse, STEREO, Parker Solar Probe, Solar Orbiter, Aditya-L1, SDO, Carrington longitude, Parker spiral",
         "featureList": [
-          "Spacecraft positions for any UTC date from 2010 to 2029",
+          "Spacecraft positions for any UTC date since 2010, extended monthly as new ephemerides appear",
           "Earth-fixed (HEE) and inertial ecliptic frames, top and edge-on views",
           "Presets for every total and hybrid solar eclipse since 2010",
           "Stonyhurst and Carrington coordinates with Parker-spiral footpoints",
@@ -134,7 +134,7 @@
         "@id": "https://sr-dash.github.io/heliofleet/#page",
         "url": "https://sr-dash.github.io/heliofleet/",
         "name": "HelioFleet: Spacecraft Positions Around the Sun and Earth",
-        "description": "Interactive map of where SDO, Aditya-L1, Solar Orbiter, Parker Solar Probe and STEREO are relative to the Sun and Earth on any date from 2010 to 2029.",
+        "description": "Interactive map of where SDO, Aditya-L1, Solar Orbiter, Parker Solar Probe and STEREO are relative to the Sun and Earth on any date since 2010.",
         "inLanguage": "en",
         "primaryImageOfPage": "https://sr-dash.github.io/heliofleet/assets/og-image.png",
         "mainEntity": { "@id": "https://sr-dash.github.io/heliofleet/#app" },
@@ -175,7 +175,7 @@
         <a href="https://sr-dash.github.io/software/">Software</a>
       </nav>
       <h1 class="wordmark">HelioFleet</h1>
-      <p class="tagline">Where the Sun-watching spacecraft are, on any date from 2010 to 2029.</p>
+      <p class="tagline" id="tagline">Where the Sun-watching spacecraft are, on any date since 2010.</p>
     </div>
     <div class="clock" aria-live="polite">
       <span class="clock-date" id="clock-date">—</span>
@@ -195,9 +195,10 @@
   </header>
 
   <section class="ribbon" aria-label="Timeline">
-    <svg id="ribbon" role="slider" tabindex="0" aria-label="Date on the timeline" aria-valuemin="2010" aria-valuemax="2030"></svg>
+    <svg id="ribbon" role="slider" tabindex="0" aria-label="Date on the timeline" aria-valuemin="2010" ></svg>
     <div class="ribbon-tip" id="ribbon-tip" hidden></div>
   </section>
+  <p class="data-stamp" id="data-stamp" aria-live="polite"></p>
 
   <main class="layout">
     <aside class="controls">
@@ -205,7 +206,7 @@
         <h2 class="panel-title">Moment</h2>
         <label class="field">
           <span class="field-label">Date and time (UTC)</span>
-          <input type="datetime-local" id="dt" step="60" min="2010-01-01T00:00" max="2029-12-31T00:00">
+          <input type="datetime-local" id="dt" step="60" min="2010-01-01T00:00">
         </label>
         <div class="steppers" role="group" aria-label="Step the date">
           <button data-step="-27.2753" title="Back one Carrington rotation">−1 CR</button>
@@ -336,7 +337,7 @@
   </footer>
 
   <noscript>
-    <p class="noscript">HelioFleet needs JavaScript to draw the map. It shows where SDO, Aditya-L1, Solar Orbiter, Parker Solar Probe, STEREO-A and STEREO-B are relative to the Sun and Earth for any date from 2010 to 2029, using JPL Horizons ephemerides. See the <a href="https://github.com/sr-dash/heliofleet">source on GitHub</a> or <a href="https://sr-dash.github.io/">Soumyaranjan Dash's homepage</a>.</p>
+    <p class="noscript">HelioFleet needs JavaScript to draw the map. It shows where SDO, Aditya-L1, Solar Orbiter, Parker Solar Probe, STEREO-A and STEREO-B are relative to the Sun and Earth for any date since 2010, using JPL Horizons ephemerides. See the <a href="https://github.com/sr-dash/heliofleet">source on GitHub</a> or <a href="https://sr-dash.github.io/">Soumyaranjan Dash's homepage</a>.</p>
   </noscript>
 
   <div class="toast" id="toast" role="status" hidden></div>

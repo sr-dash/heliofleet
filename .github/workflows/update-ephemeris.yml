@@ -1,0 +1,74 @@
+# Monthly refresh of the ephemeris files from JPL Horizons.
+#
+# Refetches every year from the previous one onward, so predicted trajectories
+# are replaced as missions publish fitted ones, and appends new years when a
+# spacecraft's Horizons ephemeris is extended. The manifest records when this
+# ran and when it runs next; the page shows both.
+
+name: Update ephemeris
+
+on:
+  schedule:
+    # 06:17 UTC on the 1st of each month. Keep in step with SCHEDULE_* in
+    # scripts/fetch_ephemeris.py, which computes the next-update stamp.
+    - cron: "17 6 1 * *"
+  workflow_dispatch:
+    inputs:
+      full:
+        description: "Rebuild every year from 2010 instead of the incremental refresh"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: update-ephemeris
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fetch ephemerides from JPL Horizons
+        run: |
+          if [ "${{ inputs.full }}" = "true" ]; then
+            python scripts/fetch_ephemeris.py
+          else
+            python scripts/fetch_ephemeris.py --incremental
+          fi
+
+      - name: Commit and push
+        id: commit
+        run: |
+          git config user.name "Soumyaranjan Dash"
+          git config user.email "sdash@nso.edu"
+          git add data README.md sitemap.xml
+          if git diff --cached --quiet; then
+            echo "No changes."
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          end=$(python -c "import json,datetime as d; m=json.load(open('data/manifest.json')); print(d.datetime.fromtimestamp((m['timeline']['end']-2440587.5)*86400, d.timezone.utc).date())")
+          git commit -m "Update ephemeris data for $(date -u +%Y-%m)" \
+                     -m "Monthly refresh from JPL Horizons. Timeline now ends ${end}."
+          git push
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      # Pushes made with the workflow token do not always start a Pages build,
+      # so request one explicitly.
+      - name: Rebuild the site
+        if: steps.commit.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api -X POST "repos/${{ github.repository }}/pages/builds" --silent \
+            || echo "::warning::Could not request a Pages build; it will publish on the next push."

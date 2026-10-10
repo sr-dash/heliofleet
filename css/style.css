@@ -196,6 +196,14 @@ button, input, select { font: inherit; color: inherit; }
 .ribbon-tip b { font-weight: 600; }
 .ribbon-tip span { display: block; color: var(--muted); font: 12px "IBM Plex Mono", monospace; }
 
+.data-stamp {
+  margin: 6px 28px 0;
+  display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px 18px;
+  font: 12px/1.4 "IBM Plex Mono", monospace; color: var(--muted);
+}
+.data-stamp:empty { display: none; }
+.data-stamp b { font-weight: 500; color: var(--ink); }
+
 /* ---------- layout ---------- */
 .layout {
   display: grid;
@@ -390,6 +398,7 @@ tbody tr:hover td { background: var(--surface); }
   .controls { position: static; }
   .masthead { grid-template-columns: 1fr; padding: 18px 16px 12px; gap: 12px; }
   .ribbon { margin: 0 16px; }
+  .data-stamp { margin: 6px 16px 0; justify-content: flex-start; }
   .map-wrap { height: 72vh; min-height: 380px; }
   .inset { width: 132px; }
   .cap-extra { display: none; }

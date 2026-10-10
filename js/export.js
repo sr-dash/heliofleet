@@ -139,7 +139,7 @@ export async function composeSnapshot(scene, s, th, view, meta) {
   }
   if (meta.absent) ctx.fillText(meta.absent, X, y + 2, CW);
 
-  ctx.fillText('Ephemerides: JPL Horizons · HGS/Carrington from Earth, IAU rotation model', X, H - 38);
+  ctx.fillText(`Ephemerides: JPL Horizons${meta.stamp ? ` (${meta.stamp.replace('Ephemerides ', '')})` : ''} · HGS/Carrington from Earth`, X, H - 38, CW);
   ctx.fillText('sr-dash.github.io/heliofleet', X, H - 22);
   return cv;
 }

@@ -23,7 +23,9 @@ const S = {
   wind: 400,
   hidden: new Set(),
 };
-let RANGE = [jdOf('2010-01-01T00:00Z'), jdOf('2029-12-31T00:00Z')];
+let RANGE = [jdOf('2010-01-01T00:00Z'), jdOf('2030-01-01T00:00Z')];
+let STAMP = '';
+const inRange = (iso) => jdOf(iso) >= RANGE[0] && jdOf(iso) <= RANGE[1] + 1;
 let theme;
 let scene = null;
 let ribbon;
@@ -112,6 +114,7 @@ async function update({ fromInput = false } = {}) {
 
 // ---------- clock & context ----------
 const PRESETS = PRESET_GROUPS.flatMap((g) => g.items.map((it) => ({ ...it, group: g.id, jd: jdOf(it.t) })));
+const presetGroups = () => PRESET_GROUPS.map((g) => ({ ...g, items: g.items.filter((it) => inRange(it.t)) }));
 function nearestPreset() {
   let best = null;
   for (const p of PRESETS) {
@@ -175,6 +178,23 @@ function absentLine() {
   return absent.length ? `Not on the map: ${absent.join(' · ')}.` : '';
 }
 
+// ---------- data stamp ----------
+function renderStamp(m) {
+  const day = (jd) => isoMinute(jd).slice(0, 10);
+  const utc = (iso) => `${iso.slice(0, 10)} ${iso.slice(11, 16)} UTC`;
+  const parts = [`Timeline <b>${day(RANGE[0])}</b> to <b>${day(RANGE[1])}</b>`];
+  if (m.generated) parts.push(`Ephemerides updated <b>${utc(m.generated)}</b>`);
+  if (m.next_update) {
+    const due = Date.parse(m.next_update) < Date.now();
+    parts.push(due ? 'Next scheduled update <b>due now</b>' : `Next scheduled update <b>${utc(m.next_update)}</b>`);
+  }
+  $('data-stamp').innerHTML = parts.map((p) => `<span>${p}</span>`).join('');
+  STAMP = m.generated ? `Ephemerides updated ${m.generated.slice(0, 10)}` : '';
+  const y0 = dateFromJD(RANGE[0]).getUTCFullYear();
+  const y1 = dateFromJD(RANGE[1]).getUTCFullYear();
+  $('tagline').textContent = `Where the Sun-watching spacecraft are, on any date from ${y0} to ${y1}.`;
+}
+
 // ---------- hud ----------
 function renderHud() {
   const f = S.frame === 'hee' ? 'Earth-fixed (HEE)' : 'Inertial ecliptic J2000';
@@ -208,7 +228,7 @@ function buildPresets() {
   const today = jdFromDate(new Date());
   const show = (id) => {
     tabs.querySelectorAll('button').forEach((b) => b.setAttribute('aria-selected', b.dataset.id === id ? 'true' : 'false'));
-    const g = PRESET_GROUPS.find((x) => x.id === id);
+    const g = presetGroups().find((x) => x.id === id);
     chips.replaceChildren();
     for (const it of g.items) {
       const b = document.createElement('button');
@@ -376,6 +396,7 @@ async function snapshot(kind) {
     time: `${iso.slice(11)} UTC`,
     context: contextLine(nearestPreset()),
     absent: absentLine(),
+    stamp: STAMP,
     frame: `${S.frame === 'hee' ? 'Earth-fixed (HEE)' : 'Inertial ecliptic J2000'}, ${S.view === 'top' ? 'viewed from ecliptic north' : 'edge-on'}`,
   };
   const base = `heliofleet_${iso.replace(/[-:]/g, '').replace('T', '_')}UT`;
@@ -394,14 +415,16 @@ async function main() {
   readURL();
   theme = readTheme();
   setTheme(document.documentElement.dataset.theme, false);
+  let manifest;
   try {
-    await loadManifest();
+    manifest = await loadManifest();
   } catch (err) {
     $('loading').textContent = `${err.message}. Serve the site over http (for example: python3 -m http.server).`;
     return;
   }
   const e = info('earth');
-  RANGE = [e.start, e.end];
+  RANGE = manifest.timeline ? [manifest.timeline.start, manifest.timeline.end] : [e.start, e.end];
+  renderStamp(manifest);
   $('dt').min = isoMinute(e.start);
   $('dt').max = isoMinute(e.end);
 

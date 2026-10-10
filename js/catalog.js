@@ -54,6 +54,10 @@ export const ECLIPSES = [
   { t: '2026-08-12T17:46Z', label: 'Iceland & Spain', where: 'Greenland, Iceland, Spain' },
   { t: '2027-08-02T10:07Z', label: 'Egypt', where: 'Spain, North Africa, Arabia' },
   { t: '2028-07-22T02:56Z', label: 'Australia', where: 'Australia, New Zealand' },
+  { t: '2030-11-25T06:50Z', label: 'Southern Africa', where: 'Namibia, Botswana, South Africa, Australia' },
+  { t: '2031-11-14T21:06Z', label: 'Pacific', where: 'Pacific Ocean, Panama', hybrid: true },
+  { t: '2033-03-30T18:01Z', label: 'Alaska', where: 'Alaska, Russian Far East' },
+  { t: '2034-03-20T10:17Z', label: 'Africa & Asia', where: 'Nigeria, Egypt, Iran, Afghanistan, India' },
 ];
 
 export const MILESTONES = [

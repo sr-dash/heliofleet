@@ -1,6 +1,6 @@
 # HelioFleet
 
-Where the Sun-watching spacecraft are, on any date from 2010 to 2029.
+Where the Sun-watching spacecraft are, on any date since 2010.
 
 **Live:** https://sr-dash.github.io/heliofleet
 
@@ -24,22 +24,32 @@ Keyboard: `←` / `→` step a day (`Shift` for an hour), `Space` plays and paus
 
 Positions come from [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/), as heliocentric vectors in the ICRF ecliptic frame on a uniform UT grid. Most bodies are sampled daily and Parker every 3 hours. Geocentric Moon and Aditya-L1 vectors for the inset are sampled every 6 h and 2 h. The browser interpolates them with a 4-point Lagrange polynomial. Heliographic coordinates use the IAU solar rotation model and agree with SunPy to better than 0.01°.
 
+<!-- coverage:start -->
 | Spacecraft | Horizons ID | Coverage in this site |
 |---|---|---|
-| SDO | -136395 | 2010-02-12 to 2026-11-15; shown at Earth afterwards (geosynchronous orbit) |
+| SDO | -136395 | 2010-02-12 to 2026-11-15; shown at Earth after its ephemeris ends (geosynchronous orbit) |
 | Aditya-L1 | -156 | 2023-09-03 to 2027-01-21 |
-| Solar Orbiter | -144 | 2020-02-11 to 2029-12-31 |
+| Solar Orbiter | -144 | 2020-02-11 to 2030-11-20 |
 | Parker Solar Probe | -96 | 2018-08-12 to 2029-12-31 |
 | STEREO-A | -234 | 2010-01-01 to 2027-01-14 |
-| STEREO-B | -235 | 2010-01-01 to 2018-10-17 (contact lost 2014-10-01; later positions are predictions) |
+| STEREO-B | -235 | 2010-01-01 to 2018-10-18; contact lost 2014-10-01; later positions are predictions |
 
-Positions past each mission's latest tracking data are planning trajectories. To refresh them:
+Timeline: 2010-01-01 to 2030-11-19. Data last updated 2026-10-10; next scheduled update 2026-11-01.
+<!-- coverage:end -->
+
+Positions past each mission's latest tracking data are planning trajectories.
+
+### Monthly updates
+
+The [Update ephemeris](.github/workflows/update-ephemeris.yml) workflow runs at 06:17 UTC on the first day of each month. It asks Horizons how far each spacecraft's ephemeris now reaches and refetches every year from the previous one onward. That replaces predictions with fitted trajectories and appends new years when a mission publishes a longer prediction. The timeline grows with the latest spacecraft, and the page shows when the data was last updated and when the next update is due. It can also be run by hand from the Actions tab.
+
+To run the same update locally:
 
 ```bash
-python3 scripts/fetch_ephemeris.py
+python3 scripts/fetch_ephemeris.py --incremental
 ```
 
-`--only psp,solo` refreshes selected bodies. The script needs only the Python standard library.
+Without `--incremental` the script rebuilds everything from 2010. `--only psp,solo` limits it to selected bodies. The script needs only the Python standard library.
 
 ## Running locally
 

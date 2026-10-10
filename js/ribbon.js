@@ -128,6 +128,7 @@ export function createRibbon(svg, tip, { start, end, onScrub, onPick }) {
     });
 
     for (const mi of MILESTONES) {
+      if (jdOf(mi.t) < start || jdOf(mi.t) > end + 1) continue;
       const yy = LANE0 + SPACECRAFT.indexOf(mi.body) * LANE_DY;
       const g = el('g', {}, svg);
       el('circle', { cx: x(jdOf(mi.t)), cy: yy, r: 4.5, fill: 'var(--plot-bg)', stroke: `var(--c-${mi.body})`, 'stroke-width': 2 }, g);
@@ -136,6 +137,7 @@ export function createRibbon(svg, tip, { start, end, onScrub, onPick }) {
     }
 
     for (const ec of ECLIPSES) {
+      if (jdOf(ec.t) < start || jdOf(ec.t) > end + 1) continue;
       const g = el('g', {}, svg);
       const cx = x(jdOf(ec.t));
       el('circle', { cx, cy: ROW_ECL, r: narrow ? 5.5 : 7.5, fill: 'none', stroke: 'var(--sun)', 'stroke-width': 1.4, opacity: 0.55, 'stroke-dasharray': ec.hybrid ? '2 2' : 'none' }, g);
@@ -145,6 +147,7 @@ export function createRibbon(svg, tip, { start, end, onScrub, onPick }) {
     }
 
     for (const ev of SPACE_WEATHER) {
+      if (jdOf(ev.t) < start || jdOf(ev.t) > end + 1) continue;
       const g = el('g', {}, svg);
       const cx = x(jdOf(ev.t));
       el('path', { d: `M${cx} ${ROW_SW - 6} L${cx + 5} ${ROW_SW + 4} L${cx - 5} ${ROW_SW + 4} Z`, fill: 'var(--accent)' }, g);
