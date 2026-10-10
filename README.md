@@ -65,6 +65,8 @@ js/ribbon.js             timeline with mission lanes and presets
 js/export.js             PNG / PDF snapshot
 js/catalog.js            spacecraft, eclipses, milestones, events
 data/<body>/<year>.json  ephemeris chunks; data/manifest.json indexes them
+assets/                  icons and the social preview image
+site.webmanifest, sitemap.xml, favicon.ico
 scripts/fetch_ephemeris.py
 ```
 
