@@ -50,16 +50,29 @@ BODIES = {
     "solo":       dict(cmd="-144",    center="500@10",  step=24, units="au", start="2020-02-11",       end=None),
     "aditya":     dict(cmd="-156",    center="500@10",  step=24, units="au", start="2023-09-03",       end=None),
     "aditya_geo": dict(cmd="-156",    center="500@399", step=2,  units="km", start="2023-09-02 10:00", end="aditya"),
+    # Sun-Earth L1 monitors: geocentric only; the page adds Earth's position.
+    "soho_geo":   dict(cmd="-21",     center="500@399", step=12, units="km", start=APP_START,          end=None),
+    "ace_geo":    dict(cmd="-92",     center="500@399", step=12, units="km", start=APP_START,          end=None),
+    "wind_geo":   dict(cmd="-8",      center="500@399", step=12, units="km", start=APP_START,          end=None),
+    "dscovr_geo": dict(cmd="-78",     center="500@399", step=12, units="km", start="2015-02-12",       end=None),
+    "bepi":       dict(cmd="-121",    center="500@10",  step=24, units="au", start="2018-10-21",       end=None),
+    "maven":      dict(cmd="-202",    center="500@10",  step=24, units="au", start="2013-11-19",       end=None),
 }
 
 # Rows of the coverage table in README.md.
 README_ROWS = [
     ("sdo", "SDO", "-136395", "shown at Earth after its ephemeris ends (geosynchronous orbit)"),
-    ("aditya", "Aditya-L1", "-156", ""),
+    ("soho_geo", "SOHO", "-21", "Sun-Earth L1"),
+    ("aditya", "Aditya-L1", "-156", "Sun-Earth L1"),
+    ("ace_geo", "ACE", "-92", "Sun-Earth L1"),
+    ("wind_geo", "Wind", "-8", "Sun-Earth L1"),
+    ("dscovr_geo", "DSCOVR", "-78", "Sun-Earth L1"),
     ("solo", "Solar Orbiter", "-144", ""),
     ("psp", "Parker Solar Probe", "-96", ""),
     ("sta", "STEREO-A", "-234", ""),
     ("stb", "STEREO-B", "-235", "contact lost 2014-10-01; later positions are predictions"),
+    ("bepi", "BepiColombo", "-121", ""),
+    ("maven", "MAVEN", "-202", "Mars orbit"),
 ]
 
 JD_UNIX_EPOCH = 2440587.5
