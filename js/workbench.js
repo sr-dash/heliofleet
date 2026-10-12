@@ -292,7 +292,7 @@ export function initWorkbench(ctx) {
   $('cite').addEventListener('click', () => {
     const { apa, bib } = citationText();
     openSheet('Cite HelioFleet',
-      'If HelioFleet helped your research, please cite it. Metadata is also in <a href="https://github.com/sr-dash/heliofleet/blob/main/CITATION.cff">CITATION.cff</a>, which GitHub turns into a “Cite this repository” button.',
+      'If HelioFleet helped your research, please cite it. The DOI <a href="https://doi.org/10.5281/zenodo.23328187">10.5281/zenodo.23328187</a> always points to the latest version; to cite version 1.0.0 specifically, use <a href="https://doi.org/10.5281/zenodo.23328188">10.5281/zenodo.23328188</a>. The same metadata is in <a href="https://github.com/sr-dash/heliofleet/blob/main/CITATION.cff">CITATION.cff</a>.',
       [
         { heading: 'Reference', text: apa, wrap: true },
         { heading: 'BibTeX', text: bib, file: { name: 'heliofleet.bib', type: 'application/x-bibtex' } },

@@ -1,5 +1,7 @@
 # HelioFleet
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23328187.svg)](https://doi.org/10.5281/zenodo.23328187)
+
 Where the Sun-watching spacecraft are, on any date since 2010.
 
 **Live:** https://sr-dash.github.io/heliofleet
@@ -100,7 +102,11 @@ scripts/fetch_ephemeris.py
 
 ## Citing HelioFleet
 
-If HelioFleet helps your research, please cite it. GitHub's **Cite this repository** button (from [CITATION.cff](CITATION.cff)) and the **Cite HelioFleet** button on the page give APA and BibTeX references.
+If HelioFleet helps your research, please cite it:
+
+> Dash, S. (2026). *HelioFleet: an interactive map of heliophysics spacecraft positions* (Version 1.0.0) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.23328187
+
+That DOI always resolves to the latest release; [10.5281/zenodo.23328188](https://doi.org/10.5281/zenodo.23328188) is version 1.0.0 specifically. GitHub's **Cite this repository** button (from [CITATION.cff](CITATION.cff)) and the **Cite HelioFleet** button on the page give APA and BibTeX references.
 
 ## License
 

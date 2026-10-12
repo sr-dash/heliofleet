@@ -244,18 +244,20 @@ export const CITATION = {
   version: '1.0.0',
   year: 2026,
   title: 'HelioFleet: an interactive map of heliophysics spacecraft positions',
-  doi: null,
+  // Zenodo concept DOI: resolves to the latest release.
+  doi: '10.5281/zenodo.23328187',
+  versionDoi: '10.5281/zenodo.23328188',
 };
 
 export function citationText() {
   const c = CITATION;
   const doi = c.doi ? `https://doi.org/${c.doi}` : SITE;
-  const apa = `Dash, S. (${c.year}). ${c.title} (Version ${c.version}) [Computer software]. ${doi}`;
+  const apa = `Dash, S. (${c.year}). ${c.title} (Version ${c.version}) [Computer software]. ${c.doi ? 'Zenodo. ' : ''}${doi}`;
   const bib = `@software{dash_heliofleet_${c.year},
   author    = {Dash, Soumyaranjan},
   title     = {{${c.title}}},
   year      = {${c.year}},
-  version   = {${c.version}},${c.doi ? `\n  doi       = {${c.doi}},` : ''}
+  version   = {${c.version}},${c.doi ? `\n  publisher = {Zenodo},\n  doi       = {${c.doi}},` : ''}
   url       = {${SITE}},
   note      = {Ephemerides from JPL Horizons}
 }`;
