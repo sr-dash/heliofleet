@@ -1,0 +1,29 @@
+{
+  "title": "HelioFleet: an interactive map of heliophysics spacecraft positions",
+  "upload_type": "software",
+  "description": "<p>HelioFleet is a web tool that shows where heliophysics spacecraft (SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, Solar Orbiter, Parker Solar Probe, BepiColombo, STEREO-A/B and MAVEN) are relative to the Sun and Earth on any date since 2010. It reports Stonyhurst and Carrington coordinates and Parker-spiral footpoints, searches for radial alignments, quadratures and magnetic connections, checks which observers see a given point on the Sun, and exports coordinates and time series. Positions come from JPL Horizons ephemerides, refreshed monthly.</p><p>Live site: <a href=\"https://sr-dash.github.io/heliofleet/\">https://sr-dash.github.io/heliofleet/</a></p>",
+  "creators": [
+    {
+      "name": "Dash, Soumyaranjan",
+      "affiliation": "National Solar Observatory",
+      "orcid": "0000-0003-0103-6569"
+    }
+  ],
+  "license": "MIT",
+  "keywords": [
+    "heliophysics",
+    "spacecraft ephemerides",
+    "solar physics",
+    "multi-spacecraft observations",
+    "solar eclipse",
+    "space weather",
+    "JPL Horizons"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://sr-dash.github.io/heliofleet/",
+      "relation": "isDocumentedBy",
+      "resource_type": "other"
+    }
+  ]
+}

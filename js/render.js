@@ -235,13 +235,45 @@ export function drawMap(ctx, W, H, scene, s, th, view, opts = {}) {
     ctx.globalAlpha = 1;
   }
 
+  // Direction of a chosen point on the Sun (visibility tool)
+  if (scene.spot) {
+    const [dx, dy] = scene.spot.dir;
+    const len = Math.hypot(dx, dy) || 1;
+    const far = Math.hypot(W, H);
+    ctx.beginPath();
+    ctx.moveTo(ox, oy);
+    ctx.lineTo(ox + (dx / len) * far, oy - (dy / len) * far);
+    ctx.strokeStyle = th.accent;
+    ctx.lineWidth = 1.6 * k;
+    ctx.setLineDash([7 * k, 5 * k]);
+    ctx.globalAlpha = 0.85;
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
+    const lr = Math.min(W, H) * 0.12;
+    ctx.font = `600 ${11.5 * k}px ${FONT_SANS}`;
+    ctx.fillStyle = th.accent;
+    ctx.textAlign = dx >= 0 ? 'left' : 'right';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(scene.spot.label, ox + (dx / len) * lr + (dx >= 0 ? 8 : -8) * k, oy - (dy / len) * lr - 10 * k);
+  }
+
   // Sun, drawn at true size once zoomed in far enough
   drawSun(ctx, ox, oy, Math.max(R_SUN_AU * ppa, 6.5 * k), th);
 
   // Bodies, front to back so spacecraft sit over Earth
   const order = [...scene.bodies].reverse().filter((b) => !s.hidden.has(b.key));
   const labels = [];
+  const near = order.filter((b) => BODIES[b.key].near).reverse();
+  if (near.length && s.labels) {
+    const [x, y] = map(scene.bodies[0].xy);
+    labels.push({
+      text: `+ ${near.map((b) => BODIES[b.key].tag).join(' · ')}`,
+      x, y, r: 4.4 * k * 1.6, size: 11 * k, key: 'earth', group: true,
+    });
+  }
   for (const b of order) {
+    if (BODIES[b.key].near) continue;
     const [x, y] = map(b.xy);
     const r = (BODIES[b.key].kind === 'planet' && b.key !== 'earth' ? 3.6 : 4.4) * k;
     drawMarker(ctx, b.key, x, y, r, th.color[b.key], th.bg, b.st);
@@ -254,7 +286,7 @@ export function drawMap(ctx, W, H, scene, s, th, view, opts = {}) {
   }
   if (labels.length) {
     // Spacecraft first so they win the best spots, then Earth, then planets.
-    const rank = (l) => (l.planet ? 2 : l.key === 'earth' ? 1 : 0);
+    const rank = (l) => (l.planet ? 3 : l.group ? 2 : l.key === 'earth' ? 1 : 0);
     labels.sort((a, b) => rank(a) - rank(b));
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
@@ -267,12 +299,12 @@ export function drawMap(ctx, W, H, scene, s, th, view, opts = {}) {
         ctx.beginPath(); ctx.moveTo(l.x, l.y); ctx.lineTo(cx, cy);
         ctx.strokeStyle = th.color[l.key]; ctx.globalAlpha = 0.6; ctx.lineWidth = 1; ctx.stroke(); ctx.globalAlpha = 1;
       }
-      ctx.font = `${l.planet ? 400 : 600} ${l.size}px ${FONT_SANS}`;
+      ctx.font = `${l.planet || l.group ? 400 : 600} ${l.size}px ${FONT_SANS}`;
       ctx.fillStyle = th.bg;
       ctx.globalAlpha = 0.75;
       ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
       ctx.globalAlpha = 1;
-      ctx.fillStyle = l.planet ? th.muted : th.color[l.key];
+      ctx.fillStyle = l.planet || l.group ? th.muted : th.color[l.key];
       ctx.fillText(l.text, rect.x + 3, rect.y + rect.h / 2 + 0.5);
     }
   }
@@ -336,28 +368,33 @@ export function drawInset(ctx, W, H, scene, s, th, opts = {}) {
     ctx.fillText('Moon', mx + (mx > ox ? 6 : -6) * k, my);
   }
 
-  // Aditya-L1 halo track
-  const col = th.color.aditya;
-  if (!s.hidden.has('aditya') && ins.adityaPath.length > 1) {
-    const n = ins.adityaPath.length;
-    ctx.strokeStyle = col; ctx.lineWidth = 1.4 * k;
+  // L1 fleet: fading 180-day tracks, then markers and labels
+  const fleet = ins.fleet.filter((f) => !s.hidden.has(f.key));
+  for (const f of fleet) {
+    const n = f.path.length;
+    ctx.strokeStyle = th.color[f.key];
+    ctx.lineWidth = 1.2 * k;
     for (let i = 1; i < n; i++) {
-      const [x0, y0] = map(ins.adityaPath[i - 1]);
-      const [x1, y1] = map(ins.adityaPath[i]);
-      ctx.globalAlpha = 0.08 + 0.7 * (i / n);
+      const [x0, y0] = map(f.path[i - 1]);
+      const [x1, y1] = map(f.path[i]);
+      ctx.globalAlpha = 0.05 + 0.55 * (i / n);
       ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
     }
     ctx.globalAlpha = 1;
   }
-  if (!s.hidden.has('aditya') && ins.aditya) {
-    const [ax, ay] = map(ins.aditya);
-    if (ay > -10 && ay < H + 10) {
-      drawMarker(ctx, 'aditya', ax, ay, 4 * k, col, th.bg, 'ok');
-      ctx.font = `600 ${11 * k}px ${FONT_SANS}`;
-      ctx.fillStyle = col;
-      ctx.textAlign = ax > ox ? 'right' : 'left';
-      ctx.fillText('Aditya-L1', ax + (ax > ox ? -9 : 9) * k, ay - 11 * k);
-    }
+  const tags = [];
+  for (const f of fleet) {
+    const [ax, ay] = map(f.pos);
+    if (ay < -10 || ay > H + 10 || ax < -10 || ax > W + 10) continue;
+    drawMarker(ctx, f.key, ax, ay, 3.4 * k, th.color[f.key], th.bg, 'ok');
+    tags.push({ text: BODIES[f.key].tag, x: ax, y: ay, r: 5 * k, size: 10.5 * k, key: f.key });
+  }
+  ctx.font = `600 ${10.5 * k}px ${FONT_SANS}`;
+  ctx.textAlign = 'left';
+  const reserved = [{ x: lx - 6 * k, y: ly - 7 * k, w: 30 * k, h: 14 * k }];
+  for (const l of placeLabels(ctx, tags, W, H, reserved)) {
+    ctx.fillStyle = th.color[l.key];
+    ctx.fillText(l.text, l.rect.x + 3, l.rect.y + l.rect.h / 2 + 0.5);
   }
 
   // Earth (and SDO in geosynchronous orbit, far below this scale)

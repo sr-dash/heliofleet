@@ -3,6 +3,7 @@
 
 import { BODIES, SPACECRAFT, ECLIPSES, MILESTONES, SPACE_WEATHER } from './catalog.js';
 import { info } from './ephem.js';
+import { dataKeys } from './scene.js';
 
 const NS = 'http://www.w3.org/2000/svg';
 const jdOf = (iso) => Date.parse(iso) / 864e5 + 2440587.5;
@@ -22,14 +23,15 @@ export function createRibbon(svg, tip, { start, end, onScrub, onPick }) {
   let cursorLabel;
   let cursorBg;
   let current = start;
-  const H = 168;
   let LEFT = 96;
   const RIGHT = 14;
   const ROW_ECL = 18;
-  const LANE0 = 44;
-  const LANE_DY = 14;
-  const ROW_SW = LANE0 + LANE_DY * SPACECRAFT.length + 6;
-  const AXIS = H - 16;
+  const LANE0 = 42;
+  const LANE_DY = 11.5;
+  const ROW_SW = LANE0 + LANE_DY * (SPACECRAFT.length - 1) + 20;
+  const AXIS = ROW_SW + 16;
+  const H = AXIS + 16;
+  svg.style.height = `${H}px`;
 
   const x = (jd) => LEFT + ((jd - start) / (end - start)) * (W - LEFT - RIGHT);
   const jdAt = (px) => start + ((px - LEFT) / (W - LEFT - RIGHT)) * (end - start);
@@ -93,7 +95,7 @@ export function createRibbon(svg, tip, { start, end, onScrub, onPick }) {
 
     // Row labels
     const lbl = (text, yy, fill = muted) => {
-      el('text', { x: LEFT - 10, y: yy + 3.5, 'text-anchor': 'end', fill, 'font-size': 12, style: 'font-family: "Instrument Sans", sans-serif; font-weight: 500' }, svg).textContent = text;
+      el('text', { x: LEFT - 10, y: yy + 3.5, 'text-anchor': 'end', fill, 'font-size': 11.5, style: 'font-family: "Instrument Sans", sans-serif; font-weight: 500' }, svg).textContent = text;
     };
     lbl(narrow ? 'Eclipses' : 'Total eclipses', ROW_ECL);
     lbl(narrow ? 'Events' : 'Space weather', ROW_SW);
@@ -102,7 +104,7 @@ export function createRibbon(svg, tip, { start, end, onScrub, onPick }) {
     SPACECRAFT.forEach((key, i) => {
       const yy = LANE0 + i * LANE_DY;
       const b = BODIES[key];
-      const m = info(key);
+      const m = info(dataKeys(key)[0]);
       const col = `var(--c-${key})`;
       lbl(narrow ? b.tag : b.short, yy, col);
       if (!m) return;
@@ -120,7 +122,7 @@ export function createRibbon(svg, tip, { start, end, onScrub, onPick }) {
         if (s1 <= s0) continue;
         el('line', {
           x1: x(s0), x2: x(s1), y1: yy, y2: yy, stroke: col,
-          'stroke-width': dashed ? 2 : 4, 'stroke-linecap': 'round',
+          'stroke-width': dashed ? 2 : 3.5, 'stroke-linecap': 'round',
           'stroke-dasharray': dashed ? '2 4' : 'none',
           opacity: dashed ? 0.7 : 0.9,
         }, svg);
@@ -131,7 +133,7 @@ export function createRibbon(svg, tip, { start, end, onScrub, onPick }) {
       if (jdOf(mi.t) < start || jdOf(mi.t) > end + 1) continue;
       const yy = LANE0 + SPACECRAFT.indexOf(mi.body) * LANE_DY;
       const g = el('g', {}, svg);
-      el('circle', { cx: x(jdOf(mi.t)), cy: yy, r: 4.5, fill: 'var(--plot-bg)', stroke: `var(--c-${mi.body})`, 'stroke-width': 2 }, g);
+      el('circle', { cx: x(jdOf(mi.t)), cy: yy, r: 4, fill: 'var(--plot-bg)', stroke: `var(--c-${mi.body})`, 'stroke-width': 2 }, g);
       el('circle', { cx: x(jdOf(mi.t)), cy: yy, r: 9, fill: 'transparent' }, g);
       marker(g, mi.t, `<b>${mi.label}</b><span>${fmt(mi.t)}</span>`);
     }

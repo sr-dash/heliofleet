@@ -13,7 +13,7 @@
     gtag('config', 'G-8X5BSNF3VV');
   </script>
 
-  <meta name="description" content="Interactive map of where SDO, Aditya-L1, Solar Orbiter, Parker Solar Probe and STEREO are relative to the Sun and Earth on any date since 2010, with total solar eclipse presets, heliographic coordinates and PNG/PDF snapshots. Built from JPL Horizons ephemerides.">
+  <meta name="description" content="Interactive map of SDO, SOHO, Aditya-L1, Solar Orbiter, Parker Solar Probe, STEREO, BepiColombo and more around the Sun and Earth on any date since 2010. Eclipse presets, alignment search, spot visibility, coordinate export and PNG/PDF snapshots from JPL Horizons ephemerides.">
   <meta name="keywords" content="HelioFleet, spacecraft positions, where is STEREO, Parker Solar Probe location, Solar Orbiter location, Aditya-L1, SDO, heliophysics, solar eclipse, Stonyhurst coordinates, Carrington longitude, Parker spiral, JPL Horizons, heliospheric orbit map">
   <meta name="author" content="Soumyaranjan Dash">
   <meta name="robots" content="index, follow, max-image-preview:large">
@@ -41,7 +41,7 @@
   <meta property="og:site_name" content="Soumyaranjan Dash Portfolio">
   <meta property="og:locale" content="en_US">
   <meta property="og:title" content="HelioFleet: where the Sun-watching spacecraft are">
-  <meta property="og:description" content="SDO, Aditya-L1, Solar Orbiter, Parker Solar Probe and STEREO around the Sun and Earth on any date since 2010, with every total solar eclipse since 2010 as a preset.">
+  <meta property="og:description" content="SDO, SOHO, Aditya-L1, Solar Orbiter, Parker, STEREO, BepiColombo and more around the Sun and Earth on any date since 2010, with eclipse presets and alignment search.">
   <meta property="og:url" content="https://sr-dash.github.io/heliofleet/">
   <meta property="og:image" content="https://sr-dash.github.io/heliofleet/assets/og-image.png">
   <meta property="og:image:secure_url" content="https://sr-dash.github.io/heliofleet/assets/og-image.png">
@@ -54,7 +54,7 @@
   <meta name="twitter:site" content="@soumyatheory">
   <meta name="twitter:creator" content="@soumyatheory">
   <meta name="twitter:title" content="HelioFleet: where the Sun-watching spacecraft are">
-  <meta name="twitter:description" content="SDO, Aditya-L1, Solar Orbiter, Parker Solar Probe and STEREO around the Sun and Earth on any date since 2010.">
+  <meta name="twitter:description" content="SDO, SOHO, Aditya-L1, Solar Orbiter, Parker, STEREO, BepiColombo and more around the Sun and Earth on any date since 2010.">
   <meta name="twitter:image" content="https://sr-dash.github.io/heliofleet/assets/og-image.png">
   <meta name="twitter:image:alt" content="HelioFleet map of spacecraft around the Sun during the 8 April 2024 total solar eclipse">
 
@@ -97,7 +97,7 @@
         "name": "HelioFleet",
         "alternateName": "HelioFleet spacecraft position map",
         "url": "https://sr-dash.github.io/heliofleet/",
-        "description": "Interactive map of where SDO, Aditya-L1, Solar Orbiter, Parker Solar Probe and STEREO are relative to the Sun and Earth on any date since 2010, with total solar eclipse presets, heliographic coordinates and PNG/PDF snapshots.",
+        "description": "Interactive map of SDO, SOHO, Aditya-L1, Solar Orbiter, Parker Solar Probe, STEREO, BepiColombo and more around the Sun and Earth on any date since 2010. Eclipse presets, alignment search, spot visibility, coordinate export and PNG/PDF snapshots from JPL Horizons ephemerides.",
         "applicationCategory": "EducationalApplication",
         "applicationSubCategory": "Heliophysics visualization",
         "operatingSystem": "Any (web browser)",
@@ -108,13 +108,16 @@
         "datePublished": "2026-10-09",
         "image": "https://sr-dash.github.io/heliofleet/assets/og-image.png",
         "screenshot": "https://sr-dash.github.io/heliofleet/assets/og-image.png",
-        "keywords": "spacecraft positions, heliophysics, solar eclipse, STEREO, Parker Solar Probe, Solar Orbiter, Aditya-L1, SDO, Carrington longitude, Parker spiral",
+        "keywords": "spacecraft positions, heliophysics, solar eclipse, multi-spacecraft alignment, quadrature, magnetic connectivity, STEREO, Parker Solar Probe, Solar Orbiter, Aditya-L1, SDO, SOHO, BepiColombo, Carrington longitude, Parker spiral",
         "featureList": [
           "Spacecraft positions for any UTC date since 2010, extended monthly as new ephemerides appear",
           "Earth-fixed (HEE) and inertial ecliptic frames, top and edge-on views",
           "Presets for every total and hybrid solar eclipse since 2010",
           "Stonyhurst and Carrington coordinates with Parker-spiral footpoints",
-          "Near-Earth inset with the L1 point and Aditya-L1 halo orbit",
+          "Near-Earth inset with the L1 point and the SOHO, Aditya-L1, ACE, Wind and DSCOVR orbits",
+          "Search for radial alignments, quadratures and magnetic connections between spacecraft",
+          "Visibility of any Carrington or Stonyhurst location from every observer",
+          "CSV and JSON export of coordinates and time series, with SunPy cross-check code",
           "PNG and PDF snapshot export"
         ],
         "isBasedOn": {
@@ -134,7 +137,7 @@
         "@id": "https://sr-dash.github.io/heliofleet/#page",
         "url": "https://sr-dash.github.io/heliofleet/",
         "name": "HelioFleet: Spacecraft Positions Around the Sun and Earth",
-        "description": "Interactive map of where SDO, Aditya-L1, Solar Orbiter, Parker Solar Probe and STEREO are relative to the Sun and Earth on any date since 2010.",
+        "description": "Interactive map of SDO, SOHO, Aditya-L1, Solar Orbiter, Parker Solar Probe, STEREO, BepiColombo and more around the Sun and Earth on any date since 2010.",
         "inLanguage": "en",
         "primaryImageOfPage": "https://sr-dash.github.io/heliofleet/assets/og-image.png",
         "mainEntity": { "@id": "https://sr-dash.github.io/heliofleet/#app" },
@@ -284,6 +287,7 @@
           <button id="dl-pdf" class="btn-primary">Download PDF</button>
         </div>
         <button id="copy-link" class="btn-ghost wide">Copy link to this moment</button>
+        <button id="cite" class="btn-ghost wide">Cite HelioFleet</button>
       </section>
     </aside>
 
@@ -305,29 +309,108 @@
       <ul class="legend" id="legend" aria-label="Show or hide bodies"></ul>
     </section>
 
-    <section class="readout" aria-label="Coordinates">
-      <div class="readout-head">
-        <h2 class="panel-title">Coordinates</h2>
-        <p class="readout-note">Stonyhurst heliographic (HGS) and Carrington longitudes as seen from Earth. Footpoint is where a nominal Parker spiral at the chosen wind speed meets the Sun.</p>
+    <section class="readout workbench" aria-label="Research tools">
+      <div class="wb-tabs" role="tablist" aria-label="Research tools">
+        <button role="tab" id="tab-coords" aria-controls="panel-coords" aria-selected="true">Coordinates</button>
+        <button role="tab" id="tab-align" aria-controls="panel-align" aria-selected="false" tabindex="-1">Find alignments</button>
+        <button role="tab" id="tab-vis" aria-controls="panel-vis" aria-selected="false" tabindex="-1">Who sees this spot</button>
+        <button role="tab" id="tab-series" aria-controls="panel-series" aria-selected="false" tabindex="-1">Export data</button>
       </div>
-      <div class="table-wrap">
-        <table id="table">
-          <thead>
-            <tr>
-              <th scope="col">Body</th>
-              <th scope="col" title="Distance from Sun centre">r <small>au</small></th>
-              <th scope="col" title="Stonyhurst longitude; positive is west of the Earth–Sun line">HGS lon</th>
-              <th scope="col" title="Stonyhurst latitude">HGS lat</th>
-              <th scope="col" title="Carrington longitude">Carr. lon</th>
-              <th scope="col" title="Sun-centred angle between the body and Earth">∠ Earth</th>
-              <th scope="col" title="Distance from Earth">to Earth <small>au</small></th>
-              <th scope="col" title="Stonyhurst longitude of the Parker-spiral footpoint">Footpoint</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+
+      <div class="wb-panel" role="tabpanel" id="panel-coords" aria-labelledby="tab-coords">
+        <div class="readout-head">
+          <p class="readout-note">Stonyhurst heliographic (HGS) and Carrington longitudes as seen from Earth. Footpoint is where a nominal Parker spiral at the chosen wind speed meets the Sun.</p>
+          <div class="wb-actions">
+            <button class="btn-ghost" id="coords-csv">CSV</button>
+            <button class="btn-ghost" id="coords-json">JSON</button>
+            <button class="btn-ghost" id="coords-sunpy">SunPy code</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="table">
+            <thead>
+              <tr>
+                <th scope="col">Body</th>
+                <th scope="col" title="Distance from Sun centre">r <small>au</small></th>
+                <th scope="col" title="Stonyhurst longitude; positive is west of the Earth–Sun line">HGS lon</th>
+                <th scope="col" title="Stonyhurst latitude">HGS lat</th>
+                <th scope="col" title="Carrington longitude">Carr. lon</th>
+                <th scope="col" title="Sun-centred angle between the body and Earth">∠ Earth</th>
+                <th scope="col" title="Distance from Earth">to Earth <small>au</small></th>
+                <th scope="col" title="Stonyhurst longitude of the Parker-spiral footpoint">Footpoint</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="absent" id="absent"></p>
       </div>
-      <p class="absent" id="absent"></p>
+
+      <div class="wb-panel" role="tabpanel" id="panel-align" aria-labelledby="tab-align" hidden>
+        <form class="tool-form" id="align-form">
+          <label class="field"><span class="field-label">Search for</span>
+            <select id="align-kind"></select></label>
+          <label class="field"><span class="field-label">Spacecraft</span>
+            <select id="align-a"></select></label>
+          <label class="field" id="align-b-field"><span class="field-label">and</span>
+            <select id="align-b"></select></label>
+          <label class="field"><span class="field-label">Tolerance (°)</span>
+            <input type="number" id="align-tol" min="0.5" max="45" step="0.5" value="5"></label>
+          <label class="field"><span class="field-label">From</span>
+            <input type="date" id="align-from"></label>
+          <label class="field"><span class="field-label">To</span>
+            <input type="date" id="align-to"></label>
+          <button type="submit" class="btn-primary" id="align-go">Search</button>
+        </form>
+        <p class="tool-help" id="align-help"></p>
+        <div class="tool-result" id="align-result" aria-live="polite"></div>
+      </div>
+
+      <div class="wb-panel" role="tabpanel" id="panel-vis" aria-labelledby="tab-vis" hidden>
+        <form class="tool-form" id="vis-form">
+          <label class="field"><span class="field-label">Coordinates</span>
+            <select id="vis-sys">
+              <option value="carrington">Carrington</option>
+              <option value="stonyhurst">Stonyhurst</option>
+            </select></label>
+          <label class="field"><span class="field-label">Longitude (°)</span>
+            <input type="number" id="vis-lon" step="0.1" value="0" required></label>
+          <label class="field"><span class="field-label">Latitude (°)</span>
+            <input type="number" id="vis-lat" min="-90" max="90" step="0.1" value="0" required></label>
+          <label class="toggle inline"><input type="checkbox" id="vis-map" checked><span>Mark on map</span></label>
+          <button type="submit" class="btn-primary">Check</button>
+          <button type="button" class="btn-ghost" id="vis-clear">Clear</button>
+        </form>
+        <p class="tool-help">Enter an active region, flare site or filament. The table shows how far it sits from disk centre for each observer at the current moment and updates as you move in time. The angle is measured from the local vertical, so 0° is disk centre and 90° is the limb. Loops and CMEs well above the surface stay visible a little beyond 90°.</p>
+        <div class="tool-result" id="vis-result" aria-live="polite"></div>
+      </div>
+
+      <div class="wb-panel" role="tabpanel" id="panel-series" aria-labelledby="tab-series" hidden>
+        <form class="tool-form" id="series-form">
+          <label class="field"><span class="field-label">From</span>
+            <input type="date" id="series-from" required></label>
+          <label class="field"><span class="field-label">To</span>
+            <input type="date" id="series-to" required></label>
+          <label class="field"><span class="field-label">Every</span>
+            <select id="series-step">
+              <option value="0.0416666667">1 hour</option>
+              <option value="0.25">6 hours</option>
+              <option value="1" selected>1 day</option>
+              <option value="7">1 week</option>
+            </select></label>
+          <label class="field"><span class="field-label">Format</span>
+            <select id="series-format">
+              <option value="csv">CSV</option>
+              <option value="json">JSON</option>
+            </select></label>
+          <button type="submit" class="btn-primary">Download</button>
+        </form>
+        <fieldset class="series-bodies">
+          <legend class="field-label">Bodies</legend>
+          <div id="series-bodies"></div>
+        </fieldset>
+        <p class="tool-help" id="series-help">Each row gives the heliocentric ecliptic J2000 position, Stonyhurst and Carrington coordinates, separation from Earth and the Parker-spiral footpoint at the current wind speed. Column definitions are written at the top of the file.</p>
+      </div>
     </section>
   </main>
 
@@ -337,8 +420,17 @@
   </footer>
 
   <noscript>
-    <p class="noscript">HelioFleet needs JavaScript to draw the map. It shows where SDO, Aditya-L1, Solar Orbiter, Parker Solar Probe, STEREO-A and STEREO-B are relative to the Sun and Earth for any date since 2010, using JPL Horizons ephemerides. See the <a href="https://github.com/sr-dash/heliofleet">source on GitHub</a> or <a href="https://sr-dash.github.io/">Soumyaranjan Dash's homepage</a>.</p>
+    <p class="noscript">HelioFleet needs JavaScript to draw the map. It shows where SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, Solar Orbiter, Parker Solar Probe, BepiColombo, STEREO-A, STEREO-B and MAVEN are relative to the Sun and Earth for any date since 2010, using JPL Horizons ephemerides. See the <a href="https://github.com/sr-dash/heliofleet">source on GitHub</a> or <a href="https://sr-dash.github.io/">Soumyaranjan Dash's homepage</a>.</p>
   </noscript>
+
+  <dialog class="sheet" id="sheet" aria-labelledby="sheet-title">
+    <div class="sheet-head">
+      <h2 id="sheet-title"></h2>
+      <button class="btn-ghost" id="sheet-close" aria-label="Close">✕</button>
+    </div>
+    <p class="sheet-note" id="sheet-note"></p>
+    <div id="sheet-body"></div>
+  </dialog>
 
   <div class="toast" id="toast" role="status" hidden></div>
 

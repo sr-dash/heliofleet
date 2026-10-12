@@ -57,6 +57,31 @@ export function heliographic(r, e, jd) {
   return { dist, lat, lon: wrap180(lon), carr };
 }
 
+// Outward unit normal (ecliptic frame) of the solar surface point at heliographic
+// lon/lat in degrees. system: 'carrington' or 'stonyhurst'.
+export function surfaceNormal(lon, lat, system, e, jd) {
+  let x;
+  let y;
+  if (system === 'carrington') {
+    [x, y] = primeMeridian(jd - (norm(e) * AU_KM) / C_KM_S / 86400);
+  } else {
+    x = unit(sub(e, scale(POLE, dot(e, POLE))));
+    y = cross(POLE, x);
+  }
+  const cl = Math.cos(lat * D);
+  const sl = Math.sin(lat * D);
+  const co = Math.cos(lon * D);
+  const so = Math.sin(lon * D);
+  return [0, 1, 2].map((i) => cl * co * x[i] + cl * so * y[i] + sl * POLE[i]);
+}
+
+// Angle (deg) between the local vertical at surface point n and the line of
+// sight to an observer at obs (au). Below 90° the point faces the observer.
+export function viewAngle(n, obs) {
+  const d = sub(obs, scale(n, R_SUN_AU));
+  return Math.acos(Math.max(-1, Math.min(1, dot(n, d) / norm(d)))) / D;
+}
+
 // Stonyhurst longitude of the Parker-spiral footpoint of a body at radius r
 // (au) for solar-wind speed v (km/s).
 export function footpointLon(lon, r, v) {

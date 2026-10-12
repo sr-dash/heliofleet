@@ -5,13 +5,28 @@ import { drawMap, drawInset } from './render.js';
 import { BODIES } from './catalog.js';
 
 const W = 1200;
-const H = 760;
+const H = 820;
 const SCALE = 2;
 const MONO = '"IBM Plex Mono", monospace';
 const SANS = '"Instrument Sans", sans-serif';
 const DISPLAY = '"Big Shoulders Display", sans-serif';
 
 const deg = (v, signed = true) => `${signed && v >= 0 ? '+' : ''}${v.toFixed(1)}°`;
+
+// Draw text wrapped to width; returns the y after the last line.
+function wrapText(ctx, text, x, y, width, lh) {
+  let line = '';
+  for (const word of text.split(' ')) {
+    const test = line ? `${line} ${word}` : word;
+    if (ctx.measureText(test).width > width && line) {
+      ctx.fillText(line, x, y);
+      line = word;
+      y += lh;
+    } else line = test;
+  }
+  if (line) { ctx.fillText(line, x, y); y += lh; }
+  return y;
+}
 
 export async function composeSnapshot(scene, s, th, view, meta) {
   await document.fonts.ready;
@@ -77,21 +92,33 @@ export async function composeSnapshot(scene, s, th, view, meta) {
   ctx.font = `600 10px ${SANS}`;
   ctx.fillText('NEAR EARTH · SUN UP', X + CW - IW + 8, y + IH + 14);
 
-  // Legend beside the inset
+  // Legend beside the inset: deep-space fleet one per line, the near-Earth
+  // group as one entry (they share Earth's spot on the map)
   let ly = y + 8;
-  ctx.font = `600 13px ${SANS}`;
-  for (const b of scene.bodies) {
-    if (s.hidden.has(b.key)) continue;
-    const kind = BODIES[b.key].kind;
-    ctx.fillStyle = th.color[b.key];
+  const LW = CW - IW - 16;
+  const visible = scene.bodies.filter((b) => !s.hidden.has(b.key) && !(BODIES[b.key].kind === 'planet' && b.key !== 'earth'));
+  const near = visible.filter((b) => BODIES[b.key].near);
+  const mark = (key, yy) => {
+    ctx.fillStyle = th.color[key];
     ctx.save();
-    ctx.translate(X + 6, ly);
-    if (kind === 'sc') { ctx.rotate(Math.PI / 4); ctx.fillRect(-4, -4, 8, 8); }
+    ctx.translate(X + 6, yy);
+    if (BODIES[key].kind === 'sc') { ctx.rotate(Math.PI / 4); ctx.fillRect(-4, -4, 8, 8); }
     else { ctx.beginPath(); ctx.arc(0, 0, 4.5, 0, 2 * Math.PI); ctx.fill(); }
     ctx.restore();
+  };
+  ctx.font = `600 13px ${SANS}`;
+  for (const b of visible) {
+    if (BODIES[b.key].near) continue;
+    mark(b.key, ly);
     ctx.fillStyle = th.ink;
-    ctx.fillText(BODIES[b.key].name, X + 18, ly + 4.5);
-    ly += 20;
+    ctx.fillText(BODIES[b.key].name, X + 18, ly + 4.5, LW - 18);
+    ly += 19;
+    if (b.key === 'earth' && near.length) {
+      ctx.font = `400 12px ${SANS}`;
+      ctx.fillStyle = th.muted;
+      ly = wrapText(ctx, `with ${near.map((n) => BODIES[n.key].short).join(', ')}`, X + 18, ly + 2, LW - 18, 15) + 4;
+      ctx.font = `600 13px ${SANS}`;
+    }
   }
 
   // Coordinate table
@@ -124,11 +151,11 @@ export async function composeSnapshot(scene, s, th, view, meta) {
     row.forEach((v, i) => {
       const [, f, a] = cols[i];
       ctx.textAlign = a;
-      ctx.font = i ? `400 12.5px ${MONO}` : `600 13px ${SANS}`;
+      ctx.font = i ? `400 12px ${MONO}` : `600 12.5px ${SANS}`;
       ctx.fillStyle = i ? th.ink : th.color[b.key];
       ctx.fillText(v, X + f * CW, y);
     });
-    y += 21;
+    y += 18;
   }
   ctx.textAlign = 'left';
   ctx.fillStyle = th.muted;
@@ -137,7 +164,7 @@ export async function composeSnapshot(scene, s, th, view, meta) {
     ctx.fillText('* STEREO-B: contact lost 2014-10-01; position is a prediction.', X, y + 2);
     y += 16;
   }
-  if (meta.absent) ctx.fillText(meta.absent, X, y + 2, CW);
+  if (meta.absent) wrapText(ctx, meta.absent, X, y + 2, CW, 14);
 
   ctx.fillText(`Ephemerides: JPL Horizons${meta.stamp ? ` (${meta.stamp.replace('Ephemerides ', '')})` : ''} · HGS/Carrington from Earth`, X, H - 38, CW);
   ctx.fillText('sr-dash.github.io/heliofleet', X, H - 22);

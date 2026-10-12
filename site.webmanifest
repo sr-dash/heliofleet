@@ -1,7 +1,7 @@
 {
   "name": "HelioFleet: Spacecraft Positions Around the Sun",
   "short_name": "HelioFleet",
-  "description": "Where SDO, Aditya-L1, Solar Orbiter, Parker Solar Probe and STEREO are relative to the Sun and Earth on any date since 2010.",
+  "description": "Where SDO, SOHO, Aditya-L1, Solar Orbiter, Parker Solar Probe, STEREO, BepiColombo and more are relative to the Sun and Earth on any date since 2010.",
   "id": "/heliofleet/",
   "start_url": "/heliofleet/",
   "scope": "/heliofleet/",

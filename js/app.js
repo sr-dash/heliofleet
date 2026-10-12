@@ -4,6 +4,7 @@ import { drawMap, drawInset, readTheme, mapGeometry } from './render.js';
 import { createRibbon } from './ribbon.js';
 import { composeSnapshot, downloadPNG, downloadPDF } from './export.js';
 import { BODIES, SPACECRAFT, PLANETS, PRESET_GROUPS } from './catalog.js';
+import { initWorkbench } from './workbench.js';
 
 const $ = (id) => document.getElementById(id);
 const jdOf = (iso) => Date.parse(iso) / 864e5 + 2440587.5;
@@ -22,6 +23,8 @@ const S = {
   spirals: false,
   wind: 400,
   hidden: new Set(),
+  spot: null,
+  spotOnMap: true,
 };
 let RANGE = [jdOf('2010-01-01T00:00Z'), jdOf('2030-01-01T00:00Z')];
 let STAMP = '';
@@ -29,6 +32,7 @@ const inRange = (iso) => jdOf(iso) >= RANGE[0] && jdOf(iso) <= RANGE[1] + 1;
 let theme;
 let scene = null;
 let ribbon;
+let bench;
 
 // ---------- URL state ----------
 function readURL() {
@@ -49,6 +53,16 @@ function readURL() {
   if (q.has('planets')) S.planets = q.get('planets') !== '0';
   if (q.has('spirals')) S.spirals = q.get('spirals') === '1';
   if (q.has('hide')) q.get('hide').split(',').filter((k) => BODIES[k]).forEach((k) => S.hidden.add(k));
+  // spot=c,LON,LAT (Carrington) or s,LON,LAT (Stonyhurst); a trailing ,0 hides it on the map
+  const sp = (q.get('spot') || '').split(',');
+  if (['c', 's'].includes(sp[0]) && sp.length >= 3) {
+    const lon = parseFloat(sp[1]);
+    const lat = parseFloat(sp[2]);
+    if (Number.isFinite(lon) && Number.isFinite(lat) && Math.abs(lat) <= 90) {
+      S.spot = { sys: sp[0] === 'c' ? 'carrington' : 'stonyhurst', lon, lat };
+      S.spotOnMap = sp[3] !== '0';
+    }
+  }
 }
 
 let urlTimer;
@@ -65,6 +79,7 @@ function writeURL() {
     if (S.spirals) q.set('spirals', '1');
     if (S.wind !== 400) q.set('wind', S.wind);
     if (S.hidden.size) q.set('hide', [...S.hidden].join(','));
+    if (S.spot) q.set('spot', [S.spot.sys[0], S.spot.lon, S.spot.lat, ...(S.spotOnMap ? [] : [0])].join(','));
     history.replaceState(null, '', `?${q}`);
   }, 250);
 }
@@ -110,6 +125,7 @@ async function update({ fromInput = false } = {}) {
   $('loading').hidden = !!scene;
   paint();
   renderTable();
+  bench?.refresh();
 }
 
 // ---------- clock & context ----------
@@ -491,8 +507,16 @@ async function main() {
       toast('Copy the address bar to share this moment');
     }
   });
+  bench = initWorkbench({
+    S,
+    toast,
+    scene: () => scene,
+    range: () => RANGE,
+    jump: (jd) => { stopPlay(); S.jd = jd; update(); },
+    redraw: () => update(),
+  });
   document.addEventListener('keydown', (ev) => {
-    if (ev.target.closest('input, select, textarea, #ribbon')) return;
+    if (bench.isOpen() || ev.target.closest('input, select, textarea, #ribbon, [role="tab"]')) return;
     if (ev.key === ' ') { ev.preventDefault(); playing ? stopPlay() : startPlay(); return; }
     const d = { ArrowLeft: -1, ArrowRight: 1 }[ev.key];
     if (!d) return;

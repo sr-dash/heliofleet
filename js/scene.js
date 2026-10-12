@@ -4,29 +4,59 @@
 import { position, covers, info } from './ephem.js';
 import {
   heliographic, footpointLon, parkerSpiral, angleBetween, eclipticLon,
-  toFrame, project, norm,
+  toFrame, project, norm, surfaceNormal, AU_KM,
 } from './frames.js';
-import { BODIES, SPACECRAFT, PLANETS } from './catalog.js';
+import { BODIES, SPACECRAFT, PLANETS, L1_FLEET } from './catalog.js';
 
 const jdOf = (iso) => Date.parse(iso) / 864e5 + 2440587.5;
 const L1_KM = 1.4915e6;
 
+// Ephemeris series a body's heliocentric position is built from.
+export function dataKeys(key) {
+  const b = BODIES[key];
+  return b?.derived ? [b.geoKey, 'earth'] : [key];
+}
+
+export function coversBody(key, t) {
+  const b = BODIES[key];
+  return covers(b?.derived ? b.geoKey : key, t);
+}
+
+// Heliocentric ecliptic position (au) of any body, or null.
+export function helioPosition(key, t) {
+  const b = BODIES[key];
+  if (!b?.derived) return position(key, t);
+  const g = position(b.geoKey, t);
+  const e = position('earth', t);
+  return g && e ? [e[0] + g[0] / AU_KM, e[1] + g[1] / AU_KM, e[2] + g[2] / AU_KM] : null;
+}
+
 // Ephemeris ranges a scene needs, so the caller can load them first.
 export function needs(jd, s) {
   const out = [['earth', jd - Math.max(s.trailDays, 366), jd + s.trailDays]];
-  for (const k of SPACECRAFT) out.push([k, jd - s.trailDays, jd + s.trailDays]);
+  for (const k of SPACECRAFT) for (const d of dataKeys(k)) out.push([d, jd - s.trailDays, jd + s.trailDays]);
   if (s.planets) for (const k of PLANETS) out.push([k, jd - BODIES[k].period - 2, jd]);
-  out.push(['moon_geo', jd - 30, jd], ['aditya_geo', jd - 200, jd]);
+  out.push(['moon_geo', jd - 30, jd]);
+  for (const k of L1_FLEET) out.push([BODIES[k].geoKey, jd - 200, jd]);
   return out;
 }
 
-function status(key, jd, p) {
+export function status(key, jd, p) {
   const b = BODIES[key];
   if (b.launch && jd < jdOf(b.launch)) return 'prelaunch';
   if (b.ended && jd > jdOf(b.ended)) return 'ended';
   if (!p) return b.fallback ? 'approx' : 'nodata';
   if (b.lost && jd > jdOf(b.lost)) return 'lost';
   return 'ok';
+}
+
+// Position and status of a spacecraft at jd, applying the fallbacks the map
+// uses (SDO at Earth past its ephemeris). Null when it is not on the map.
+export function spacecraftAt(key, jd, earth) {
+  const p = helioPosition(key, jd);
+  const st = status(key, jd, p);
+  if (st === 'prelaunch' || st === 'ended' || st === 'nodata') return { st, p: null };
+  return { st, p: st === 'approx' ? earth : p };
 }
 
 export function buildScene(jd, s) {
@@ -53,13 +83,11 @@ export function buildScene(jd, s) {
   add('earth', earth, 'ok');
   const missing = [];
   for (const key of SPACECRAFT) {
-    let p = position(key, jd);
-    const st = status(key, jd, p);
-    if (st === 'prelaunch' || st === 'ended' || st === 'nodata') {
+    const { st, p } = spacecraftAt(key, jd, earth);
+    if (!p) {
       missing.push({ key, st });
       continue;
     }
-    if (st === 'approx') p = earth;
     add(key, p, st);
   }
   if (s.planets) {
@@ -71,16 +99,18 @@ export function buildScene(jd, s) {
 
   // Trails follow the true path in the chosen frame, so in the Earth-fixed
   // frame each sample is rotated by Earth's longitude at that sample time.
+  // Near-Earth spacecraft would only retrace Earth's own path, so they skip.
   const trails = {};
   if (s.trailDays > 0) {
     for (const b of bodies) {
-      if (BODIES[b.key].kind !== 'sc' || b.st === 'approx') continue;
+      const meta = BODIES[b.key];
+      if (meta.kind !== 'sc' || meta.near || b.st === 'approx') continue;
       const h = Math.min(info(b.key).step, s.trailDays / 160);
       const past = [];
       const future = [];
       for (let t = jd - s.trailDays; t <= jd + s.trailDays + 1e-9; t += h) {
-        if (!covers(b.key, t)) continue;
-        const p = position(b.key, t);
+        if (!coversBody(b.key, t)) continue;
+        const p = helioPosition(b.key, t);
         const lon = s.frame === 'hee' ? earthLonAt(t) : eLon;
         if (!p || lon === null) continue;
         (t <= jd ? past : future).push(xy(p, lon));
@@ -108,13 +138,26 @@ export function buildScene(jd, s) {
   const spirals = {};
   if (s.spirals && s.view === 'top') {
     for (const b of bodies) {
-      if (BODIES[b.key].kind === 'planet' && b.key !== 'earth') continue;
-      if (b.key === 'sdo') continue;
+      const meta = BODIES[b.key];
+      if (meta.kind === 'planet' && b.key !== 'earth') continue;
+      if (meta.near) continue;
       spirals[b.key] = parkerSpiral(b.p, s.wind).map((p) => xy(p));
     }
   }
 
-  return { jd, earth, bodies, missing, trails, orbits, spirals, inset: buildInset(jd, eLon, earthLonAt) };
+  // A point on the Sun chosen in the visibility tool, as a direction.
+  let spot = null;
+  if (s.spot && s.spotOnMap) {
+    const n = surfaceNormal(s.spot.lon, s.spot.lat, s.spot.sys, earth, jd);
+    const sys = s.spot.sys === 'carrington' ? 'Carrington' : 'Stonyhurst';
+    const lat = `${s.spot.lat >= 0 ? '+' : '−'}${Math.abs(s.spot.lat)}°`;
+    spot = { dir: xy(n), label: `Spot · ${sys} ${s.spot.lon}°, ${lat}` };
+  }
+
+  return {
+    jd, earth, bodies, missing, trails, orbits, spirals, spot,
+    inset: buildInset(jd, eLon, earthLonAt),
+  };
 }
 
 // Near-Earth view in a GSE-like frame: Sun straight up, Earth's direction of
@@ -131,14 +174,20 @@ function buildInset(jd, eLon, earthLonAt) {
     return pts;
   };
   const moon = position('moon_geo', jd);
-  const adi = position('aditya_geo', jd);
-  const adiOk = adi && jd >= jdOf(BODIES.aditya.launch);
+  const fleet = [];
+  for (const key of L1_FLEET) {
+    const b = BODIES[key];
+    if (jd < jdOf(b.launch)) continue;
+    const g = position(b.geoKey, jd);
+    if (!g) continue;
+    const step = Math.max(info(b.geoKey)?.step ?? 0.5, 1 / 6);
+    fleet.push({ key, pos: gse(g, eLon), path: path(b.geoKey, 180, step) });
+  }
   return {
     l1: [0, L1_KM],
     moon: moon ? gse(moon, eLon) : null,
     moonPath: path('moon_geo', 27.3, 0.25),
-    aditya: adiOk ? gse(adi, eLon) : null,
-    adityaPath: adiOk ? path('aditya_geo', 180, 1 / 6) : [],
+    fleet,
     sdo: jd >= jdOf(BODIES.sdo.launch),
   };
 }
