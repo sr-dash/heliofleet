@@ -342,6 +342,12 @@
       <div class="map-wrap" id="map-wrap">
         <canvas id="map" aria-label="Map of spacecraft positions around the Sun"></canvas>
         <p class="hud" id="hud"></p>
+        <div class="spot-chip" id="spot-chip" hidden>
+          <span class="spot-arrow" aria-hidden="true">➜</span>
+          <span id="spot-text"></span>
+          <button type="button" id="spot-edit">Edit</button>
+          <button type="button" id="spot-clear" aria-label="Remove the marked spot">✕</button>
+        </div>
         <figure class="inset">
           <figcaption>Near Earth<span class="cap-extra"> · Sun up</span></figcaption>
           <canvas id="inset" aria-label="Earth, Moon, L1 and Aditya-L1"></canvas>

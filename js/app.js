@@ -148,7 +148,16 @@ async function update({ fromInput = false } = {}) {
   $('loading').hidden = !!scene;
   paint();
   renderTable();
+  renderSpotChip();
   bench?.refresh();
+}
+
+// A marked point on the Sun is shown only when someone chose it; the chip
+// says what it is and removes it.
+function renderSpotChip() {
+  const chip = $('spot-chip');
+  chip.hidden = !(S.spot && S.spotOnMap && scene?.spot);
+  if (!chip.hidden) $('spot-text').textContent = scene.spot.label;
 }
 
 // ---------- clock & context ----------
@@ -810,6 +819,8 @@ async function main() {
         { heading: tr('Light theme'), text: tag('&theme=plate'), wrap: true },
       ]);
   });
+  $('spot-edit').addEventListener('click', () => bench.showSpotTool());
+  $('spot-clear').addEventListener('click', () => { bench.clearSpot(); update(); });
   document.addEventListener('keydown', (ev) => {
     if (bench.isOpen() || ev.target.closest('input, select, textarea, #ribbon, [role="tab"]')) return;
     if (ev.key === ' ') { ev.preventDefault(); playing ? stopPlay() : startPlay(); return; }

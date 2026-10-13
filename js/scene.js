@@ -153,7 +153,7 @@ export function buildScene(jd, s) {
     const n = surfaceNormal(s.spot.lon, s.spot.lat, s.spot.sys, earth, jd);
     const sys = tr(s.spot.sys === 'carrington' ? 'Carrington' : 'Stonyhurst');
     const lat = `${s.spot.lat >= 0 ? '+' : '−'}${Math.abs(s.spot.lat)}°`;
-    spot = { dir: xy(n), label: tr('Spot · {sys} {lon}°, {lat}', { sys, lon: s.spot.lon, lat }) };
+    spot = { dir: xy(n), short: tr('Spot'), label: tr('Spot · {sys} {lon}°, {lat}', { sys, lon: s.spot.lon, lat }) };
   }
 
   // CME fronts from DONKI cone-model fits, moved out at constant speed and

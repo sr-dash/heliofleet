@@ -261,31 +261,36 @@ export function drawMap(ctx, W, H, scene, s, th, view, opts = {}) {
     ctx.globalAlpha = 1;
   }
 
-  // Direction of a chosen point on the Sun (visibility tool)
+  // Sun, drawn at true size once zoomed in far enough
+  drawSun(ctx, ox, oy, Math.max(R_SUN_AU * ppa, 6.5 * k), th);
+
+  // A point chosen on the Sun (visibility tool or a flare): a short arrow out
+  // from the limb, so it cannot be mistaken for a line across the heliosphere.
   if (scene.spot) {
     const [dx, dy] = scene.spot.dir;
     const len = Math.hypot(dx, dy) || 1;
-    const far = Math.hypot(W, H);
-    ctx.beginPath();
-    ctx.moveTo(ox, oy);
-    ctx.lineTo(ox + (dx / len) * far, oy - (dy / len) * far);
+    const ux = dx / len;
+    const uy = -dy / len;
+    const r0 = Math.max(R_SUN_AU * ppa, 6.5 * k) + 3 * k;
+    const r1 = r0 + Math.min(Math.max(0.12 * Math.min(W, H), 38 * k), 110 * k);
+    const [x0, y0] = [ox + ux * r0, oy + uy * r0];
+    const [x1, y1] = [ox + ux * r1, oy + uy * r1];
     ctx.strokeStyle = th.accent;
-    ctx.lineWidth = 1.6 * k;
-    ctx.setLineDash([7 * k, 5 * k]);
-    ctx.globalAlpha = 0.85;
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.globalAlpha = 1;
-    const lr = Math.min(W, H) * 0.12;
-    ctx.font = `600 ${11.5 * k}px ${FONT_SANS}`;
     ctx.fillStyle = th.accent;
-    ctx.textAlign = dx >= 0 ? 'left' : 'right';
+    ctx.lineWidth = 2.2 * k;
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+    const h = 7 * k;
+    ctx.beginPath();
+    ctx.moveTo(x1 + ux * h, y1 + uy * h);
+    ctx.lineTo(x1 - uy * h * 0.6, y1 + ux * h * 0.6);
+    ctx.lineTo(x1 + uy * h * 0.6, y1 - ux * h * 0.6);
+    ctx.closePath();
+    ctx.fill();
+    ctx.font = `600 ${11.5 * k}px ${FONT_SANS}`;
+    ctx.textAlign = ux >= 0 ? 'left' : 'right';
     ctx.textBaseline = 'middle';
-    ctx.fillText(scene.spot.label, ox + (dx / len) * lr + (dx >= 0 ? 8 : -8) * k, oy - (dy / len) * lr - 10 * k);
+    ctx.fillText(scene.spot.short, x1 + ux * 12 * k, y1 + uy * 12 * k);
   }
-
-  // Sun, drawn at true size once zoomed in far enough
-  drawSun(ctx, ox, oy, Math.max(R_SUN_AU * ppa, 6.5 * k), th);
 
   // Bodies, front to back so spacecraft sit over Earth
   const order = [...scene.bodies].reverse().filter((b) => !s.hidden.has(b.key));

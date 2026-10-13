@@ -382,6 +382,15 @@ export function initWorkbench(ctx) {
     refresh() { renderVis(); },
     isOpen: () => sheet.open,
     openSheet,
+    showSpotTool() {
+      select($('tab-vis'));
+      document.querySelector('.workbench').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      $('vis-lon').focus();
+    },
+    clearSpot() {
+      S.spot = null;
+      $('vis-result').replaceChildren();
+    },
     syncSpot() {
       if (!S.spot) return;
       $('vis-sys').value = S.spot.sys;
