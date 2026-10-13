@@ -55,4 +55,4 @@ node tests/validate.mjs                 # geometry against Horizons and SunPy
 
 ## Security
 
-Please report security problems privately, as described in the [security policy](SECURITY.md), not in a public issue.
+Please report security problems privately through the repository's Security tab (**Report a vulnerability**), as described in the [security policy](SECURITY.md), not in a public issue.

@@ -8,7 +8,9 @@ Only the current version of the site, built from the `main` branch and published
 
 ## Reporting a vulnerability
 
-Please do not open a public issue for a security problem. Write instead to the maintainer, Soumyaranjan Dash, at <sdash@nso.edu>, with:
+Please do not open a public issue for a security problem. Report it privately through GitHub instead: open the repository's [Security tab](https://github.com/sr-dash/heliofleet/security) and choose **Report a vulnerability** (or go straight to the [reporting form](https://github.com/sr-dash/heliofleet/security/advisories/new)). Only the maintainer can see the report, and the fix can be discussed and prepared there in private. If you cannot use GitHub, write to the maintainer, Soumyaranjan Dash, at <sdash@nso.edu>.
+
+Please include:
 
 - what the problem is and where it is (a page, a script, a workflow or a data file);
 - how to reproduce it;
