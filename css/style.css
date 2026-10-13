@@ -323,8 +323,15 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .preset-filters { display: grid; grid-template-columns: 1fr auto; gap: 6px; margin-bottom: 8px; }
 .preset-filters[hidden], .preset-foot[hidden] { display: none; }
 .preset-filters select { padding: 6px 8px; font-size: 13px; }
-.preset-foot { margin: 10px 0 0; font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 14px; }
-.preset-foot a { color: var(--ink); }
+.preset-foot { margin: 10px 0 0; font-size: 13px; color: var(--muted); display: grid; gap: 8px; }
+.cal-title { color: var(--ink); font-weight: 600; }
+.cal-links { display: flex; flex-wrap: wrap; gap: 6px; }
+.cal-links a, .cal-links button {
+  display: inline-flex; align-items: center; padding: 5px 10px; border-radius: 7px;
+  border: 1px solid var(--line); background: var(--surface-2); color: var(--ink);
+  font: 500 12.5px "Instrument Sans", "Noto Sans Devanagari", sans-serif; text-decoration: none; cursor: pointer;
+}
+.cal-links a:hover, .cal-links button:hover { border-color: var(--accent); }
 .chips { display: grid; gap: 2px; max-height: 260px; overflow-y: auto; margin: 0 -6px; padding-right: 2px; }
 .chip {
   display: grid; grid-template-columns: 22px 1fr auto; align-items: center; gap: 8px;

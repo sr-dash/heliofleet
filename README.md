@@ -37,7 +37,7 @@ The timeline and the **Space weather** presets carry events from NASA's [DONKI](
 
 ### Calendar
 
-[calendar.ics](https://sr-dash.github.io/heliofleet/calendar.ics) lists upcoming perihelia (Parker Solar Probe, Solar Orbiter), radial alignments within 3° (between spacecraft or on the Sun–Earth line), quadratures with Earth within 1°, solar conjunctions within 2° of the Sun's centre as seen from Earth, and total solar eclipses. Subscribe with `webcal://sr-dash.github.io/heliofleet/calendar.ics`; each event links back to that moment in HelioFleet. The same events fill the **Upcoming** presets tab.
+[calendar.ics](https://sr-dash.github.io/heliofleet/calendar.ics) lists upcoming perihelia (Parker Solar Probe, Solar Orbiter), radial alignments within 3° (between spacecraft or on the Sun–Earth line), quadratures with Earth within 1°, solar conjunctions within 2° of the Sun's centre as seen from Earth, and total solar eclipses. The **Upcoming** tab offers one-click subscription in Google Calendar and Apple Calendar, a copyable feed address for Outlook and other calendars (“Subscribe from web”), and a one-time `.ics` download. Each event links back to that moment in HelioFleet. The same events fill the **Upcoming** presets tab.
 
 ### Embedding
 

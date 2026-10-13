@@ -401,8 +401,28 @@ function buildPresets() {
   }
   $('sw-kind').addEventListener('change', () => show('weather'));
   $('sw-year').addEventListener('change', () => show('weather'));
-  const base = `${location.host}${location.pathname.replace(/[^/]*$/, '')}calendar.ics`;
-  foot.innerHTML = `<a href="webcal://${base}">${tr('Subscribe in your calendar')}</a><a href="calendar.ics" download>${tr('Download .ics')}</a><span>${tr('Perihelia, alignments, quadratures, solar conjunctions and eclipses, refreshed monthly.')}</span>`;
+  // webcal:// only works where the system has a calendar app registered for
+  // it, so offer the common services directly and a copyable feed address.
+  const feed = 'https://sr-dash.github.io/heliofleet/calendar.ics';
+  const google = `https://calendar.google.com/calendar/render?cid=${encodeURIComponent(feed.replace('https://', 'webcal://'))}`;
+  foot.innerHTML = `
+    <span class="cal-title">${tr('Add these events to your calendar')}</span>
+    <span class="cal-links">
+      <a href="${google}" target="_blank" rel="noopener">Google Calendar</a>
+      <a href="${feed.replace('https://', 'webcal://')}">${tr('Apple Calendar')}</a>
+      <button type="button" id="cal-copy">${tr('Copy feed link')}</button>
+      <a href="calendar.ics" download>${tr('Download .ics')}</a>
+    </span>
+    <span>${tr('For Outlook and other calendars, copy the feed link and paste it under “Subscribe from web” or “Add calendar from URL”.')}</span>
+    <span>${tr('Perihelia, alignments, quadratures, solar conjunctions and eclipses, refreshed monthly.')}</span>`;
+  $('cal-copy').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(feed);
+      toast(tr('Feed link copied: {url}', { url: feed }));
+    } catch {
+      toast(feed);
+    }
+  });
   show(current);
 }
 
