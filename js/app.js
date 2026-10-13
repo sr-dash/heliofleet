@@ -17,6 +17,7 @@ import {
   coverageRows, coverageSummary, drawCoverage, coverageHeight, coverageNote,
 } from './coverage.js';
 import { INSTRUMENTS, INSTRUMENT } from './instruments.js';
+import { hvUrl, defaultLayer } from './helioviewer.js';
 import {
   LANGUAGES, detectLang, loadLang, lang, saveLang, tr, translatePage,
 } from './i18n.js';
@@ -113,6 +114,10 @@ function writeURL() {
     for (const k of ['theme', 'embed', 'lang']) if (cur.has(k)) q.set(k, cur.get(k));
     if (S.spot) q.set('spot', [S.spot.sys[0], S.spot.lon, S.spot.lat, ...(S.spotOnMap ? [] : [0])].join(','));
     history.replaceState(null, '', `?${q}`);
+    const sky = new URLSearchParams({ t: q.get('t') });
+    if (S.fov.size) sky.set('fov', [...S.fov].join(','));
+    if (q.has('lang')) sky.set('lang', q.get('lang'));
+    $('sky-link').href = `sky.html?${sky}`;
     if (EMBED) {
       const full = new URLSearchParams(q);
       full.delete('embed');
@@ -240,6 +245,8 @@ function renderClock() {
   const p = nearestPreset();
   $('clock-ctx').textContent = contextLine(p);
   if (EMBED) $('embed-date').textContent = `${iso.slice(0, 10)} ${iso.slice(11)} UTC`;
+  const hv = defaultLayer(S.jd);
+  if (hv) $('hv-link').href = hvUrl(S.jd, hv);
   document.querySelectorAll('.chip').forEach((c) => {
     c.setAttribute('aria-current', p && c.dataset.t === p.t ? 'true' : 'false');
   });

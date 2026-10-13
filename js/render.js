@@ -35,7 +35,7 @@ function polyline(ctx, pts, map) {
   });
 }
 
-function placeLabels(ctx, items, W, H, avoid = []) {
+export function placeLabels(ctx, items, W, H, avoid = []) {
   const placed = [...avoid];
   const hit = (r) => placed.some((q) => r.x < q.x + q.w && r.x + r.w > q.x && r.y < q.y + q.h && r.y + r.h > q.y);
   const out = [];

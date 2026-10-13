@@ -19,20 +19,21 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-INDEX = ROOT / "index.html"
+# Each page and its entry module
+PAGES = {"index.html": "app.js", "sky.html": "sky.js"}
 
 
 def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()[:10]
 
 
-def stamped():
-    html = INDEX.read_text()
+def stamped(page, entry):
+    html = (ROOT / page).read_text()
     css = digest(ROOT / "css" / "style.css")
     html = re.sub(r'href="css/style\.css(\?v=[0-9a-f]*)?"', f'href="css/style.css?v={css}"', html)
     modules = sorted((ROOT / "js").glob("*.js"))
     imports = {f"./js/{m.name}": f"./js/{m.name}?v={digest(m)}" for m in modules}
-    html = re.sub(r'src="js/app\.js(\?v=[0-9a-f]*)?"', f'src="{imports["./js/app.js"][2:]}"', html)
+    html = re.sub(rf'src="js/{re.escape(entry)}(\?v=[0-9a-f]*)?"', f'src="{imports["./js/" + entry][2:]}"', html)
     block = ('<!-- assets:start (written by scripts/stamp_assets.py) -->\n'
              f'  <script type="importmap">{json.dumps({"imports": imports}, separators=(",", ":"))}</script>\n'
              '  <!-- assets:end -->')
@@ -45,15 +46,20 @@ def stamped():
 
 
 def main():
-    new = stamped()
+    stale = []
+    for page, entry in PAGES.items():
+        new = stamped(page, entry)
+        if new != (ROOT / page).read_text():
+            stale.append(page)
+            if "--check" not in sys.argv:
+                (ROOT / page).write_text(new)
     if "--check" in sys.argv:
-        if new != INDEX.read_text():
-            print("index.html is out of date: run python3 scripts/stamp_assets.py")
+        if stale:
+            print(f"out of date: {', '.join(stale)}; run python3 scripts/stamp_assets.py")
             sys.exit(1)
         print("asset stamps are current")
         return
-    INDEX.write_text(new)
-    print("index.html stamped")
+    print(f"stamped: {', '.join(stale) or 'nothing changed'}")
 
 
 if __name__ == "__main__":

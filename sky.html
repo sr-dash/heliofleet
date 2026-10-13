@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Earth's View of the Corona: Instrument Fields of View | HelioFleet</title>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-8X5BSNF3VV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-8X5BSNF3VV');
+  </script>
+
+  <meta name="description" content="The fields of view of coronagraphs and heliospheric imagers on SOHO, STEREO, Solar Orbiter and Parker Solar Probe, projected onto Earth's plane of the sky, with MLSO K-Cor and UCoMP and DKIST Cryo-NIRSP observation footprints for any date.">
+  <meta name="author" content="Soumyaranjan Dash">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://sr-dash.github.io/heliofleet/sky.html">
+  <link rel="author" href="https://sr-dash.github.io/">
+  <meta name="google-site-verification" content="wNt-P7enH5ZTT0cjYYqXEN9GRrj-0_OcbZSER57FIK4">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0B1026" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#E6ECF1" media="(prefers-color-scheme: light)">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Soumyaranjan Dash Portfolio">
+  <meta property="og:title" content="HelioFleet: Earth's view of the instrument fields of view">
+  <meta property="og:description" content="Coronagraph and heliospheric imager fields projected onto Earth's plane of the sky, with ground-based and DKIST observation footprints.">
+  <meta property="og:url" content="https://sr-dash.github.io/heliofleet/sky.html">
+  <meta property="og:image" content="https://sr-dash.github.io/heliofleet/assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@soumyatheory">
+  <meta name="twitter:creator" content="@soumyatheory">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=d7586453ce">
+  <script>
+    try {
+      const q = new URLSearchParams(location.search);
+      const t = ['night', 'eclipse', 'halpha', 'plate'].includes(q.get('theme')) ? q.get('theme') : localStorage.getItem('heliofleet-theme');
+      if (t) document.documentElement.dataset.theme = t;
+      else if (matchMedia('(prefers-color-scheme: light)').matches) document.documentElement.dataset.theme = 'plate';
+    } catch (e) {}
+  </script>
+</head>
+<body class="sky-page">
+  <header class="masthead">
+    <div class="brand">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="https://sr-dash.github.io/" rel="author">Soumyaranjan Dash</a>
+        <span aria-hidden="true">/</span>
+        <a href="https://sr-dash.github.io/software/">Software</a>
+        <span aria-hidden="true">/</span>
+        <a href="./" id="map-link">HelioFleet</a>
+      </nav>
+      <h1 class="wordmark">Earth's view</h1>
+      <p class="tagline">Where each instrument's field of view meets the plane of the sky seen from Earth, with solar north up and west to the right.</p>
+    </div>
+    <div class="clock" aria-live="polite">
+      <span class="clock-date" id="clock-date">—</span>
+      <span class="clock-time" id="clock-time">—</span>
+    </div>
+    <div class="switches">
+      <div class="lang-switch" id="lang-switch" role="group" aria-label="Language"></div>
+    </div>
+  </header>
+
+  <section class="sky-controls" aria-label="Date and zoom">
+    <label class="field"><span class="field-label">Date and time (UTC)</span>
+      <input type="datetime-local" id="dt" step="60"></label>
+    <div class="steppers sky-steps" role="group" aria-label="Step the date">
+      <button data-step="-1" title="Back one day">−1 d</button>
+      <button data-step="-0.041666667" title="Back one hour">−1 h</button>
+      <button data-step="0.041666667" title="Forward one hour">+1 h</button>
+      <button data-step="1" title="Forward one day">+1 d</button>
+      <button id="now" title="Today">Today</button>
+    </div>
+    <div class="field"><span class="field-label">Zoom</span>
+      <div class="seg" data-setting="zoom">
+        <button data-value="1.6">1.6 R☉</button>
+        <button data-value="4">4 R☉</button>
+        <button data-value="32">32 R☉</button>
+        <button data-value="215">1 au</button>
+      </div>
+    </div>
+    <a class="btn-primary map-back" id="map-back" href="./">← The map</a>
+  </section>
+
+  <main class="sky-layout">
+    <section class="sky-stage" aria-label="Plane of the sky">
+      <div class="map-wrap sky-wrap" id="sky-wrap">
+        <canvas id="sky" aria-label="Fields of view projected on Earth's plane of the sky"></canvas>
+        <p class="hud" id="sky-hud"></p>
+        <p class="loading" id="loading">Loading ephemerides…</p>
+      </div>
+      <p class="coverage-note" id="sky-note">Lines of sight from each spacecraft are followed to where they cross the plane through Sun centre perpendicular to the Sun–Earth line. Spacecraft appear where Earth sees them. Fields are drawn from the published elongation ranges; heliospheric imagers use the published field sizes.</p>
+    </section>
+
+    <aside class="sky-side">
+      <section class="panel">
+        <h2 class="panel-title">Layers</h2>
+        <div class="fov-list" id="sky-layers"></div>
+      </section>
+      <section class="panel">
+        <h2 class="panel-title">Ground observatories</h2>
+        <div id="sites"></div>
+      </section>
+      <section class="panel">
+        <h2 class="panel-title">DKIST Cryo-NIRSP</h2>
+        <p class="tool-help" id="cryo-summary"></p>
+        <div class="chips" id="cryo-list"></div>
+        <div class="cryo-nav">
+          <button class="btn-ghost" id="cryo-prev">← Earlier observations</button>
+          <button class="btn-ghost" id="cryo-next">Later observations →</button>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="colophon">
+    <p data-i18n-html="sky-credits">Positions from <a href="https://ssd.jpl.nasa.gov/horizons/">JPL Horizons</a>. DKIST Cryo-NIRSP footprints from the <a href="https://dkist.data.nso.edu/">DKIST Data Center</a>, via the <a href="https://sr-dash.github.io/cryonirsp-viewer/">Cryo-NIRSP viewer</a>. MLSO K-Cor and UCoMP are operated by the <a href="https://www2.hao.ucar.edu/mlso">High Altitude Observatory</a>. Instrument fields of view from their instrument papers, listed in the <a href="https://github.com/sr-dash/heliofleet#instrument-field-of-view-sources">README</a>.</p>
+    <p data-i18n-html="sky-credit">Made by <a href="https://sr-dash.github.io/" rel="author">Dr. Soumyaranjan Dash</a> · <a href="./">HelioFleet map</a> · <a href="https://github.com/sr-dash/heliofleet">Source on GitHub</a> · <a href="https://github.com/sr-dash/heliofleet/issues/new/choose">Suggest a feature or report a problem</a></p>
+  </footer>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+  <!-- assets:start (written by scripts/stamp_assets.py) -->
+  <script type="importmap">{"imports":{"./js/animate.js":"./js/animate.js?v=0a5fd6979e","./js/app.js":"./js/app.js?v=0fb622cb02","./js/bodyinfo.js":"./js/bodyinfo.js?v=d96ce73256","./js/cards.js":"./js/cards.js?v=376df29bfb","./js/catalog.js":"./js/catalog.js?v=43b4d14cab","./js/coverage.js":"./js/coverage.js?v=7e64d1c926","./js/ephem.js":"./js/ephem.js?v=56c0c10b78","./js/events.js":"./js/events.js?v=f9807e6265","./js/export.js":"./js/export.js?v=d57fc7647f","./js/frames.js":"./js/frames.js?v=c3a2e0d167","./js/helioviewer.js":"./js/helioviewer.js?v=14248f1791","./js/i18n.js":"./js/i18n.js?v=b27b772be8","./js/instruments.js":"./js/instruments.js?v=b96df13d1d","./js/render.js":"./js/render.js?v=2af6e326ec","./js/ribbon.js":"./js/ribbon.js?v=ee457569eb","./js/scene.js":"./js/scene.js?v=34a1e85666","./js/sky.js":"./js/sky.js?v=25786310b3","./js/skyproj.js":"./js/skyproj.js?v=1c2ce7a7a0","./js/tools.js":"./js/tools.js?v=f21c405613","./js/workbench.js":"./js/workbench.js?v=b219063990"}}</script>
+  <!-- assets:end -->
+  <script type="module" src="js/sky.js?v=25786310b3"></script>
+</body>
+</html>

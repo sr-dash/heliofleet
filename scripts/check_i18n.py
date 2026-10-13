@@ -22,7 +22,7 @@ ATTRS = {"title", "aria-label", "placeholder", "alt"}
 SKIP_TEXT = re.compile(r"^[\d\s.,:+\-−±×°/()]*(au|d|h|CR|fps|km/s)?[\d\s.,:+\-−±×°/()]*$")
 # Proper nouns, units and codes that stay as they are in every language
 KEEP = {"HelioFleet", "HelioFleet ↗", "JPL Horizons", "Soumyaranjan Dash", "Dr. Soumyaranjan Dash",
-        "CSV", "JSON", "GIF", "μ", "r", "au", "H-alpha", "E", "W"}
+        "CSV", "JSON", "GIF", "μ", "r", "au", "H-alpha", "1.6 R☉", "4 R☉", "32 R☉"}
 
 
 class Page(HTMLParser):
@@ -94,9 +94,11 @@ def catalogue_keys():
 
 
 def all_keys():
-    page = Page()
-    page.feed((ROOT / "index.html").read_text())
-    keys = page.keys | js_keys() | catalogue_keys()
+    keys = js_keys() | catalogue_keys()
+    for name in ("index.html", "sky.html"):
+        page = Page()
+        page.feed((ROOT / name).read_text())
+        keys |= page.keys
     return sorted(k for k in keys if k not in KEEP and not SKIP_TEXT.match(k))
 
 

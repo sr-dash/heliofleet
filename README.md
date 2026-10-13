@@ -12,6 +12,7 @@ HelioFleet places SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, Solar Orbiter, Parker
 
 - **Spacecraft cards:** hover any body on the map or in the near-Earth panel for its distance, longitude and angle from Earth; click it for a card with heliocentric speed, distance and light time to Earth, the Sun's apparent size, the Sun–spacecraft–Earth angle, the previous and next perihelion, launch date, and links to the mission page and data archive. The card's buttons open the alignment search or data export for that spacecraft, hide it, or highlight its view of the Sun.
 - **Instrument fields of view:** toggle the white-light coronagraphs and heliospheric imagers (SOHO LASCO C2/C3; STEREO COR2, HI-1, HI-2; Solar Orbiter Metis and SoloHI; Parker WISPR-I and WISPR-O) to see which parts of the heliosphere each one images. They are drawn in the ecliptic plane from the published elongation ranges: coronagraphs centred on the Sun, STEREO HI toward the Earth side of the Sun (the 2015 and 2023 spacecraft rolls kept them there), SoloHI to solar east and WISPR along Parker's direction of travel. Share a view with `fov=c3,hi1a,...`.
+- **Helioviewer:** "Solar images in Helioviewer" opens [Helioviewer.org](https://helioviewer.org) at the selected moment (AIA 193, or EIT 195 before SDO). Spacecraft cards link straight to their own layers: SDO AIA and HMI; SOHO EIT and LASCO C2/C3; STEREO EUVI and COR2; Solar Orbiter EUI; and, from Earth's card, GONG H-alpha and MLSO K-Cor. Helioviewer shows the image nearest to that time.
 - **Solar coverage:** a strip under the map shows which longitudes along the solar equator each observer sees, in Stonyhurst or Carrington longitude: solid within 60° of disk centre, pale out to the limb. The bottom row counts observers with a solar-disk imager (Earth with SDO, SOHO and Aditya-L1; STEREO; Solar Orbiter) per longitude and marks in red what no one sees, with the share of the Sun covered and the largest gap. Spacecraft without a disk imager are outlined for their geometry and not counted, and STEREO-B is left out after contact was lost. Click the strip to mark a longitude on the map.
 - **Event search:** one box above the presets searches eclipses, mission milestones, every DONKI flare, CME and storm, and the upcoming calendar. It matches flare classes (`X9`), locations (`S07W33`), active regions (`12673`), dates (`2024-05`), names (`Gannon`, `Parker perihelion`) and storm levels (`G5`); every word must match, case and accents are ignored, and the nearest events come first.
 - **Two frames:** Earth-fixed (Heliocentric Earth Ecliptic, Earth at the bottom) or inertial ecliptic J2000.
@@ -121,6 +122,11 @@ js/cards.js              hover tooltips and spacecraft cards
 js/bodyinfo.js           speed, light time, apparent Sun size, perihelia
 js/coverage.js           solar coverage strip
 js/instruments.js        coronagraph and imager fields of view
+js/helioviewer.js        Helioviewer.org layers and links
+sky.html, js/sky.js      Earth's view sub-page
+js/skyproj.js            plane-of-sky projection, ground sites, Sun altitude
+data/ground/cryonirsp.json  DKIST Cryo-NIRSP footprints
+scripts/fetch_ground.py  builds it from the Cryo-NIRSP viewer inventory
 scripts/stamp_assets.py  content-hashed asset URLs for index.html
 js/i18n.js               language choice and translation
 i18n/<lang>.json         Hindi and Spanish interface text
@@ -136,9 +142,22 @@ scripts/fetch_ephemeris.py
 
 ## Acknowledgements
 
+- Solar images: [Helioviewer.org](https://helioviewer.org), linked at the selected moment.
+- DKIST Cryo-NIRSP observations: the [DKIST Data Center](https://dkist.data.nso.edu/), via the [Cryo-NIRSP viewer](https://sr-dash.github.io/cryonirsp-viewer/). MLSO K-Cor and UCoMP are operated by the [High Altitude Observatory](https://www2.hao.ucar.edu/mlso).
 - Spacecraft and planet positions: [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/), Solar System Dynamics Group, NASA Jet Propulsion Laboratory.
 - Flares, CMEs and geomagnetic storms, including the CME speeds, directions and widths behind the CME fronts on the map: the Space Weather Database Of Notifications, Knowledge, Information ([DONKI](https://ccmc.gsfc.nasa.gov/DONKI/)), developed and maintained by the [Community Coordinated Modeling Center](https://ccmc.gsfc.nasa.gov/) at NASA Goddard Space Flight Center.
 - Heliographic coordinates follow the IAU solar rotation model as implemented in [SunPy](https://sunpy.org/), which was used to validate them.
+
+### Earth's view (sky.html)
+
+A second page, [Earth's view](https://sr-dash.github.io/heliofleet/sky.html), draws the plane of the sky seen from Earth, through Sun centre and perpendicular to the Sun–Earth line, with solar north up and west to the right, as in a solar image. Each instrument's field of view is projected onto it by following its lines of sight from the spacecraft to where they cross that plane, so Earth-side coronagraphs appear as rings while fields from spacecraft far from the Sun–Earth line stretch across the sky. On the same plane:
+
+- **MLSO K-Cor** (1.05–3 R☉) and **UCoMP** (1.05–2 R☉) at Mauna Loa;
+- **DKIST Cryo-NIRSP** observation footprints within 12 hours of the moment, from the [Cryo-NIRSP viewer](https://sr-dash.github.io/cryonirsp-viewer/) inventory (refreshed monthly by `scripts/fetch_ground.py`), each linked to its page in that viewer, with buttons to step to earlier or later observing days;
+- the Sun's altitude and daylight window at Haleakalā (DKIST) and Mauna Loa (MLSO);
+- the spacecraft, placed where Earth sees them.
+
+Heliospheric imagers are modelled as fields of their published size (HI-1 a 20° square, HI-2 a 70° circle, SoloHI a 40° circle, WISPR-I 40° and WISPR-O 58° squares tilted 10° south), so their outlines on this page are approximate.
 
 ### Instrument field-of-view sources
 

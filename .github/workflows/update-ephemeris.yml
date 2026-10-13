@@ -6,6 +6,7 @@
 # records when this ran and when it runs next; the page shows both.
 # Events: merges the last 150 days of DONKI flares, CMEs and storms.
 # Calendar: rebuilds calendar.ics and data/upcoming.json from the new data.
+# Ground: refreshes the DKIST Cryo-NIRSP footprints from the Cryo-NIRSP viewer.
 
 name: Update ephemeris
 
@@ -55,6 +56,9 @@ jobs:
           else
             python scripts/fetch_events.py --incremental
           fi
+
+      - name: Fetch DKIST Cryo-NIRSP footprints
+        run: python scripts/fetch_ground.py
 
       - name: Build the calendar of upcoming events
         run: python scripts/build_calendar.py

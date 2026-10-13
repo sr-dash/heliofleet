@@ -9,4 +9,9 @@
       <image:loc>https://sr-dash.github.io/heliofleet/assets/og-image.png</image:loc>
     </image:image>
   </url>
+  <url>
+    <loc>https://sr-dash.github.io/heliofleet/sky.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
 </urlset>

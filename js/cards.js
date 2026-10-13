@@ -8,6 +8,7 @@ import { R_SUN_AU } from './frames.js';
 import { tr } from './i18n.js';
 import { liveFacts, perihelia } from './bodyinfo.js';
 import { INSTRUMENTS } from './instruments.js';
+import { layersAt, hvUrl } from './helioviewer.js';
 
 const $ = (id) => document.getElementById(id);
 const sgn = (v, d = 2) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(d)}°`;
@@ -120,6 +121,7 @@ export function initCards(ctx) {
         <button data-act="series">${tr('Export its positions')}</button>
         ${key !== 'earth' ? `<button data-act="hide">${tr('Hide on map')}</button>` : ''}
       </div>
+      ${layersAt(key, sc.jd).length ? `<div class="card-links card-hv"><span>${tr('Images in Helioviewer:')}</span>${layersAt(key, sc.jd).map((l) => `<a href="${hvUrl(sc.jd, l)}" target="_blank" rel="noopener">${l.label}</a>`).join('')}</div>` : ''}
       ${meta.site ? `<div class="card-links"><a href="${meta.site}" target="_blank" rel="noopener">${tr('Mission page')}</a><a href="${meta.data}" target="_blank" rel="noopener">${tr('Data archive')}</a></div>` : ''}`;
     wire(key);
     if (hasPeri) {

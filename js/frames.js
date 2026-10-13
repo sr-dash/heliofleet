@@ -103,6 +103,14 @@ export function parkerSpiral(p, v, n = 90) {
   return out;
 }
 
+// Axes of Earth's plane of the sky through Sun centre, as in a solar image:
+// north = solar north projected on the sky, west = to the right (north x e).
+export function earthSkyAxes(e) {
+  const eu = unit(e);
+  const north = unit(sub(POLE, scale(eu, dot(POLE, eu))));
+  return { e: eu, north, west: cross(north, eu) };
+}
+
 export const angleBetween = (a, b) =>
   Math.acos(Math.max(-1, Math.min(1, dot(a, b) / (norm(a) * norm(b))))) / D;
 
