@@ -8,6 +8,7 @@ import {
 } from './frames.js';
 import { BODIES, SPACECRAFT, PLANETS, L1_FLEET } from './catalog.js';
 import { activeCMEs } from './events.js';
+import { tr } from './i18n.js';
 
 const jdOf = (iso) => Date.parse(iso) / 864e5 + 2440587.5;
 const L1_KM = 1.4915e6;
@@ -150,9 +151,9 @@ export function buildScene(jd, s) {
   let spot = null;
   if (s.spot && s.spotOnMap) {
     const n = surfaceNormal(s.spot.lon, s.spot.lat, s.spot.sys, earth, jd);
-    const sys = s.spot.sys === 'carrington' ? 'Carrington' : 'Stonyhurst';
+    const sys = tr(s.spot.sys === 'carrington' ? 'Carrington' : 'Stonyhurst');
     const lat = `${s.spot.lat >= 0 ? '+' : '−'}${Math.abs(s.spot.lat)}°`;
-    spot = { dir: xy(n), label: `Spot · ${sys} ${s.spot.lon}°, ${lat}` };
+    spot = { dir: xy(n), label: tr('Spot · {sys} {lon}°, {lat}', { sys, lon: s.spot.lon, lat }) };
   }
 
   // CME fronts from DONKI cone-model fits, moved out at constant speed and
@@ -173,7 +174,7 @@ export function buildScene(jd, s) {
       cmes.push({
         id: c.id, arc, speed: c.speed,
         apex: xy([c.r * Math.cos(phi), c.r * Math.sin(phi), 0]),
-        label: `CME ${c.speed.toLocaleString('en-US')} km/s`,
+        label: tr('CME {v} km/s', { v: c.speed.toLocaleString('en-US') }),
       });
     }
   }

@@ -3,12 +3,13 @@
 
 import { drawMap, drawInset } from './render.js';
 import { BODIES } from './catalog.js';
+import { tr } from './i18n.js';
 
 const W = 1200;
 const H = 820;
 const SCALE = 2;
 const MONO = '"IBM Plex Mono", monospace';
-const SANS = '"Instrument Sans", sans-serif';
+const SANS = '"Instrument Sans", "Noto Sans Devanagari", sans-serif';
 const DISPLAY = '"Big Shoulders Display", sans-serif';
 
 const deg = (v, signed = true) => `${signed && v >= 0 ? '+' : ''}${v.toFixed(1)}°`;
@@ -90,7 +91,7 @@ export async function composeSnapshot(scene, s, th, view, meta) {
   ctx.stroke();
   ctx.fillStyle = th.muted;
   ctx.font = `600 10px ${SANS}`;
-  ctx.fillText('NEAR EARTH · SUN UP', X + CW - IW + 8, y + IH + 14);
+  ctx.fillText(tr('NEAR EARTH · SUN UP'), X + CW - IW + 8, y + IH + 14);
 
   // Legend beside the inset: deep-space fleet one per line, the near-Earth
   // group as one entry (they share Earth's spot on the map)
@@ -116,7 +117,7 @@ export async function composeSnapshot(scene, s, th, view, meta) {
     if (b.key === 'earth' && near.length) {
       ctx.font = `400 12px ${SANS}`;
       ctx.fillStyle = th.muted;
-      ly = wrapText(ctx, `with ${near.map((n) => BODIES[n.key].short).join(', ')}`, X + 18, ly + 2, LW - 18, 15) + 4;
+      ly = wrapText(ctx, tr('with {list}', { list: near.map((n) => BODIES[n.key].short).join(', ') }), X + 18, ly + 2, LW - 18, 15) + 4;
       ctx.font = `600 13px ${SANS}`;
     }
   }
@@ -124,16 +125,27 @@ export async function composeSnapshot(scene, s, th, view, meta) {
   // Coordinate table
   y += IH + 40;
   const cols = [
-    ['Body', 0, 'left'],
+    [tr('Body'), 0, 'left'],
     ['r au', 0.36, 'right'],
-    ['HGS lon', 0.52, 'right'],
-    ['HGS lat', 0.68, 'right'],
-    ['Carr.', 0.84, 'right'],
-    ['∠ Earth', 1, 'right'],
+    [tr('HGS lon'), 0.52, 'right'],
+    [tr('HGS lat'), 0.68, 'right'],
+    [tr('Carr.'), 0.84, 'right'],
+    [tr('∠ Earth'), 1, 'right'],
   ];
   ctx.font = `500 11px ${SANS}`;
   ctx.fillStyle = th.muted;
-  for (const [t, f, a] of cols) { ctx.textAlign = a; ctx.fillText(t, X + f * CW, y); }
+  // Headers that do not fit their column (longer in some languages) wrap
+  // onto two lines, the first word above the rest.
+  for (const [t, f, a] of cols) {
+    ctx.textAlign = a;
+    const sp = t.indexOf(' ');
+    if (sp > 0 && ctx.measureText(t).width > 0.15 * CW) {
+      ctx.fillText(t.slice(0, sp), X + f * CW, y - 12);
+      ctx.fillText(t.slice(sp + 1), X + f * CW, y);
+    } else {
+      ctx.fillText(t, X + f * CW, y);
+    }
+  }
   y += 8;
   ctx.strokeStyle = th.line;
   ctx.beginPath(); ctx.moveTo(X, y); ctx.lineTo(X + CW, y); ctx.stroke();
@@ -161,12 +173,12 @@ export async function composeSnapshot(scene, s, th, view, meta) {
   ctx.fillStyle = th.muted;
   ctx.font = `400 11px ${SANS}`;
   if (scene.bodies.some((b) => b.st === 'lost')) {
-    ctx.fillText('* STEREO-B: contact lost 2014-10-01; position is a prediction.', X, y + 2);
+    ctx.fillText(`* ${tr('STEREO-B: contact lost 2014-10-01; position is a prediction.')}`, X, y + 2);
     y += 16;
   }
   if (meta.absent) wrapText(ctx, meta.absent, X, y + 2, CW, 14);
 
-  ctx.fillText(`Ephemerides: JPL Horizons${meta.stamp ? ` (${meta.stamp.replace('Ephemerides ', '')})` : ''} · HGS/Carrington from Earth`, X, H - 38, CW);
+  ctx.fillText(`${tr('Ephemerides: JPL Horizons')}${meta.stamp ? ` (${tr('updated {date}', { date: meta.stamp })})` : ''} · ${tr('HGS/Carrington from Earth')}`, X, H - 38, CW);
   ctx.fillText('sr-dash.github.io/heliofleet', X, H - 22);
   return cv;
 }
@@ -188,7 +200,7 @@ export async function downloadPNG(cv, base) {
 
 export function downloadPDF(cv, base, title) {
   const { jsPDF } = window.jspdf ?? {};
-  if (!jsPDF) throw new Error('The PDF library did not load. Check your connection and try again.');
+  if (!jsPDF) throw new Error(tr('The PDF library did not load. Check your connection and try again.'));
   const pdf = new jsPDF({ orientation: 'landscape', unit: 'pt', format: [W * 0.75, H * 0.75] });
   pdf.setProperties({ title, creator: 'HelioFleet' });
   pdf.addImage(cv.toDataURL('image/jpeg', 0.93), 'JPEG', 0, 0, W * 0.75, H * 0.75);
@@ -248,7 +260,7 @@ export function composeFrame(ctx, W, H, scene, s, th, meta) {
     }
     ctx.fillStyle = th.muted;
     ctx.font = `400 ${13 * k}px ${SANS}`;
-    ctx.fillText('Ephemerides: JPL Horizons', X, H - 46 * k);
+    ctx.fillText(tr('Ephemerides: JPL Horizons'), X, H - 46 * k);
     ctx.fillText('sr-dash.github.io/heliofleet', X, H - 26 * k);
     return;
   }

@@ -8,6 +8,7 @@ import {
 } from './frames.js';
 import { BODIES, SPACECRAFT, PLANETS } from './catalog.js';
 import { dataKeys, helioPosition, spacecraftAt } from './scene.js';
+import { tr } from './i18n.js';
 
 const SITE = 'https://sr-dash.github.io/heliofleet/';
 const iso = (jd) => dateFromJD(jd + 1 / 172800).toISOString().slice(0, 19) + 'Z';
@@ -91,7 +92,7 @@ export function toJSON(rows, meta) {
 export async function timeSeries(keys, jd0, jd1, step, wind, limit = 250000) {
   const n = Math.floor((jd1 - jd0) / step) + 1;
   if (n * keys.length > limit) {
-    throw new Error(`That is ${(n * keys.length).toLocaleString()} rows; choose a shorter range or a coarser step (limit ${limit.toLocaleString()}).`);
+    throw new Error(tr('That is {n} rows; choose a shorter range or a coarser step (limit {limit}).', { n: (n * keys.length).toLocaleString('en-US'), limit: limit.toLocaleString('en-US') }));
   }
   const series = new Set(['earth']);
   for (const k of keys) for (const d of dataKeys(k)) series.add(d);

@@ -19,6 +19,7 @@ HelioFleet places SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, Solar Orbiter, Parker
 - **Snapshots:** download the current view as PNG or PDF, with the map, inset and coordinate table on one page.
 - **Shareable links:** the URL keeps the moment and display settings, for example [the 2024 North American eclipse](https://sr-dash.github.io/heliofleet/?t=2024-04-08T18:17Z).
 - **Four themes:** Night, Totality, H-alpha and Plate (light).
+- **Three languages:** English, हिन्दी (Hindi) and Español (Spanish), chosen from the header, remembered per visitor, picked up from the browser's language, or set in a link with `lang=hi` or `lang=es`.
 
 ### Research tools
 
@@ -112,6 +113,9 @@ js/tools.js              exports, SunPy code, alignment search, spot visibility
 js/workbench.js          the research-tools tabs and the code/citation sheet
 js/events.js             DONKI events, CME fronts, upcoming events
 js/animate.js            MP4 / WebM / GIF recording
+js/i18n.js               language choice and translation
+i18n/<lang>.json         Hindi and Spanish interface text
+scripts/check_i18n.py    finds untranslated or mismatched strings
 scripts/fetch_events.py  DONKI flares, CMEs and storms -> data/events.json
 scripts/build_calendar.py  calendar.ics and data/upcoming.json
 data/<body>/<year>.json  ephemeris chunks; data/manifest.json indexes them
@@ -120,6 +124,16 @@ site.webmanifest, sitemap.xml, favicon.ico
 CITATION.cff, .zenodo.json  citation metadata
 scripts/fetch_ephemeris.py
 ```
+
+## Translations
+
+Interface text lives in `i18n/hi.json` and `i18n/es.json`, keyed by the English text, so anything without a translation falls back to English. Spacecraft names, dates, numbers and the exported data files (CSV, JSON, SunPy code, citation) stay in English. After changing any interface text, run:
+
+```bash
+python3 scripts/check_i18n.py
+```
+
+It lists every English string the page can show and reports, for each language, the strings that are missing and entries whose `{placeholders}` differ. `--keys` prints the full list, which is the place to start when adding another language. Corrections from native speakers are very welcome as pull requests or issues.
 
 ## Citing HelioFleet
 

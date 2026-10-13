@@ -7,8 +7,14 @@ import { buildScene, needs } from './scene.js';
 import { drawMap, drawInset, readTheme, mapGeometry } from './render.js';
 import { createRibbon } from './ribbon.js';
 import { composeSnapshot, downloadPNG, downloadPDF } from './export.js';
-import { BODIES, SPACECRAFT, PLANETS, PRESET_GROUPS, SPACE_WEATHER } from './catalog.js';
+import {
+  BODIES, SPACECRAFT, PLANETS, PRESET_GROUPS, SPACE_WEATHER, ECLIPSES, MILESTONES,
+} from './catalog.js';
+import { ALIGN_KINDS } from './tools.js';
 import { initWorkbench } from './workbench.js';
+import {
+  LANGUAGES, detectLang, loadLang, lang, saveLang, tr, translatePage,
+} from './i18n.js';
 
 const $ = (id) => document.getElementById(id);
 const jdOf = (iso) => Date.parse(iso) / 864e5 + 2440587.5;
@@ -90,7 +96,7 @@ function writeURL() {
     if (!S.cmes) q.set('cme', '0');
     // Embed and theme come from whoever wrote the link; keep them as they are.
     const cur = new URLSearchParams(location.search);
-    for (const k of ['theme', 'embed']) if (cur.has(k)) q.set(k, cur.get(k));
+    for (const k of ['theme', 'embed', 'lang']) if (cur.has(k)) q.set(k, cur.get(k));
     if (S.spot) q.set('spot', [S.spot.sys[0], S.spot.lon, S.spot.lat, ...(S.spotOnMap ? [] : [0])].join(','));
     history.replaceState(null, '', `?${q}`);
     if (EMBED) {
@@ -146,11 +152,13 @@ async function update({ fromInput = false } = {}) {
 }
 
 // ---------- clock & context ----------
-const PRESETS = PRESET_GROUPS.flatMap((g) => g.items.map((it) => ({ ...it, group: g.id, jd: jdOf(it.t) })));
+// Built on first use, after the catalogue has been translated
+let presetCache = null;
+const presetList = () => (presetCache ??= PRESET_GROUPS.flatMap((g) => g.items.map((it) => ({ ...it, group: g.id, jd: jdOf(it.t) }))));
 const presetGroups = () => PRESET_GROUPS.map((g) => ({ ...g, items: g.items.filter((it) => inRange(it.t)) }));
 function nearestPreset(jd = S.jd) {
   let best = null;
-  for (const p of PRESETS) {
+  for (const p of presetList()) {
     const d = Math.abs(p.jd - jd);
     if (d < 0.5 && (!best || d < best.d)) best = { ...p, d };
   }
@@ -158,7 +166,7 @@ function nearestPreset(jd = S.jd) {
 }
 function contextLine(p) {
   if (!p) return '';
-  if (p.group === 'eclipses') return `${p.hybrid ? 'Hybrid' : 'Total'} solar eclipse · ${p.label}`;
+  if (p.group === 'eclipses') return `${tr(p.hybrid ? 'Hybrid solar eclipse' : 'Total solar eclipse')} · ${p.label}`;
   return p.label;
 }
 function renderClock() {
@@ -184,8 +192,8 @@ function renderTable() {
     const meta = BODIES[b.key];
     const planet = meta.kind === 'planet' && b.key !== 'earth';
     const isEarth = b.key === 'earth';
-    const tr = document.createElement('tr');
-    const flag = b.st === 'lost' ? 'contact lost · predicted' : b.st === 'approx' ? 'GEO · shown at Earth' : '';
+    const row = document.createElement('tr');
+    const flag = b.st === 'lost' ? tr('contact lost · predicted') : b.st === 'approx' ? tr('GEO · shown at Earth') : '';
     const cells = [
       `<span class="dot${meta.kind === 'planet' ? ' planet' : ''}" style="--c:var(--c-${b.key})"></span>${meta.short}${flag ? `<span class="flag">${flag}</span>` : ''}`,
       b.dist.toFixed(b.dist < 0.2 ? 4 : 3),
@@ -196,43 +204,43 @@ function renderTable() {
       isEarth ? '—' : b.dEarth.toFixed(b.dEarth < 0.1 ? 4 : 3),
       planet ? '—' : sgn(b.foot, 1),
     ];
-    tr.innerHTML = cells.map((c) => `<td>${c}</td>`).join('');
-    if (isEarth) tr.title = `B0 = ${b.lat.toFixed(2)}°, L0 = ${b.carr.toFixed(2)}°`;
-    body.appendChild(tr);
+    row.innerHTML = cells.map((c) => `<td>${c}</td>`).join('');
+    if (isEarth) row.title = `B0 = ${b.lat.toFixed(2)}°, L0 = ${b.carr.toFixed(2)}°`;
+    body.appendChild(row);
   }
   $('absent').textContent = absentLine();
 }
 function absentLine() {
   const why = {
-    prelaunch: (k) => `launches ${BODIES[k].launch.slice(0, 10)}`,
-    ended: (k) => `mission ended ${BODIES[k].ended.slice(0, 10)}`,
-    nodata: () => 'outside the ephemeris',
+    prelaunch: (k) => tr('launches {date}', { date: BODIES[k].launch.slice(0, 10) }),
+    ended: (k) => tr('mission ended {date}', { date: BODIES[k].ended.slice(0, 10) }),
+    nodata: () => tr('outside the ephemeris'),
   };
   const absent = scene.missing.map((m) => `${BODIES[m.key].short} (${why[m.st](m.key)})`);
-  return absent.length ? `Not on the map: ${absent.join(' · ')}.` : '';
+  return absent.length ? tr('Not on the map: {list}.', { list: absent.join(' · ') }) : '';
 }
 
 // ---------- data stamp ----------
 function renderStamp(m) {
   const day = (jd) => isoMinute(jd).slice(0, 10);
   const utc = (iso) => `${iso.slice(0, 10)} ${iso.slice(11, 16)} UTC`;
-  const parts = [`Timeline <b>${day(RANGE[0])}</b> to <b>${day(RANGE[1])}</b>`];
-  if (m.generated) parts.push(`Ephemerides updated <b>${utc(m.generated)}</b>`);
+  const parts = [tr('Timeline <b>{from}</b> to <b>{to}</b>', { from: day(RANGE[0]), to: day(RANGE[1]) })];
+  if (m.generated) parts.push(tr('Ephemerides updated <b>{time}</b>', { time: utc(m.generated) }));
   if (m.next_update) {
     const due = Date.parse(m.next_update) < Date.now();
-    parts.push(due ? 'Next scheduled update <b>due now</b>' : `Next scheduled update <b>${utc(m.next_update)}</b>`);
+    parts.push(due ? tr('Next scheduled update <b>due now</b>') : tr('Next scheduled update <b>{time}</b>', { time: utc(m.next_update) }));
   }
   $('data-stamp').innerHTML = parts.map((p) => `<span>${p}</span>`).join('');
-  STAMP = m.generated ? `Ephemerides updated ${m.generated.slice(0, 10)}` : '';
+  STAMP = m.generated ? m.generated.slice(0, 10) : '';
   const y0 = dateFromJD(RANGE[0]).getUTCFullYear();
   const y1 = dateFromJD(RANGE[1]).getUTCFullYear();
-  $('tagline').textContent = `Where the Sun-watching spacecraft are, on any date from ${y0} to ${y1}.`;
+  $('tagline').textContent = tr('Where the Sun-watching spacecraft are, on any date from {y0} to {y1}.', { y0, y1 });
 }
 
 // ---------- hud ----------
 function renderHud() {
-  const f = S.frame === 'hee' ? 'Earth-fixed (HEE)' : 'Inertial ecliptic J2000';
-  const v = S.view === 'top' ? 'from ecliptic north' : 'edge-on, north up';
+  const f = tr(S.frame === 'hee' ? 'Earth-fixed (HEE)' : 'Inertial ecliptic J2000');
+  const v = tr(S.view === 'top' ? 'from ecliptic north' : 'edge-on, north up');
   $('hud').textContent = `${f}\n${v}`;
 }
 
@@ -293,7 +301,7 @@ async function focusFlare(f) {
     S.spot = { sys: 'carrington', lon: +((((loc.lon + L0) % 360) + 360) % 360).toFixed(1), lat: loc.lat };
     S.spotOnMap = true;
     bench?.syncSpot();
-    toast(`${f.cls} flare at ${f.loc}: source region marked on the map`);
+    toast(tr('{cls} flare at {loc}: source region marked on the map', { cls: f.cls, loc: f.loc }));
   }
   S.jd = f.jd;
   update();
@@ -312,20 +320,20 @@ function weatherItems(kind, year) {
   if (!ev) return null;
   if (kind === 'xflares' || kind === 'flares') {
     return ev.flares.filter((f) => (kind === 'flares' || f.cls[0] === 'X') && inYear(f.t) && rangeOK(f.jd)).reverse().map((f) => ({
-      glyph: GLYPH.flare, title: `${f.cls} flare`, date: f.t.slice(0, 10),
+      glyph: GLYPH.flare, title: tr('{cls} flare', { cls: f.cls }), date: f.t.slice(0, 10),
       sub: [f.loc, f.ar ? `AR ${f.ar}` : null].filter(Boolean).join(' · '),
       onClick: () => focusFlare(f),
     }));
   }
   if (kind === 'cmes') {
     return ev.cmes.filter((c) => inYear(c.t) && rangeOK(c.jd)).reverse().map((c) => ({
-      glyph: GLYPH.cme, title: `CME, ${c.speed.toLocaleString('en-US')} km/s`, date: c.t.slice(0, 10),
-      sub: [c.lon !== null ? `toward HGS ${c.lon >= 0 ? 'W' : 'E'}${Math.abs(c.lon)}°` : 'no direction fit', c.src].filter(Boolean).join(' · '),
+      glyph: GLYPH.cme, title: tr('CME, {v} km/s', { v: c.speed.toLocaleString('en-US') }), date: c.t.slice(0, 10),
+      sub: [c.lon !== null ? tr('toward HGS {dir}', { dir: `${c.lon >= 0 ? 'W' : 'E'}${Math.abs(c.lon)}°` }) : tr('no direction fit'), c.src].filter(Boolean).join(' · '),
       onClick: () => jump((c.jd21 ?? c.jd) + 0.25),
     }));
   }
   return ev.storms.filter((g) => inYear(g.t) && rangeOK(g.jd)).reverse().map((g) => ({
-    glyph: GLYPH.storm, title: `${G_LABEL[g.g]} geomagnetic storm`, date: g.t.slice(0, 10),
+    glyph: GLYPH.storm, title: tr('{g} geomagnetic storm', { g: G_LABEL[g.g] }), date: g.t.slice(0, 10),
     sub: `Kp ${g.kp.toFixed(2)}`, onClick: () => jump(g.jd),
   }));
 }
@@ -334,10 +342,13 @@ function upcomingItems() {
   const up = upcoming();
   if (!up) return null;
   const now = jdFromDate(new Date()) - 0.5;
-  return up.events.filter((e) => e.t >= now && e.t <= RANGE[1]).slice(0, 120).map((e) => ({
-    glyph: GLYPH[e.kind], title: e.title, sub: KIND_LABEL[e.kind], date: isoMinute(e.t).slice(0, 10), future: true,
-    onClick: () => { jump(e.t); toast(e.detail); },
-  }));
+  return up.events.filter((e) => e.t >= now && e.t <= RANGE[1]).slice(0, 120).map((e) => {
+    const { title, detail } = describeUpcoming(e);
+    return {
+      glyph: GLYPH[e.kind], title, sub: KIND_LABEL[e.kind], date: isoMinute(e.t).slice(0, 10), future: true,
+      onClick: () => { jump(e.t); toast(detail); },
+    };
+  });
 }
 
 function buildPresets() {
@@ -365,21 +376,21 @@ function buildPresets() {
       const g = presetGroups().find((x) => x.id === id);
       items = g.items.map((it) => ({
         glyph: id === 'eclipses' ? GLYPH.eclipse(it.hybrid) : GLYPH.milestone(it.body),
-        title: id === 'eclipses' ? `${it.label}${it.hybrid ? ' (hybrid)' : ''}` : it.label,
+        title: id === 'eclipses' ? `${it.label}${it.hybrid ? ` (${tr('hybrid')})` : ''}` : it.label,
         sub: it.where ?? it.note ?? '', date: it.t.slice(0, 10), t: it.t, future: jdOf(it.t) > today,
         onClick: () => jump(jdOf(it.t)),
       }));
     }
     if (!items) {
-      chips.innerHTML = '<p class="tool-help">The event list could not be loaded. Reload the page to try again.</p>';
+      chips.innerHTML = `<p class="tool-help">${tr('The event list could not be loaded. Reload the page to try again.')}</p>`;
     } else if (!items.length) {
-      chips.innerHTML = '<p class="tool-help">Nothing matches these filters.</p>';
+      chips.innerHTML = `<p class="tool-help">${tr('Nothing matches these filters.')}</p>`;
     } else {
       for (const it of items.slice(0, 400)) chips.appendChild(chip(it));
     }
     renderClock();
   };
-  const groups = [...PRESET_GROUPS, { id: 'upcoming', title: 'Upcoming' }];
+  const groups = [...PRESET_GROUPS, { id: 'upcoming', title: tr('Upcoming') }];
   for (const g of groups) {
     const b = document.createElement('button');
     b.role = 'tab';
@@ -391,7 +402,7 @@ function buildPresets() {
   $('sw-kind').addEventListener('change', () => show('weather'));
   $('sw-year').addEventListener('change', () => show('weather'));
   const base = `${location.host}${location.pathname.replace(/[^/]*$/, '')}calendar.ics`;
-  foot.innerHTML = `<a href="webcal://${base}">Subscribe in your calendar</a><a href="calendar.ics" download>Download .ics</a><span>Perihelia, alignments, quadratures, solar conjunctions and eclipses, refreshed monthly.</span>`;
+  foot.innerHTML = `<a href="webcal://${base}">${tr('Subscribe in your calendar')}</a><a href="calendar.ics" download>${tr('Download .ics')}</a><span>${tr('Perihelia, alignments, quadratures, solar conjunctions and eclipses, refreshed monthly.')}</span>`;
   show(current);
 }
 
@@ -402,17 +413,17 @@ function ribbonMarks() {
   return () => [
     ...ev.flares.filter((f) => f.cls[0] === 'X').map((f) => ({
       jd: f.jd, kind: 'flare', size: Math.min(1, Math.log10(flareFlux(f.cls) / 1e-4)),
-      html: `<b>${f.cls} flare</b><span>${fmtUT(f.t)}</span><span>${[f.loc, f.ar ? `AR ${f.ar}` : null].filter(Boolean).join(' · ')}</span>`,
+      html: `<b>${tr('{cls} flare', { cls: f.cls })}</b><span>${fmtUT(f.t)}</span><span>${[f.loc, f.ar ? `AR ${f.ar}` : null].filter(Boolean).join(' · ')}</span>`,
       pick: () => focusFlare(f),
     })),
     ...ev.cmes.filter((c) => c.speed >= 2000).map((c) => ({
       jd: c.jd, kind: 'cme', size: Math.min(1, (c.speed - 2000) / 1500),
-      html: `<b>CME, ${c.speed.toLocaleString('en-US')} km/s</b><span>${fmtUT(c.t)}</span>${c.src ? `<span>Source ${c.src}</span>` : ''}`,
+      html: `<b>${tr('CME, {v} km/s', { v: c.speed.toLocaleString('en-US') })}</b><span>${fmtUT(c.t)}</span>${c.src ? `<span>${tr('Source {loc}', { loc: c.src })}</span>` : ''}`,
       pick: () => jump((c.jd21 ?? c.jd) + 0.25),
     })),
     ...ev.storms.filter((g) => g.g >= 4).map((g) => ({
       jd: g.jd, kind: 'storm', size: g.g === 5 ? 1 : 0.5,
-      html: `<b>${G_LABEL[g.g]} geomagnetic storm</b><span>${fmtUT(g.t)}</span><span>Kp ${g.kp.toFixed(2)}</span>`,
+      html: `<b>${tr('{g} geomagnetic storm', { g: G_LABEL[g.g] })}</b><span>${fmtUT(g.t)}</span><span>Kp ${g.kp.toFixed(2)}</span>`,
       pick: () => jump(g.jd),
     })),
   ];
@@ -458,7 +469,7 @@ function startPlay() {
   playing = true;
   $('play').setAttribute('aria-pressed', 'true');
   $('embed-play').setAttribute('aria-pressed', 'true');
-  $('play').querySelector('.play-label').textContent = 'Pause';
+  $('play').querySelector('.play-label').textContent = tr('Pause');
   last = performance.now();
   requestAnimationFrame(tick);
 }
@@ -467,7 +478,7 @@ function stopPlay() {
   playing = false;
   $('play').setAttribute('aria-pressed', 'false');
   $('embed-play').setAttribute('aria-pressed', 'false');
-  $('play').querySelector('.play-label').textContent = 'Play';
+  $('play').querySelector('.play-label').textContent = tr('Play');
   update();
 }
 
@@ -559,21 +570,96 @@ async function snapshot(kind) {
     context: contextLine(nearestPreset()),
     absent: absentLine(),
     stamp: STAMP,
-    frame: `${S.frame === 'hee' ? 'Earth-fixed (HEE)' : 'Inertial ecliptic J2000'}, ${S.view === 'top' ? 'viewed from ecliptic north' : 'edge-on'}`,
+    frame: frameLine(),
   };
   const base = `heliofleet_${iso.replace(/[-:]/g, '').replace('T', '_')}UT`;
   try {
     const cv = await composeSnapshot(scene, S, theme, S, meta);
     if (kind === 'png') await downloadPNG(cv, base);
     else downloadPDF(cv, base, `HelioFleet ${meta.date} ${meta.time}`);
-    toast(`Saved ${base}.${kind}`);
+    toast(tr('Saved {file}', { file: `${base}.${kind}` }));
   } catch (err) {
     toast(err.message);
   }
 }
 
+// ---------- language ----------
+function frameLine() {
+  return `${tr(S.frame === 'hee' ? 'Earth-fixed (HEE)' : 'Inertial ecliptic J2000')}, ${tr(S.view === 'top' ? 'from ecliptic north' : 'edge-on, north up')}`;
+}
+
+// Catalogue text shown on the page, translated in place once at load.
+function localize() {
+  if (lang() === 'en') return;
+  for (const k of ['earth', ...PLANETS]) { BODIES[k].name = tr(BODIES[k].name); BODIES[k].short = tr(BODIES[k].short); }
+  for (const e of ECLIPSES) { e.label = tr(e.label); e.where = tr(e.where); }
+  for (const m of MILESTONES) m.label = tr(m.label);
+  for (const w of SPACE_WEATHER) { w.label = tr(w.label); w.note = tr(w.note); }
+  for (const g of PRESET_GROUPS) g.title = tr(g.title);
+  for (const a of Object.values(ALIGN_KINDS)) { a.label = tr(a.label); a.help = tr(a.help); }
+  for (const k of Object.keys(G_LABEL)) G_LABEL[k] = tr(G_LABEL[k]);
+  for (const k of Object.keys(KIND_LABEL)) KIND_LABEL[k] = tr(KIND_LABEL[k]);
+  // Search engines index each language at its own address
+  const canon = document.querySelector('link[rel="canonical"]');
+  if (canon) canon.href = `https://sr-dash.github.io/heliofleet/?lang=${lang()}`;
+}
+
+function buildLangSwitch() {
+  const box = $('lang-switch');
+  for (const [code, name] of Object.entries(LANGUAGES)) {
+    const b = document.createElement('button');
+    b.textContent = name;
+    b.lang = code;
+    b.setAttribute('aria-pressed', code === lang() ? 'true' : 'false');
+    b.addEventListener('click', () => {
+      if (code === lang()) return;
+      saveLang(code);
+      const q = new URLSearchParams(location.search);
+      if (code === 'en') q.delete('lang'); else q.set('lang', code);
+      q.set('t', `${isoMinute(S.jd)}Z`);
+      location.search = `?${q}`;
+    });
+    box.appendChild(b);
+  }
+}
+
+// Upcoming-event text in the page language, from the values the calendar
+// builder stores; English comes straight from the calendar feed.
+function describeUpcoming(e) {
+  if (lang() === 'en' || !e.v) return { title: e.title, detail: e.detail };
+  const v = e.v;
+  const n = (k) => BODIES[k]?.name ?? k;
+  const [a, b] = e.bodies;
+  switch (e.kind) {
+    case 'perihelion':
+      return { title: tr('{name} perihelion', { name: n(a) }),
+        detail: tr('Closest approach to the Sun: {r} au ({rs} solar radii).', { r: v.r, rs: v.rs }) };
+    case 'alignment':
+      return b === 'earth'
+        ? { title: tr('{name} on the Sun–Earth line', { name: n(a) }),
+          detail: tr(v.inside ? '{name} lies between the Sun and Earth, {sep}° off the Sun–Earth line at {r} au.' : '{name} lies beyond Earth, {sep}° off the Sun–Earth line at {r} au.', { name: n(a), sep: v.sep, r: v.ra }) }
+        : { title: tr('{a} and {b} radially aligned', { a: n(a), b: n(b) }),
+          detail: tr('Sun-centred separation {sep}° at closest; {a} at {ra} au, {b} at {rb} au.', { sep: v.sep, a: n(a), b: n(b), ra: v.ra, rb: v.rb }) };
+    case 'quadrature':
+      return { title: tr('{name} in quadrature with Earth', { name: n(a) }),
+        detail: tr(v.ahead ? '{name} is 90° from Earth as seen from the Sun (west, ahead of Earth), at {r} au.' : '{name} is 90° from Earth as seen from the Sun (east, trailing Earth), at {r} au.', { name: n(a), r: v.r }) };
+    case 'conjunction':
+      return { title: tr('Solar conjunction: {name} behind the Sun', { name: n(a) }),
+        detail: tr('{name} is {sep}° from the Sun\'s centre as seen from Earth; communications are often limited near conjunction.', { name: n(a), sep: v.sep }) };
+    case 'eclipse':
+      return { title: `${tr(v.hybrid ? 'Hybrid solar eclipse' : 'Total solar eclipse')}: ${tr(v.label)}`,
+        detail: tr('Greatest eclipse. Path: {where}.', { where: tr(v.where) }) };
+    default:
+      return { title: e.title, detail: e.detail };
+  }
+}
+
 // ---------- boot ----------
 async function main() {
+  await loadLang(detectLang());
+  localize();
+  translatePage();
+  buildLangSwitch();
   readURL();
   theme = readTheme();
   setTheme(document.documentElement.dataset.theme, false);
@@ -584,7 +670,7 @@ async function main() {
   try {
     manifest = await loadManifest();
   } catch (err) {
-    $('loading').textContent = `${err.message}. Serve the site over http (for example: python3 -m http.server).`;
+    $('loading').textContent = `${err.message}. ${tr('Serve the site over http (for example: python3 -m http.server).')}`;
     return;
   }
   const e = info('earth');
@@ -657,9 +743,9 @@ async function main() {
     await new Promise((r) => setTimeout(r, 300));
     try {
       await navigator.clipboard.writeText(location.href);
-      toast('Link copied');
+      toast(tr('Link copied'));
     } catch {
-      toast('Copy the address bar to share this moment');
+      toast(tr('Copy the address bar to share this moment'));
     }
   });
   bench = initWorkbench({
@@ -676,7 +762,7 @@ async function main() {
         date: iso.slice(0, 10),
         time: `${iso.slice(11)} UTC`,
         context: contextLine(nearestPreset(jd)),
-        frame: `${S.frame === 'hee' ? 'Earth-fixed (HEE)' : 'Inertial ecliptic J2000'}, ${S.view === 'top' ? 'from ecliptic north' : 'edge-on'}`,
+        frame: frameLine(),
       };
     },
   });
@@ -692,11 +778,16 @@ async function main() {
     q.delete('theme');
     const base = 'https://sr-dash.github.io/heliofleet/';
     const tag = (extra) => `<iframe src="${base}?${q}${extra}" title="HelioFleet: spacecraft positions around the Sun" width="100%" height="560" style="border:0;border-radius:12px" loading="lazy"></iframe>`;
-    bench.openSheet('Embed on your site',
-      'Paste this into a web page, wiki or course site to show the current map. Viewers can zoom, pan and step through time, and open the full HelioFleet in a new tab. Add <code>&amp;theme=plate</code> (or <code>night</code>, <code>eclipse</code>, <code>halpha</code>) to fix the colours.',
+    bench.openSheet(tr('Embed on your site'),
+      tr('Paste this into a web page, wiki or course site to show the current map. Viewers can zoom, pan and step through time, and open the full HelioFleet in a new tab. Add {theme} (or {others}) to fix the colours, and {lang} or {es} for Hindi or Spanish.', {
+        theme: '<code>&amp;theme=plate</code>',
+        others: '<code>night</code>, <code>eclipse</code>, <code>halpha</code>',
+        lang: '<code>&amp;lang=hi</code>',
+        es: '<code>&amp;lang=es</code>',
+      }),
       [
-        { heading: 'This moment', text: tag(''), wrap: true },
-        { heading: 'Light theme', text: tag('&theme=plate'), wrap: true },
+        { heading: tr('This moment'), text: tag(''), wrap: true },
+        { heading: tr('Light theme'), text: tag('&theme=plate'), wrap: true },
       ]);
   });
   document.addEventListener('keydown', (ev) => {

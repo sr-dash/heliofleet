@@ -7,6 +7,7 @@ import { BODIES, SPACECRAFT, ECLIPSES, MILESTONES, SPACE_WEATHER } from './catal
 // { jd, kind: 'flare' | 'cme' | 'storm', size (0-1), html, pick() }.
 import { info } from './ephem.js';
 import { dataKeys } from './scene.js';
+import { tr } from './i18n.js';
 
 const NS = 'http://www.w3.org/2000/svg';
 const jdOf = (iso) => Date.parse(iso) / 864e5 + 2440587.5;
@@ -92,7 +93,7 @@ export function createRibbon(svg, tip, { start, end, onScrub, onPick, marks }) {
         fill: 'var(--ink)', opacity: 0.035,
       }, svg);
       if (x(end) - x(today) > 74) {
-        el('text', { x: x(today) + 4, y: AXIS - 4, fill: muted, 'font-size': 10 }, svg).textContent = 'predicted →';
+        el('text', { x: x(today) + 4, y: AXIS - 4, fill: muted, 'font-size': 10 }, svg).textContent = tr('predicted →');
       }
     }
 
@@ -100,8 +101,8 @@ export function createRibbon(svg, tip, { start, end, onScrub, onPick, marks }) {
     const lbl = (text, yy, fill = muted) => {
       el('text', { x: LEFT - 10, y: yy + 3.5, 'text-anchor': 'end', fill, 'font-size': 11.5, style: 'font-family: "Instrument Sans", sans-serif; font-weight: 500' }, svg).textContent = text;
     };
-    lbl(narrow ? 'Eclipses' : 'Total eclipses', ROW_ECL);
-    lbl(narrow ? 'Events' : 'Space weather', ROW_SW);
+    lbl(tr(narrow ? 'Eclipses' : 'Total eclipses'), ROW_ECL);
+    lbl(tr(narrow ? 'Events' : 'Space weather'), ROW_SW);
 
     // Spacecraft lanes
     SPACECRAFT.forEach((key, i) => {
@@ -148,7 +149,7 @@ export function createRibbon(svg, tip, { start, end, onScrub, onPick, marks }) {
       el('circle', { cx, cy: ROW_ECL, r: narrow ? 5.5 : 7.5, fill: 'none', stroke: 'var(--sun)', 'stroke-width': 1.4, opacity: 0.55, 'stroke-dasharray': ec.hybrid ? '2 2' : 'none' }, g);
       el('circle', { cx, cy: ROW_ECL, r: narrow ? 3.5 : 5, fill: 'var(--plot-bg)', stroke: 'var(--sun)', 'stroke-width': 1.6 }, g);
       el('circle', { cx, cy: ROW_ECL, r: 11, fill: 'transparent' }, g);
-      marker(g, ec.t, `<b>${ec.hybrid ? 'Hybrid' : 'Total'} eclipse · ${ec.label}</b><span>${fmt(ec.t)}</span><span>${ec.where}</span>`);
+      marker(g, ec.t, `<b>${tr(ec.hybrid ? 'Hybrid eclipse' : 'Total eclipse')} · ${ec.label}</b><span>${fmt(ec.t)}</span><span>${ec.where}</span>`);
     }
 
     // Space-weather row: DONKI events when available, else the curated list.

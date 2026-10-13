@@ -5,6 +5,7 @@
 import { ensure } from './ephem.js';
 import { buildScene, needs } from './scene.js';
 import { composeFrame } from './export.js';
+import { tr } from './i18n.js';
 
 const MP4_MUXER = 'https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/+esm';
 const GIFENC = 'https://cdn.jsdelivr.net/npm/gifenc@1.0.3/+esm';
@@ -31,7 +32,7 @@ export const videoSupport = () => (typeof VideoEncoder !== 'undefined' ? 'mp4' :
 export async function recordAnimation(o) {
   const n = Math.floor((o.jd1 - o.jd0) / o.step + 1e-9) + 1;
   const limit = o.format === 'gif' ? LIMITS.gif : LIMITS.video;
-  if (n > limit) throw new Error(`That is ${n} frames; the limit is ${limit}. Use a larger step or a shorter range.`);
+  if (n > limit) throw new Error(tr('That is {n} frames; the limit is {limit}. Use a larger step or a shorter range.', { n, limit }));
   await preload(o.S, o.jd0, o.jd1);
   const cv = document.createElement('canvas');
   cv.width = o.width;
@@ -97,7 +98,7 @@ async function mp4(o, n, cv, draw, check) {
 
 async function webm(o, n, cv, draw, check) {
   if (typeof MediaRecorder === 'undefined' || !cv.captureStream) {
-    throw new Error('This browser cannot record video. Try the GIF format, or a current Chrome, Edge, Safari or Firefox.');
+    throw new Error(tr('This browser cannot record video. Try the GIF format, or a current Chrome, Edge, Safari or Firefox.'));
   }
   const mime = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm', 'video/mp4']
     .find((m) => MediaRecorder.isTypeSupported(m));

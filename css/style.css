@@ -180,6 +180,14 @@ button, input, select { font: inherit; color: inherit; }
   font: 500 13px/1.4 "Instrument Sans", sans-serif;
   color: var(--muted);
 }
+.switches { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.lang-switch { display: flex; gap: 2px; font-size: 13px; }
+.lang-switch button {
+  border: 0; background: none; cursor: pointer; color: var(--muted);
+  padding: 3px 8px; border-radius: 6px; font: 500 13px "Instrument Sans", "Noto Sans Devanagari", sans-serif;
+}
+.lang-switch button[aria-pressed="true"] { color: var(--ink); background: var(--surface-2); }
+.lang-switch button:hover { color: var(--ink); }
 .theme-switch { display: flex; gap: 4px; padding: 4px; border: 1px solid var(--line); border-radius: 999px; }
 .theme-switch button {
   display: flex; align-items: center; gap: 6px;
@@ -192,6 +200,15 @@ button, input, select { font: inherit; color: inherit; }
   background: radial-gradient(circle, var(--b) 0 34%, var(--a) 36%);
   box-shadow: inset 0 0 0 1px rgba(128, 128, 128, 0.4);
 }
+
+/* Hindi: Devanagari face for running text, and section titles without the
+   condensed Latin display face, which has no Devanagari glyphs. */
+:lang(hi) body { font-family: "Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif; }
+:lang(hi) .panel-title, :lang(hi) .sheet-head h2 {
+  font-family: "Noto Sans Devanagari", "Instrument Sans", sans-serif; font-weight: 600;
+  text-transform: none; letter-spacing: 0;
+}
+:lang(hi) .tagline, :lang(hi) .tool-help, :lang(hi) .readout-note { line-height: 1.7; }
 
 /* ---------- timeline ribbon ---------- */
 .ribbon {
@@ -501,7 +518,7 @@ tbody tr:hover td { background: var(--surface); }
 /* ---------- responsive ---------- */
 @media (max-width: 1080px) {
   .masthead { grid-template-columns: 1fr auto; }
-  .theme-switch { grid-column: 1 / -1; justify-self: start; }
+  .switches { grid-column: 1 / -1; justify-self: start; flex-direction: row-reverse; flex-wrap: wrap; align-items: center; }
   .sw-name { display: none; }
   .theme-switch button { padding: 5px; }
 }

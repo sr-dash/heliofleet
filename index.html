@@ -18,6 +18,10 @@
   <meta name="author" content="Soumyaranjan Dash">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="canonical" href="https://sr-dash.github.io/heliofleet/">
+  <link rel="alternate" hreflang="en" href="https://sr-dash.github.io/heliofleet/">
+  <link rel="alternate" hreflang="hi" href="https://sr-dash.github.io/heliofleet/?lang=hi">
+  <link rel="alternate" hreflang="es" href="https://sr-dash.github.io/heliofleet/?lang=es">
+  <link rel="alternate" hreflang="x-default" href="https://sr-dash.github.io/heliofleet/">
   <link rel="author" href="https://sr-dash.github.io/">
   <link rel="license" href="https://github.com/sr-dash/heliofleet/blob/main/LICENSE">
   <meta name="google-site-verification" content="wNt-P7enH5ZTT0cjYYqXEN9GRrj-0_OcbZSER57FIK4">
@@ -40,6 +44,8 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Soumyaranjan Dash Portfolio">
   <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="hi_IN">
+  <meta property="og:locale:alternate" content="es_ES">
   <meta property="og:title" content="HelioFleet: where the Sun-watching spacecraft are">
   <meta property="og:description" content="SDO, SOHO, Aditya-L1, Solar Orbiter, Parker, STEREO, BepiColombo and more around the Sun and Earth on any date since 2010, with eclipse presets and alignment search.">
   <meta property="og:url" content="https://sr-dash.github.io/heliofleet/">
@@ -102,7 +108,7 @@
         "applicationSubCategory": "Heliophysics visualization",
         "operatingSystem": "Any (web browser)",
         "browserRequirements": "Requires JavaScript and HTML5 canvas",
-        "inLanguage": "en",
+        "inLanguage": ["en", "hi", "es"],
         "isAccessibleForFree": true,
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
         "datePublished": "2026-10-09",
@@ -198,15 +204,18 @@
       <span class="clock-time" id="clock-time">—</span>
       <span class="clock-ctx" id="clock-ctx"></span>
     </div>
-    <div class="theme-switch" role="radiogroup" aria-label="Colour theme">
-      <button role="radio" data-theme-pick="night" title="Night">
-        <span class="sw" style="--a:#0B1026;--b:#FFB23F"></span><span class="sw-name">Night</span></button>
-      <button role="radio" data-theme-pick="eclipse" title="Totality">
-        <span class="sw" style="--a:#030304;--b:#EDE8DA"></span><span class="sw-name">Totality</span></button>
-      <button role="radio" data-theme-pick="halpha" title="H-alpha">
-        <span class="sw" style="--a:#1A0606;--b:#FF4433"></span><span class="sw-name">H-alpha</span></button>
-      <button role="radio" data-theme-pick="plate" title="Plate">
-        <span class="sw" style="--a:#E6ECF1;--b:#1F2A4A"></span><span class="sw-name">Plate</span></button>
+    <div class="switches">
+      <div class="lang-switch" id="lang-switch" role="group" aria-label="Language"></div>
+      <div class="theme-switch" role="radiogroup" aria-label="Colour theme">
+        <button role="radio" data-theme-pick="night" title="Night">
+          <span class="sw" style="--a:#0B1026;--b:#FFB23F"></span><span class="sw-name">Night</span></button>
+        <button role="radio" data-theme-pick="eclipse" title="Totality">
+          <span class="sw" style="--a:#030304;--b:#EDE8DA"></span><span class="sw-name">Totality</span></button>
+        <button role="radio" data-theme-pick="halpha" title="H-alpha">
+          <span class="sw" style="--a:#1A0606;--b:#FF4433"></span><span class="sw-name">H-alpha</span></button>
+        <button role="radio" data-theme-pick="plate" title="Plate">
+          <span class="sw" style="--a:#E6ECF1;--b:#1F2A4A"></span><span class="sw-name">Plate</span></button>
+      </div>
     </div>
   </header>
 
@@ -492,8 +501,8 @@
   </main>
 
   <footer class="colophon">
-    <p>Ephemerides from <a href="https://ssd.jpl.nasa.gov/horizons/">JPL Horizons</a>, sampled daily (Parker every 3 h) and interpolated; predictions beyond each mission's tracking data are planning trajectories. Heliographic coordinates follow the IAU solar rotation model, as in SunPy.</p>
-    <p>Made by <a href="https://sr-dash.github.io/" rel="author">Dr. Soumyaranjan Dash</a> · <a href="https://sr-dash.github.io/software/">More software</a> · <a href="https://github.com/sr-dash/heliofleet">Source on GitHub</a></p>
+    <p data-i18n-html="colophon-data">Ephemerides from <a href="https://ssd.jpl.nasa.gov/horizons/">JPL Horizons</a>, sampled daily (Parker every 3 h) and interpolated; predictions beyond each mission's tracking data are planning trajectories. Heliographic coordinates follow the IAU solar rotation model, as in SunPy.</p>
+    <p data-i18n-html="colophon-credit">Made by <a href="https://sr-dash.github.io/" rel="author">Dr. Soumyaranjan Dash</a> · <a href="https://sr-dash.github.io/software/">More software</a> · <a href="https://github.com/sr-dash/heliofleet">Source on GitHub</a></p>
   </footer>
 
   <noscript>

@@ -4,9 +4,10 @@
 
 import { BODIES } from './catalog.js';
 import { R_SUN_AU } from './frames.js';
+import { tr } from './i18n.js';
 
 const FONT_MONO = '"IBM Plex Mono", ui-monospace, monospace';
-const FONT_SANS = '"Instrument Sans", system-ui, sans-serif';
+const FONT_SANS = '"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif';
 
 export function readTheme(el = document.documentElement) {
   const cs = getComputedStyle(el);
@@ -179,7 +180,7 @@ export function drawMap(ctx, W, H, scene, s, th, view, opts = {}) {
     ctx.beginPath(); ctx.moveTo(0, oy); ctx.lineTo(W, oy);
     ctx.strokeStyle = th.muted; ctx.globalAlpha = 0.6; ctx.stroke(); ctx.globalAlpha = 1;
     ctx.textAlign = 'left';
-    ctx.fillText('ecliptic plane · au', 14 * k, H - 16 * k);
+    ctx.fillText(tr('ecliptic plane · au'), 14 * k, H - 16 * k);
   }
 
   // Planet orbits
@@ -304,8 +305,8 @@ export function drawMap(ctx, W, H, scene, s, th, view, opts = {}) {
     drawMarker(ctx, b.key, x, y, r, th.color[b.key], th.bg, b.st);
     if (s.labels) {
       let text = BODIES[b.key].short;
-      if (b.st === 'lost') text += ' (contact lost)';
-      if (b.st === 'approx') text += ' (at Earth)';
+      if (b.st === 'lost') text += ` (${tr('contact lost')})`;
+      if (b.st === 'approx') text += ` (${tr('at Earth')})`;
       labels.push({ text, x, y, r: r * 1.6, size: 12 * k, key: b.key, planet: BODIES[b.key].kind === 'planet' && b.key !== 'earth' });
     }
   }
@@ -357,7 +358,7 @@ export function drawInset(ctx, W, H, scene, s, th, opts = {}) {
   ctx.beginPath(); ctx.moveTo(ox, H); ctx.lineTo(ox, 0); ctx.stroke();
   ctx.fillStyle = th.sun;
   ctx.textAlign = 'center';
-  ctx.fillText('▲ to Sun', ox, 10 * k);
+  ctx.fillText(`▲ ${tr('to Sun')}`, ox, 10 * k);
 
   // Scale bar: 500 000 km
   const sb = 5e5 * ppk;
@@ -390,7 +391,7 @@ export function drawInset(ctx, W, H, scene, s, th, opts = {}) {
     const [mx, my] = map(ins.moon);
     ctx.fillStyle = th.moon; ctx.beginPath(); ctx.arc(mx, my, 3 * k, 0, 2 * Math.PI); ctx.fill();
     ctx.fillStyle = th.muted; ctx.textAlign = mx > ox ? 'left' : 'right';
-    ctx.fillText('Moon', mx + (mx > ox ? 6 : -6) * k, my);
+    ctx.fillText(tr('Moon'), mx + (mx > ox ? 6 : -6) * k, my);
   }
 
   // L1 fleet: fading 180-day tracks, then markers and labels
@@ -427,10 +428,10 @@ export function drawInset(ctx, W, H, scene, s, th, opts = {}) {
   ctx.font = `600 ${11 * k}px ${FONT_SANS}`;
   ctx.textAlign = 'left';
   ctx.fillStyle = th.color.earth;
-  ctx.fillText('Earth', ox + 12 * k, oy + 1);
+  ctx.fillText(tr('Earth'), ox + 12 * k, oy + 1);
   if (ins.sdo && !s.hidden.has('sdo')) {
     ctx.fillStyle = th.color.sdo;
     ctx.font = `${10 * k}px ${FONT_SANS}`;
-    ctx.fillText(W < 170 * k ? '+ SDO' : '+ SDO in GEO', ox + 12 * k, oy + 14 * k);
+    ctx.fillText(W < 170 * k ? '+ SDO' : tr('+ SDO in GEO'), ox + 12 * k, oy + 14 * k);
   }
 }

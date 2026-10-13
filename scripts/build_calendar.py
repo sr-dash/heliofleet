@@ -120,8 +120,8 @@ def build():
     earth = pos["earth"]
     events = []
 
-    def add(kind, jd, title, detail, keys, jd_end=None):
-        events.append({"kind": kind, "t": jd, "end": jd_end, "title": title, "detail": detail, "bodies": keys})
+    def add(kind, jd, title, detail, keys, jd_end=None, v=None):
+        events.append({"kind": kind, "t": jd, "end": jd_end, "title": title, "detail": detail, "bodies": keys, "v": v})
 
     # Perihelia on each body's own samples: interpolating between samples would
     # cut chords across the curved orbit and invent spurious minima.
@@ -137,23 +137,27 @@ def build():
             off = 0.5 * (r[i - 1] - r[i + 1]) / den if den else 0.0
             rmin = r[i] - 0.25 * (r[i - 1] - r[i + 1]) * off
             add("perihelion", t + off * sr.step, f"{NAMES[k]} perihelion",
-                f"Closest approach to the Sun: {rmin:.4f} au ({rmin * 215.03:.1f} solar radii).", [k])
+                f"Closest approach to the Sun: {rmin:.4f} au ({rmin * 215.03:.1f} solar radii).", [k],
+                v={"r": f"{rmin:.4f}", "rs": f"{rmin * 215.03:.1f}"})
 
     for a, b in ALIGN_PAIRS:
         vals = [angle(p, q) if p and q else None for p, q in zip(pos[a], pos[b])]
         for w in windows(times, vals, ALIGN_TOL):
             i = times.index(w["best"])
+            v = {"sep": f"{w['value']:.1f}", "ra": f"{norm(pos[a][i]):.3f}"}
             if b == "earth":
                 ra = norm(pos[a][i])
+                v["inside"] = ra < norm(earth[i])
                 title = f"{NAMES[a]} on the Sun–Earth line"
                 where = "between the Sun and Earth" if ra < norm(earth[i]) else "beyond Earth"
                 detail = f"{NAMES[a]} lies {where}, {w['value']:.1f}° off the Sun–Earth line at {ra:.3f} au."
             else:
                 title = f"{NAMES[a]} and {NAMES[b]} radially aligned"
+                v["rb"] = f"{norm(pos[b][i]):.3f}"
                 detail = (f"Sun-centred separation {w['value']:.1f}° at closest; "
                           f"{NAMES[a]} at {norm(pos[a][i]):.3f} au, {NAMES[b]} at {norm(pos[b][i]):.3f} au.")
             detail += f" Within {ALIGN_TOL:.0f}° from {dt_of(w['start']):%Y-%m-%d %H:%M} to {dt_of(w['end']):%Y-%m-%d %H:%M} UTC."
-            add("alignment", w["best"], title, detail, [a, b], w["end"])
+            add("alignment", w["best"], title, detail, [a, b], w["end"], v)
 
     for k in QUADRATURE:
         vals = [abs(angle(p, e) - 90) if p and e else None for p, e in zip(pos[k], earth)]
@@ -164,7 +168,8 @@ def build():
             side = "west, ahead of Earth" if ahead else "east, trailing Earth"
             add("quadrature", w["best"], f"{NAMES[k]} in quadrature with Earth",
                 f"{NAMES[k]} is 90° from Earth as seen from the Sun ({side}), at {norm(pos[k][i]):.3f} au. "
-                "Earth-facing activity appears on its limb.", [k, "earth"], w["end"])
+                "Earth-facing activity appears on its limb.", [k, "earth"], w["end"],
+                {"r": f"{norm(pos[k][i]):.3f}", "ahead": ahead})
 
     for k in CONJUNCTION:
         vals = []
@@ -180,13 +185,14 @@ def build():
             add("conjunction", w["best"], f"Solar conjunction: {NAMES[k]} behind the Sun",
                 f"{NAMES[k]} is {w['value']:.2f}° from the Sun's centre as seen from Earth; "
                 f"communications are often limited near conjunction. Within {CONJ_TOL:.0f}° from "
-                f"{dt_of(w['start']):%Y-%m-%d} to {dt_of(w['end']):%Y-%m-%d}.", [k], w["end"])
+                f"{dt_of(w['start']):%Y-%m-%d} to {dt_of(w['end']):%Y-%m-%d}.", [k], w["end"],
+                {"sep": f"{w['value']:.2f}"})
 
     for t, label, where, hybrid in eclipses():
         jd = jd_of(t)
         if jd0 <= jd <= jd1:
             add("eclipse", jd, f"{'Hybrid' if hybrid else 'Total'} solar eclipse: {label}",
-                f"Greatest eclipse. Path: {where}.", ["earth"])
+                f"Greatest eclipse. Path: {where}.", ["earth"], v={"label": label, "where": where, "hybrid": hybrid})
 
     events.sort(key=lambda e: e["t"])
     return events, manifest
