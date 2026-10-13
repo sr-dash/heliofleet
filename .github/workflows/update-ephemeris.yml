@@ -1,9 +1,11 @@
-# Monthly refresh of the ephemeris files from JPL Horizons.
+# Monthly refresh of the site's data.
 #
-# Refetches every year from the previous one onward, so predicted trajectories
-# are replaced as missions publish fitted ones, and appends new years when a
-# spacecraft's Horizons ephemeris is extended. The manifest records when this
-# ran and when it runs next; the page shows both.
+# Ephemerides: refetches every year from the previous one onward, so predicted
+# trajectories are replaced as missions publish fitted ones, and appends new
+# years when a spacecraft's Horizons ephemeris is extended. The manifest
+# records when this ran and when it runs next; the page shows both.
+# Events: merges the last 150 days of DONKI flares, CMEs and storms.
+# Calendar: rebuilds calendar.ics and data/upcoming.json from the new data.
 
 name: Update ephemeris
 
@@ -46,12 +48,23 @@ jobs:
             python scripts/fetch_ephemeris.py --incremental
           fi
 
+      - name: Fetch space-weather events from DONKI
+        run: |
+          if [ "${{ inputs.full }}" = "true" ]; then
+            python scripts/fetch_events.py
+          else
+            python scripts/fetch_events.py --incremental
+          fi
+
+      - name: Build the calendar of upcoming events
+        run: python scripts/build_calendar.py
+
       - name: Commit and push
         id: commit
         run: |
           git config user.name "Soumyaranjan Dash"
           git config user.email "sdash@nso.edu"
-          git add data README.md sitemap.xml
+          git add data README.md sitemap.xml calendar.ics
           if git diff --cached --quiet; then
             echo "No changes."
             echo "pushed=false" >> "$GITHUB_OUTPUT"
@@ -59,7 +72,7 @@ jobs:
           fi
           end=$(python -c "import json,datetime as d; m=json.load(open('data/manifest.json')); print(d.datetime.fromtimestamp((m['timeline']['end']-2440587.5)*86400, d.timezone.utc).date())")
           git commit -m "Update ephemeris data for $(date -u +%Y-%m)" \
-                     -m "Monthly refresh from JPL Horizons. Timeline now ends ${end}."
+                     -m "Monthly refresh from JPL Horizons and DONKI. Timeline now ends ${end}."
           git push
           echo "pushed=true" >> "$GITHUB_OUTPUT"
 
