@@ -65,7 +65,7 @@ Positions come from [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/), as helio
 | SOHO | -21 | 2010-01-01 to 2026-11-02; Sun-Earth L1 |
 | Aditya-L1 | -156 | 2023-09-03 to 2027-01-21; Sun-Earth L1 |
 | ACE | -92 | 2010-01-01 to 2026-12-20; Sun-Earth L1 |
-| Wind | -8 | 2010-01-01 to 2026-12-14; Sun-Earth L1 |
+| Wind | -8 | 2010-01-01 to 2026-12-11; Sun-Earth L1 |
 | DSCOVR | -78 | 2015-02-12 to 2026-10-25; Sun-Earth L1 |
 | IMAP | -43 | 2025-09-25 to 2026-11-08; Sun-Earth L1 |
 | SWFO-L1 | -231 | 2025-09-25 to 2028-02-24; Sun-Earth L1 |
@@ -141,6 +141,10 @@ assets/                  icons and the social preview image
 site.webmanifest, sitemap.xml, favicon.ico
 CITATION.cff, .zenodo.json  citation metadata
 scripts/fetch_ephemeris.py
+scripts/check_data.py    ephemeris data health
+scripts/check_links.py   external link check
+tests/validate.mjs       accuracy against Horizons and SunPy
+scripts/make_reference.py  builds tests/reference.json
 ```
 
 ## Acknowledgements
@@ -171,7 +175,10 @@ Brueckner et al. 1995, Solar Physics 162, 357 (LASCO); Howard et al. 2008, Space
 ## Maintenance
 
 - After changing anything in `css/` or `js/`, run `python3 scripts/stamp_assets.py`. It gives every stylesheet and module a content-hashed URL, so visitors never run a mix of old and new files while browsers still hold cached copies.
-- The **Check** workflow runs on every push: JavaScript syntax, `scripts/check_i18n.py`, the asset stamps, and that every data file parses.
+- The **Check** workflow runs on every push: JavaScript syntax, `scripts/check_i18n.py`, the asset stamps, that every data file parses, `scripts/check_data.py` and `tests/validate.mjs` (below).
+- **Accuracy:** `node tests/validate.mjs` runs the page's own code against reference values from JPL Horizons and SunPy in `tests/reference.json`: interpolation between stored samples, Stonyhurst and Carrington coordinates (within 0.005°; currently 0.0004°), and the sky-view projection (within 0.5″). `scripts/make_reference.py` rebuilds the reference values and needs astropy and sunpy.
+- **Data health:** `scripts/check_data.py` checks every series for missing files, gaps, impossible jumps, out-of-range distances and mismatches with the manifest, and flags missions whose ephemeris has stopped advancing. The monthly update commits nothing unless the new data pass this check and the accuracy test.
+- **Links:** the [Health check](.github/workflows/health.yml) workflow runs `scripts/check_links.py` and the data check on the 15th of each month. A failed update or health check opens an issue labelled `maintenance` (or comments on the open one).
 - Feedback comes through the issue forms (feature request, something looks wrong, add a spacecraft or instrument, translation fix) and the Discussions tab, linked from the page footer.
 
 ## Translations

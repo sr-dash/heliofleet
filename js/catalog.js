@@ -60,19 +60,19 @@ export const BODIES = {
     name: 'Interstellar Mapping and Acceleration Probe', short: 'IMAP', tag: 'IMAP', agency: 'NASA', kind: 'sc',
     hid: '-43', launch: '2025-09-24T11:30Z', near: true, geoKey: 'imap_geo', derived: true,
     site: 'https://imap.princeton.edu/',
-    data: 'https://imap.princeton.edu/data-access',
+    data: 'https://imap.princeton.edu/data',
   },
   swfo: {
     name: 'Space Weather Follow On-Lagrange 1', short: 'SWFO-L1', tag: 'SWFO', agency: 'NOAA', kind: 'sc',
     hid: '-231', launch: '2025-09-24T11:30Z', near: true, geoKey: 'swfo_geo', derived: true,
-    site: 'https://www.nesdis.noaa.gov/our-satellites/future-programs/swfo',
+    site: 'https://www.nesdis.noaa.gov/OPPA/swfo-L1.php',
     data: 'https://www.swpc.noaa.gov/',
   },
   cgo: {
     name: 'Carruthers Geocorona Observatory', short: 'Carruthers', tag: 'CGO', agency: 'NASA', kind: 'sc',
     hid: '-171', launch: '2025-09-24T11:30Z', near: true, geoKey: 'cgo_geo', derived: true,
+    // No public data archive yet
     site: 'https://science.nasa.gov/mission/carruthers-geocorona-observatory/',
-    data: 'https://carruthers.ssl.berkeley.edu/',
   },
   solo: {
     name: 'Solar Orbiter', short: 'Solar Orbiter', tag: 'SolO', agency: 'ESA / NASA', kind: 'sc',

@@ -1,0 +1,39 @@
+# Monthly health check, mid-way between data updates: external links on the
+# site and in its documentation, and the state of the ephemeris data (a
+# mission whose ephemeris has stopped advancing shows up here). A failure
+# opens an issue.
+
+name: Health check
+
+on:
+  schedule:
+    - cron: "41 7 15 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Links
+        run: python scripts/check_links.py
+
+      - name: Ephemeris data
+        if: success() || failure()
+        run: python scripts/check_data.py
+
+      - name: Report problems
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/report_failure.sh "Health check found problems"

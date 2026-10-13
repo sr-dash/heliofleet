@@ -25,6 +25,7 @@ on:
 permissions:
   contents: write
   pages: write
+  issues: write
 
 concurrency:
   group: update-ephemeris
@@ -40,6 +41,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
 
       - name: Fetch ephemerides from JPL Horizons
         run: |
@@ -62,6 +67,13 @@ jobs:
 
       - name: Build the calendar of upcoming events
         run: python scripts/build_calendar.py
+
+      # Nothing is committed unless the new data pass both checks.
+      - name: Check the new data
+        run: python scripts/check_data.py
+
+      - name: Check the geometry against Horizons and SunPy
+        run: node tests/validate.mjs
 
       - name: Commit and push
         id: commit
@@ -89,3 +101,9 @@ jobs:
         run: |
           gh api -X POST "repos/${{ github.repository }}/pages/builds" --silent \
             || echo "::warning::Could not request a Pages build; it will publish on the next push."
+
+      - name: Report a failed update
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/report_failure.sh "Monthly data update failed"

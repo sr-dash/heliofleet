@@ -122,7 +122,7 @@ export function initCards(ctx) {
         ${key !== 'earth' ? `<button data-act="hide">${tr('Hide on map')}</button>` : ''}
       </div>
       ${layersAt(key, sc.jd).length ? `<div class="card-links card-hv"><span>${tr('Images in Helioviewer:')}</span>${layersAt(key, sc.jd).map((l) => `<a href="${hvUrl(sc.jd, l)}" target="_blank" rel="noopener">${l.label}</a>`).join('')}</div>` : ''}
-      ${meta.site ? `<div class="card-links"><a href="${meta.site}" target="_blank" rel="noopener">${tr('Mission page')}</a><a href="${meta.data}" target="_blank" rel="noopener">${tr('Data archive')}</a></div>` : ''}`;
+      ${meta.site ? `<div class="card-links"><a href="${meta.site}" target="_blank" rel="noopener">${tr('Mission page')}</a>${meta.data ? `<a href="${meta.data}" target="_blank" rel="noopener">${tr('Data archive')}</a>` : ''}</div>` : ''}`;
     wire(key);
     if (hasPeri) {
       const jd = sc.jd;

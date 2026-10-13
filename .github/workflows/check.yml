@@ -25,5 +25,7 @@ jobs:
       - name: Data files parse
         run: |
           python -c "import json,glob; [json.load(open(f)) for f in glob.glob('data/**/*.json', recursive=True) + glob.glob('i18n/*.json')]; print('json ok')"
+      - name: Ephemeris data healthy
+        run: python scripts/check_data.py --no-stale
       - name: Geometry matches Horizons and SunPy
         run: node tests/validate.mjs

@@ -444,7 +444,7 @@
   },
   "wind_geo": {
    "center": "earth",
-   "end": 2461389.0,
+   "end": 2461386.0,
    "start": 2455197.5,
    "step": 0.5,
    "units": "km",
@@ -469,7 +469,7 @@
    ]
   }
  },
- "generated": "2026-10-13T18:26:45Z",
+ "generated": "2026-10-13T18:33:39Z",
  "next_update": "2026-11-01T06:17:00Z",
  "source": "JPL Horizons, ICRF ecliptic J2000, UT sample grid",
  "timeline": {

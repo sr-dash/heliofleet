@@ -196,6 +196,15 @@ def fetch_body(key, end, from_year, old):
         if y1 <= y0:
             continue
         rows = query(b["cmd"], b["center"], y0, y1, b["step"], b["units"])
+        # Horizons pads some series past their real end with zero vectors
+        # (Wind in 2026); the series ends at the first one.
+        cut = next((i for i, r in enumerate(rows) if r[1] == r[2] == r[3] == 0.0), None)
+        if cut is not None:
+            print(f"  {key}: zero vectors from {rows[cut][0]:.1f} (JD); series ends there", flush=True)
+            rows = rows[:cut]
+            end = min(end, y0 + max(0, cut - 1) * step)
+        if not rows:
+            break
         nd = 7 if b["units"] == "au" else 0
         flat = []
         for _, x, y, z in rows:
@@ -206,6 +215,8 @@ def fetch_body(key, end, from_year, old):
         first = rows[0][0] if first is None else first
         last = rows[-1][0]
         print(f"  {key} {year}: {len(rows)} samples", flush=True)
+        if cut is not None:
+            break
     # Drop chunks that now fall beyond the ephemeris (a shortened prediction).
     for f in outdir.glob("*.json"):
         if int(f.stem) > end.year:
