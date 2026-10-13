@@ -193,6 +193,10 @@ python3 scripts/check_i18n.py
 
 It lists every English string the page can show and reports, for each language, the strings that are missing and entries whose `{placeholders}` differ. `--keys` prints the full list, which is the place to start when adding another language. Corrections from native speakers are very welcome as pull requests or issues.
 
+## Contributing
+
+Reports of anything that looks wrong, requests for spacecraft and instruments, translations and pull requests are all welcome. See the [contributing guidelines](CONTRIBUTING.md) for how to run the checks and add a spacecraft, the [code of conduct](CODE_OF_CONDUCT.md), and the [security policy](SECURITY.md) for reporting security problems privately.
+
 ## Citing HelioFleet
 
 If HelioFleet helps your research, please cite it:
