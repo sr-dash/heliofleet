@@ -125,6 +125,12 @@ CITATION.cff, .zenodo.json  citation metadata
 scripts/fetch_ephemeris.py
 ```
 
+## Acknowledgements
+
+- Spacecraft and planet positions: [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/), Solar System Dynamics Group, NASA Jet Propulsion Laboratory.
+- Flares, CMEs and geomagnetic storms, including the CME speeds, directions and widths behind the CME fronts on the map: the Space Weather Database Of Notifications, Knowledge, Information ([DONKI](https://ccmc.gsfc.nasa.gov/DONKI/)), developed and maintained by the [Community Coordinated Modeling Center](https://ccmc.gsfc.nasa.gov/) at NASA Goddard Space Flight Center.
+- Heliographic coordinates follow the IAU solar rotation model as implemented in [SunPy](https://sunpy.org/), which was used to validate them.
+
 ## Translations
 
 Interface text lives in `i18n/hi.json` and `i18n/es.json`, keyed by the English text, so anything without a translation falls back to English. Spacecraft names, dates, numbers and the exported data files (CSV, JSON, SunPy code, citation) stay in English. After changing any interface text, run:

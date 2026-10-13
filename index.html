@@ -130,11 +130,23 @@
           "Embeddable map view for other websites",
           "PNG and PDF snapshot export"
         ],
-        "isBasedOn": {
-          "@type": "Dataset",
-          "name": "JPL Horizons ephemerides",
-          "url": "https://ssd.jpl.nasa.gov/horizons/"
-        },
+        "isBasedOn": [
+          {
+            "@type": "Dataset",
+            "name": "JPL Horizons ephemerides",
+            "url": "https://ssd.jpl.nasa.gov/horizons/"
+          },
+          {
+            "@type": "Dataset",
+            "name": "DONKI: Space Weather Database Of Notifications, Knowledge, Information",
+            "url": "https://ccmc.gsfc.nasa.gov/DONKI/",
+            "creator": {
+              "@type": "Organization",
+              "name": "Community Coordinated Modeling Center, NASA Goddard Space Flight Center",
+              "url": "https://ccmc.gsfc.nasa.gov/"
+            }
+          }
+        ],
         "sameAs": ["https://github.com/sr-dash/heliofleet", "https://doi.org/10.5281/zenodo.23328187"],
         "identifier": {
           "@type": "PropertyValue",
@@ -502,6 +514,7 @@
 
   <footer class="colophon">
     <p data-i18n-html="colophon-data">Ephemerides from <a href="https://ssd.jpl.nasa.gov/horizons/">JPL Horizons</a>, sampled daily (Parker every 3 h) and interpolated; predictions beyond each mission's tracking data are planning trajectories. Heliographic coordinates follow the IAU solar rotation model, as in SunPy.</p>
+    <p data-i18n-html="colophon-events">Flares, CMEs and geomagnetic storms, including the CME speeds, directions and widths used for the fronts on the map, come from the Space Weather Database Of Notifications, Knowledge, Information (<a href="https://ccmc.gsfc.nasa.gov/DONKI/">DONKI</a>), developed and maintained by the <a href="https://ccmc.gsfc.nasa.gov/">Community Coordinated Modeling Center</a> at NASA Goddard Space Flight Center.</p>
     <p data-i18n-html="colophon-credit">Made by <a href="https://sr-dash.github.io/" rel="author">Dr. Soumyaranjan Dash</a> · <a href="https://sr-dash.github.io/software/">More software</a> · <a href="https://github.com/sr-dash/heliofleet">Source on GitHub</a></p>
   </footer>
 

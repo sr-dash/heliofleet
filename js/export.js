@@ -178,6 +178,7 @@ export async function composeSnapshot(scene, s, th, view, meta) {
   }
   if (meta.absent) wrapText(ctx, meta.absent, X, y + 2, CW, 14);
 
+  ctx.fillText(tr('Space-weather events: NASA CCMC DONKI'), X, H - 54, CW);
   ctx.fillText(`${tr('Ephemerides: JPL Horizons')}${meta.stamp ? ` (${tr('updated {date}', { date: meta.stamp })})` : ''} · ${tr('HGS/Carrington from Earth')}`, X, H - 38, CW);
   ctx.fillText('sr-dash.github.io/heliofleet', X, H - 22);
   return cv;
@@ -260,7 +261,8 @@ export function composeFrame(ctx, W, H, scene, s, th, meta) {
     }
     ctx.fillStyle = th.muted;
     ctx.font = `400 ${13 * k}px ${SANS}`;
-    ctx.fillText(tr('Ephemerides: JPL Horizons'), X, H - 46 * k);
+    ctx.fillText(tr('Ephemerides: JPL Horizons'), X, H - 66 * k);
+    ctx.fillText(tr('Space-weather events: NASA CCMC DONKI'), X, H - 46 * k);
     ctx.fillText('sr-dash.github.io/heliofleet', X, H - 26 * k);
     return;
   }
@@ -297,5 +299,5 @@ export function composeFrame(ctx, W, H, scene, s, th, meta) {
   ctx.fillStyle = th.muted;
   ctx.font = `400 ${12 * k}px ${SANS}`;
   ctx.textAlign = 'right';
-  ctx.fillText('sr-dash.github.io/heliofleet · JPL Horizons', W - 16 * k, H - 16 * k);
+  ctx.fillText('sr-dash.github.io/heliofleet · JPL Horizons · NASA CCMC DONKI', W - 16 * k, H - 16 * k);
 }
