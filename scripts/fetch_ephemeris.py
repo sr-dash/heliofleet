@@ -55,6 +55,9 @@ BODIES = {
     "ace_geo":    dict(cmd="-92",     center="500@399", step=12, units="km", start=APP_START,          end=None),
     "wind_geo":   dict(cmd="-8",      center="500@399", step=12, units="km", start=APP_START,          end=None),
     "dscovr_geo": dict(cmd="-78",     center="500@399", step=12, units="km", start="2015-02-12",       end=None),
+    "imap_geo":   dict(cmd="-43",     center="500@399", step=12, units="km", start="2025-09-25",       end=None),
+    "swfo_geo":   dict(cmd="-231",    center="500@399", step=12, units="km", start="2025-09-25",       end=None),
+    "cgo_geo":    dict(cmd="-171",    center="500@399", step=12, units="km", start="2025-09-25",       end=None),
     "bepi":       dict(cmd="-121",    center="500@10",  step=24, units="au", start="2018-10-21",       end=None),
     "maven":      dict(cmd="-202",    center="500@10",  step=24, units="au", start="2013-11-19",       end=None),
 }
@@ -67,12 +70,15 @@ README_ROWS = [
     ("ace_geo", "ACE", "-92", "Sun-Earth L1"),
     ("wind_geo", "Wind", "-8", "Sun-Earth L1"),
     ("dscovr_geo", "DSCOVR", "-78", "Sun-Earth L1"),
+    ("imap_geo", "IMAP", "-43", "Sun-Earth L1"),
+    ("swfo_geo", "SWFO-L1", "-231", "Sun-Earth L1"),
+    ("cgo_geo", "Carruthers", "-171", "Sun-Earth L1"),
     ("solo", "Solar Orbiter", "-144", ""),
     ("psp", "Parker Solar Probe", "-96", ""),
     ("sta", "STEREO-A", "-234", ""),
     ("stb", "STEREO-B", "-235", "contact lost 2014-10-01; later positions are predictions"),
     ("bepi", "BepiColombo", "-121", ""),
-    ("maven", "MAVEN", "-202", "Mars orbit"),
+    ("maven", "MAVEN", "-202", "Mars orbit; no contact since 2025-12-06, later positions are predictions"),
 ]
 
 JD_UNIX_EPOCH = 2440587.5

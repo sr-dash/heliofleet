@@ -73,6 +73,19 @@
     2027
    ]
   },
+  "cgo_geo": {
+   "center": "earth",
+   "end": 2461849.5,
+   "start": 2460943.5,
+   "step": 0.5,
+   "units": "km",
+   "years": [
+    2025,
+    2026,
+    2027,
+    2028
+   ]
+  },
   "dscovr_geo": {
    "center": "earth",
    "end": 2461339.0,
@@ -122,6 +135,17 @@
     2028,
     2029,
     2030
+   ]
+  },
+  "imap_geo": {
+   "center": "earth",
+   "end": 2461353.0,
+   "start": 2460943.5,
+   "step": 0.5,
+   "units": "km",
+   "years": [
+    2025,
+    2026
    ]
   },
   "mars": {
@@ -375,6 +399,19 @@
     2018
    ]
   },
+  "swfo_geo": {
+   "center": "earth",
+   "end": 2461826.0,
+   "start": 2460943.5,
+   "step": 0.5,
+   "units": "km",
+   "years": [
+    2025,
+    2026,
+    2027,
+    2028
+   ]
+  },
   "venus": {
    "center": "sun",
    "end": 2462824.5,
@@ -432,7 +469,7 @@
    ]
   }
  },
- "generated": "2026-10-13T00:07:52Z",
+ "generated": "2026-10-13T18:26:45Z",
  "next_update": "2026-11-01T06:17:00Z",
  "source": "JPL Horizons, ICRF ecliptic J2000, UT sample grid",
  "timeline": {

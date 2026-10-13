@@ -6,7 +6,7 @@ Where the Sun-watching spacecraft are, on any date since 2010.
 
 **Live:** https://sr-dash.github.io/heliofleet
 
-HelioFleet places SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, Solar Orbiter, Parker Solar Probe, BepiColombo, STEREO-A, STEREO-B and MAVEN around the Sun and Earth for any moment you choose. Pick a date and time in UTC, drag the timeline, or jump to a preset: every total and hybrid solar eclipse since 2010, mission milestones, and major space-weather events.
+HelioFleet places SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, IMAP, SWFO-L1, Carruthers, Solar Orbiter, Parker Solar Probe, BepiColombo, STEREO-A, STEREO-B and MAVEN around the Sun and Earth for any moment you choose. Pick a date and time in UTC, drag the timeline, or jump to a preset: every total and hybrid solar eclipse since 2010, mission milestones, and major space-weather events.
 
 ## Features
 
@@ -18,7 +18,7 @@ HelioFleet places SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, Solar Orbiter, Parker
 - **Two frames:** Earth-fixed (Heliocentric Earth Ecliptic, Earth at the bottom) or inertial ecliptic J2000.
 - **Two views:** from ecliptic north, or edge-on to show orbital inclination (Solar Orbiter's climb out of the ecliptic).
 - **Trails:** the past path fades and the future path is dotted. In the Earth-fixed frame the trail is the true co-rotating track.
-- **Near-Earth inset:** Earth, the Moon, the Sun–Earth L1 point and the orbits of SOHO, Aditya-L1, ACE, Wind and DSCOVR around it, with the Sun straight up.
+- **Near-Earth inset:** Earth, the Moon, the Sun–Earth L1 point and the orbits of SOHO, Aditya-L1, ACE, Wind, DSCOVR, IMAP, SWFO-L1 and Carruthers around it, with the Sun straight up.
 - **Coordinates:** Stonyhurst heliographic longitude and latitude, Carrington longitude, separation from Earth, and the nominal Parker-spiral footpoint for a solar-wind speed you choose.
 - **Parker spirals:** optional field lines through Earth and each spacecraft.
 - **Snapshots:** download the current view as PNG or PDF, with the map, inset and coordinate table on one page.
@@ -67,12 +67,15 @@ Positions come from [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/), as helio
 | ACE | -92 | 2010-01-01 to 2026-12-20; Sun-Earth L1 |
 | Wind | -8 | 2010-01-01 to 2026-12-14; Sun-Earth L1 |
 | DSCOVR | -78 | 2015-02-12 to 2026-10-25; Sun-Earth L1 |
+| IMAP | -43 | 2025-09-25 to 2026-11-08; Sun-Earth L1 |
+| SWFO-L1 | -231 | 2025-09-25 to 2028-02-24; Sun-Earth L1 |
+| Carruthers | -171 | 2025-09-25 to 2028-03-19; Sun-Earth L1 |
 | Solar Orbiter | -144 | 2020-02-11 to 2030-11-20 |
 | Parker Solar Probe | -96 | 2018-08-12 to 2029-12-31 |
 | STEREO-A | -234 | 2010-01-01 to 2027-01-14 |
 | STEREO-B | -235 | 2010-01-01 to 2018-10-18; contact lost 2014-10-01; later positions are predictions |
 | BepiColombo | -121 | 2018-10-21 to 2027-04-10 |
-| MAVEN | -202 | 2013-11-19 to 2026-03-01; Mars orbit |
+| MAVEN | -202 | 2013-11-19 to 2026-03-01; Mars orbit; no contact since 2025-12-06, later positions are predictions |
 
 Timeline: 2010-01-01 to 2030-11-19. Data last updated 2026-10-13; next scheduled update 2026-11-01.
 <!-- coverage:end -->

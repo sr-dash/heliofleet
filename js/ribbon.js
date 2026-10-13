@@ -117,7 +117,7 @@ export function createRibbon(svg, tip, { start, end, onScrub, onPick, marks }) {
       const segs = [];
       if (b.lost) {
         segs.push([a, jdOf(b.lost), false]);
-        segs.push([jdOf(b.lost), Math.min(z, jdOf(b.ended)), true]);
+        segs.push([jdOf(b.lost), b.ended ? Math.min(z, jdOf(b.ended)) : z, true]);
       } else {
         segs.push([a, z, false]);
         if (b.fallback && z < end) segs.push([z, end, true]);

@@ -464,5 +464,7 @@
  "{d} au from the Sun": "a {d} au del Sol",
  "Fields of view seen from Earth or a spacecraft ↗": "Campos de visión vistos desde la Tierra o una nave ↗",
  "If HelioFleet helped your research, please cite it. The DOI {latest} always points to the latest version; to cite version {version} specifically, use {v1}. The same metadata is in {cff}.": "Si HelioFleet ha ayudado a tu investigación, por favor cítalo. El DOI {latest} siempre apunta a la última versión; para citar específicamente la versión {version}, usa {v1}. Los mismos metadatos están en {cff}.",
- "If HelioFleet helped your research, please cite it. The DOI {latest} always points to the latest version. The same metadata is in {cff}.": "Si HelioFleet ha ayudado a tu investigación, por favor cítalo. El DOI {latest} siempre apunta a la última versión. Los mismos metadatos están en {cff}."
+ "If HelioFleet helped your research, please cite it. The DOI {latest} always points to the latest version. The same metadata is in {cff}.": "Si HelioFleet ha ayudado a tu investigación, por favor cítalo. El DOI {latest} siempre apunta a la última versión. Los mismos metadatos están en {cff}.",
+ "IMAP, SWFO-L1 and Carruthers launch": "Lanzamiento de IMAP, SWFO-L1 y Carruthers",
+ "MAVEN contact lost": "Se pierde el contacto con MAVEN"
 }

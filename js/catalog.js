@@ -3,12 +3,12 @@
 // Near-Earth spacecraft first (they share Earth's spot on the map and appear
 // in the inset), then the deep-space fleet.
 export const SPACECRAFT = [
-  'sdo', 'soho', 'aditya', 'ace', 'wind', 'dscovr',
+  'sdo', 'soho', 'aditya', 'ace', 'wind', 'dscovr', 'imap', 'swfo', 'cgo',
   'solo', 'psp', 'bepi', 'sta', 'stb', 'maven',
 ];
 export const PLANETS = ['mercury', 'venus', 'mars'];
 // Spacecraft drawn in the near-Earth inset, around the Sun-Earth L1 point.
-export const L1_FLEET = ['soho', 'aditya', 'ace', 'wind', 'dscovr'];
+export const L1_FLEET = ['soho', 'aditya', 'ace', 'wind', 'dscovr', 'imap', 'swfo', 'cgo'];
 
 // hid: JPL Horizons ID. near: sits at Earth's position at map scale.
 // site / data: mission home page and public data archive.
@@ -56,6 +56,24 @@ export const BODIES = {
     site: 'https://www.nesdis.noaa.gov/current-satellite-missions/currently-flying/dscovr-deep-space-climate-observatory',
     data: 'https://www.ngdc.noaa.gov/dscovr/portal/',
   },
+  imap: {
+    name: 'Interstellar Mapping and Acceleration Probe', short: 'IMAP', tag: 'IMAP', agency: 'NASA', kind: 'sc',
+    hid: '-43', launch: '2025-09-24T11:30Z', near: true, geoKey: 'imap_geo', derived: true,
+    site: 'https://imap.princeton.edu/',
+    data: 'https://imap.princeton.edu/data-access',
+  },
+  swfo: {
+    name: 'Space Weather Follow On-Lagrange 1', short: 'SWFO-L1', tag: 'SWFO', agency: 'NOAA', kind: 'sc',
+    hid: '-231', launch: '2025-09-24T11:30Z', near: true, geoKey: 'swfo_geo', derived: true,
+    site: 'https://www.nesdis.noaa.gov/our-satellites/future-programs/swfo',
+    data: 'https://www.swpc.noaa.gov/',
+  },
+  cgo: {
+    name: 'Carruthers Geocorona Observatory', short: 'Carruthers', tag: 'CGO', agency: 'NASA', kind: 'sc',
+    hid: '-171', launch: '2025-09-24T11:30Z', near: true, geoKey: 'cgo_geo', derived: true,
+    site: 'https://science.nasa.gov/mission/carruthers-geocorona-observatory/',
+    data: 'https://carruthers.ssl.berkeley.edu/',
+  },
   solo: {
     name: 'Solar Orbiter', short: 'Solar Orbiter', tag: 'SolO', agency: 'ESA / NASA', kind: 'sc',
     imager: true,
@@ -94,6 +112,8 @@ export const BODIES = {
   maven: {
     name: 'MAVEN', short: 'MAVEN', tag: 'MAVEN', agency: 'NASA', kind: 'sc',
     hid: '-202', launch: '2013-11-18T18:28Z', note: 'Mars orbit',
+    // No contact since 2025-12-06; Horizons positions after that are predictions
+    lost: '2025-12-06T00:00Z',
     site: 'https://science.nasa.gov/mission/maven/',
     data: 'https://lasp.colorado.edu/maven/sdc/public/',
   },
@@ -136,6 +156,8 @@ export const MILESTONES = [
   { t: '2023-09-02T06:20Z', label: 'Aditya-L1 launch', body: 'aditya' },
   { t: '2024-01-06T10:30Z', label: 'Aditya-L1 halo-orbit insertion', body: 'aditya' },
   { t: '2024-12-24T11:53Z', label: 'Parker closest perihelion', body: 'psp' },
+  { t: '2025-09-24T11:30Z', label: 'IMAP, SWFO-L1 and Carruthers launch', body: 'imap' },
+  { t: '2025-12-06T00:00Z', label: 'MAVEN contact lost', body: 'maven' },
 ];
 
 export const SPACE_WEATHER = [
