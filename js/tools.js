@@ -247,8 +247,8 @@ export const CITATION = {
   title: 'HelioFleet: an interactive map of heliophysics spacecraft positions',
   // Zenodo concept DOI: resolves to the latest release.
   doi: '10.5281/zenodo.23328187',
-  // DOI of this version alone, once Zenodo has issued it
-  versionDoi: null,
+  // DOI of this version alone
+  versionDoi: '10.5281/zenodo.23330591',
 };
 
 export function citationText() {
