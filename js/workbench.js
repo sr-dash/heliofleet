@@ -6,7 +6,7 @@ import { tr } from './i18n.js';
 import { BODIES, SPACECRAFT } from './catalog.js';
 import {
   sceneRows, toCSV, toJSON, timeSeries, sunpyCode, ALIGN_KINDS, findAlignments,
-  windowsCSV, visibility, citationText, ALL_KEYS,
+  windowsCSV, visibility, citationText, CITATION, ALL_KEYS,
 } from './tools.js';
 import { recordAnimation, videoSupport, LIMITS } from './animate.js';
 
@@ -367,9 +367,10 @@ export function initWorkbench(ctx) {
   $('cite').addEventListener('click', () => {
     const { apa, bib } = citationText();
     openSheet(tr('Cite HelioFleet'),
-      tr('If HelioFleet helped your research, please cite it. The DOI {latest} always points to the latest version; to cite version 1.0.0 specifically, use {v1}. The same metadata is in {cff}.', {
-        latest: '<a href="https://doi.org/10.5281/zenodo.23328187">10.5281/zenodo.23328187</a>',
-        v1: '<a href="https://doi.org/10.5281/zenodo.23328188">10.5281/zenodo.23328188</a>',
+      tr(CITATION.versionDoi ? 'If HelioFleet helped your research, please cite it. The DOI {latest} always points to the latest version; to cite version {version} specifically, use {v1}. The same metadata is in {cff}.' : 'If HelioFleet helped your research, please cite it. The DOI {latest} always points to the latest version. The same metadata is in {cff}.', {
+        version: CITATION.version,
+        latest: `<a href="https://doi.org/${CITATION.doi}">${CITATION.doi}</a>`,
+        v1: `<a href="https://doi.org/${CITATION.versionDoi}">${CITATION.versionDoi}</a>`,
         cff: '<a href="https://github.com/sr-dash/heliofleet/blob/main/CITATION.cff">CITATION.cff</a>',
       }),
       [

@@ -1,7 +1,7 @@
 {
   "title": "HelioFleet: an interactive map of heliophysics spacecraft positions",
   "upload_type": "software",
-  "description": "<p>HelioFleet is a web tool that shows where heliophysics spacecraft (SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, Solar Orbiter, Parker Solar Probe, BepiColombo, STEREO-A/B and MAVEN) are relative to the Sun and Earth on any date since 2010. It reports Stonyhurst and Carrington coordinates and Parker-spiral footpoints, searches for radial alignments, quadratures and magnetic connections, checks which observers see a given point on the Sun, and exports coordinates and time series. Positions come from JPL Horizons ephemerides, refreshed monthly.</p><p>Live site: <a href=\"https://sr-dash.github.io/heliofleet/\">https://sr-dash.github.io/heliofleet/</a></p>",
+  "description": "<p>HelioFleet is a web tool that shows where heliophysics spacecraft (SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, Solar Orbiter, Parker Solar Probe, BepiColombo, STEREO-A/B and MAVEN) are relative to the Sun and Earth on any date since 2010. It reports Stonyhurst and Carrington coordinates and Parker-spiral footpoints, searches for radial alignments, quadratures and magnetic connections, checks which observers see a given point on the Sun, and exports coordinates and time series. It draws the fields of view of coronagraphs and heliospheric imagers, summarises which solar longitudes are imaged, and shows flares, CMEs and geomagnetic storms from NASA DONKI. A sky view projects every instrument's field of view onto the plane of the sky seen from Earth or from a chosen spacecraft, with MLSO K-Cor and UCoMP fields and DKIST Cryo-NIRSP observation footprints. Positions come from JPL Horizons ephemerides, refreshed monthly. The interface is available in English, Hindi and Spanish.</p><p>Live site: <a href=\"https://sr-dash.github.io/heliofleet/\">https://sr-dash.github.io/heliofleet/</a></p>",
   "creators": [
     {
       "name": "Dash, Soumyaranjan",
@@ -17,7 +17,9 @@
     "multi-spacecraft observations",
     "solar eclipse",
     "space weather",
-    "JPL Horizons"
+    "JPL Horizons",
+    "coronagraph",
+    "DKIST"
   ],
   "related_identifiers": [
     {
@@ -25,5 +27,6 @@
       "relation": "isDocumentedBy",
       "resource_type": "other"
     }
-  ]
+  ],
+  "version": "1.1.0"
 }

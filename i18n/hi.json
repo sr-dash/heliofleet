@@ -169,7 +169,6 @@
  "Hybrid eclipse": "संकर ग्रहण",
  "Hybrid solar eclipse": "संकर सूर्य ग्रहण",
  "Iceland & Spain": "आइसलैंड और स्पेन",
- "If HelioFleet helped your research, please cite it. The DOI {latest} always points to the latest version; to cite version 1.0.0 specifically, use {v1}. The same metadata is in {cff}.": "यदि HelioFleet से आपके शोध में सहायता मिली हो, तो कृपया इसका संदर्भ दें। DOI {latest} हमेशा नवीनतम संस्करण की ओर इंगित करता है; विशेष रूप से संस्करण 1.0.0 का संदर्भ देने के लिए {v1} का उपयोग करें। यही विवरण {cff} में भी है।",
  "Images in Helioviewer:": "Helioviewer में छवियाँ:",
  "Indonesia": "इंडोनेशिया",
  "Inertial": "जड़त्वीय",
@@ -463,5 +462,7 @@
  "where the observer sees it": "जहाँ प्रेक्षक उसे देखता है",
  "{a}° from Earth, seen from the Sun": "सूर्य से देखने पर पृथ्वी से {a}° दूर",
  "{d} au from the Sun": "सूर्य से {d} au",
- "Fields of view seen from Earth or a spacecraft ↗": "पृथ्वी या किसी अंतरिक्ष यान से दिखते दृष्टि-क्षेत्र ↗"
+ "Fields of view seen from Earth or a spacecraft ↗": "पृथ्वी या किसी अंतरिक्ष यान से दिखते दृष्टि-क्षेत्र ↗",
+ "If HelioFleet helped your research, please cite it. The DOI {latest} always points to the latest version; to cite version {version} specifically, use {v1}. The same metadata is in {cff}.": "यदि HelioFleet से आपके शोध में सहायता मिली हो, तो कृपया इसका संदर्भ दें। DOI {latest} हमेशा नवीनतम संस्करण की ओर इंगित करता है; विशेष रूप से संस्करण {version} का संदर्भ देने के लिए {v1} का उपयोग करें। यही विवरण {cff} में भी है।",
+ "If HelioFleet helped your research, please cite it. The DOI {latest} always points to the latest version. The same metadata is in {cff}.": "यदि HelioFleet से आपके शोध में सहायता मिली हो, तो कृपया इसका संदर्भ दें। DOI {latest} हमेशा नवीनतम संस्करण की ओर इंगित करता है। यही विवरण {cff} में भी है।"
 }
