@@ -322,7 +322,7 @@ function weatherItems(kind, year) {
   const rangeOK = (jd) => jd >= RANGE[0] && jd <= RANGE[1] + 1;
   if (kind === 'highlights') {
     return SPACE_WEATHER.filter((it) => inRange(it.t) && inYear(it.t)).map((it) => ({
-      glyph: GLYPH.flare, title: it.label, sub: it.note, date: it.t.slice(0, 10), t: it.t,
+      glyph: GLYPH.flare, title: it.label, sub: it.note, date: it.t.slice(0, 10), t: it.t, en: it.en,
       onClick: () => jump(jdOf(it.t)),
     }));
   }
@@ -354,10 +354,57 @@ function upcomingItems() {
   return up.events.filter((e) => e.t >= now && e.t <= RANGE[1]).slice(0, 120).map((e) => {
     const { title, detail } = describeUpcoming(e);
     return {
-      glyph: GLYPH[e.kind], title, sub: KIND_LABEL[e.kind], date: isoMinute(e.t).slice(0, 10), future: true,
+      glyph: e.kind === 'eclipse' ? GLYPH.eclipse(e.v?.hybrid) : GLYPH[e.kind],
+      title, sub: KIND_LABEL[e.kind], date: isoMinute(e.t).slice(0, 10), future: true,
+      en: `${e.title} ${e.kind}`,
       onClick: () => { jump(e.t); toast(detail); },
     };
   });
+}
+
+function groupItems(id) {
+  const today = jdFromDate(new Date());
+  const g = presetGroups().find((x) => x.id === id);
+  return g.items.map((it) => ({
+    glyph: id === 'eclipses' ? GLYPH.eclipse(it.hybrid) : GLYPH.milestone(it.body),
+    title: id === 'eclipses' ? `${it.label}${it.hybrid ? ` (${tr('hybrid')})` : ''}` : it.label,
+    sub: it.where ?? it.note ?? '', date: it.t.slice(0, 10), t: it.t, future: jdOf(it.t) > today,
+    en: it.en ?? it.label, onClick: () => jump(jdOf(it.t)),
+  }));
+}
+
+// ---------- event search ----------
+// One index over every preset source. Matching ignores case and accents and
+// needs every word typed; English keywords work in every language.
+const fold = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+let searchIndex = null;
+function buildSearchIndex() {
+  const out = [];
+  const add = (items, cat, keywords) => {
+    for (const it of items || []) {
+      out.push({
+        ...it,
+        sub: [cat, it.sub].filter(Boolean).join(' · '),
+        hay: fold([it.title, it.sub, it.date, cat, keywords, it.en ?? ''].join(' ')),
+      });
+    }
+  };
+  add(groupItems('eclipses'), tr('Total solar eclipse'), 'eclipse total solar hybrid');
+  add(groupItems('milestones'), tr('Mission milestone'), 'mission milestone');
+  add(weatherItems('highlights', ''), tr('Highlight'), 'space weather highlight');
+  add(weatherItems('flares', ''), tr('Flare'), 'flare solar');
+  add(weatherItems('cmes', ''), tr('CME'), 'cme coronal mass ejection');
+  add(weatherItems('storms', ''), tr('Geomagnetic storm'), 'storm geomagnetic');
+  add(upcomingItems(), tr('Upcoming'), 'upcoming calendar');
+  // Nearest to today first, so a search finds the next or most recent case
+  const now = Date.now();
+  const gap = (it) => Math.abs(Date.parse(`${it.date}T00:00Z`) - now);
+  return out.sort((a, b) => gap(a) - gap(b));
+}
+function searchEvents(q) {
+  searchIndex ??= buildSearchIndex();
+  const words = fold(q).split(/\s+/).filter(Boolean);
+  return searchIndex.filter((it) => words.every((w) => it.hay.includes(w)));
 }
 
 function buildPresets() {
@@ -381,15 +428,7 @@ function buildPresets() {
     let items;
     if (id === 'weather') items = weatherItems($('sw-kind').value, $('sw-year').value);
     else if (id === 'upcoming') items = upcomingItems();
-    else {
-      const g = presetGroups().find((x) => x.id === id);
-      items = g.items.map((it) => ({
-        glyph: id === 'eclipses' ? GLYPH.eclipse(it.hybrid) : GLYPH.milestone(it.body),
-        title: id === 'eclipses' ? `${it.label}${it.hybrid ? ` (${tr('hybrid')})` : ''}` : it.label,
-        sub: it.where ?? it.note ?? '', date: it.t.slice(0, 10), t: it.t, future: jdOf(it.t) > today,
-        onClick: () => jump(jdOf(it.t)),
-      }));
-    }
+    else items = groupItems(id);
     if (!items) {
       chips.innerHTML = `<p class="tool-help">${tr('The event list could not be loaded. Reload the page to try again.')}</p>`;
     } else if (!items.length) {
@@ -408,6 +447,34 @@ function buildPresets() {
     b.addEventListener('click', () => show(g.id));
     tabs.appendChild(b);
   }
+  // Search across every tab; clearing it (or Escape) brings the tabs back.
+  const box = $('preset-search');
+  const summary = $('preset-summary');
+  const runSearch = () => {
+    const q = box.value.trim();
+    tabs.classList.toggle('searching', !!q);
+    if (!q) { summary.hidden = true; show(current); return; }
+    const hits = searchEvents(q);
+    filters.hidden = true;
+    foot.hidden = true;
+    summary.hidden = false;
+    chips.replaceChildren();
+    if (!hits.length) {
+      summary.textContent = tr('No events match “{q}”. Try a flare class (X9), a year (2017) or a name (Parker).', { q });
+      return;
+    }
+    const shown = hits.slice(0, 200);
+    summary.textContent = hits.length === 1 ? tr('1 event matches')
+      : hits.length > shown.length ? tr('Showing the first {shown} of {n} matching events', { shown: shown.length, n: hits.length })
+        : tr('{n} events match', { n: hits.length });
+    for (const it of shown) chips.appendChild(chip(it));
+    renderClock();
+  };
+  box.addEventListener('input', runSearch);
+  box.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { box.value = ''; runSearch(); }
+  });
+  tabs.addEventListener('click', () => { if (box.value) { box.value = ''; tabs.classList.remove('searching'); summary.hidden = true; } });
   $('sw-kind').addEventListener('change', () => show('weather'));
   $('sw-year').addEventListener('change', () => show('weather'));
   // webcal:// only works where the system has a calendar app registered for
@@ -621,9 +688,9 @@ function frameLine() {
 function localize() {
   if (lang() === 'en') return;
   for (const k of ['earth', ...PLANETS]) { BODIES[k].name = tr(BODIES[k].name); BODIES[k].short = tr(BODIES[k].short); }
-  for (const e of ECLIPSES) { e.label = tr(e.label); e.where = tr(e.where); }
-  for (const m of MILESTONES) m.label = tr(m.label);
-  for (const w of SPACE_WEATHER) { w.label = tr(w.label); w.note = tr(w.note); }
+  for (const e of ECLIPSES) { e.en = `${e.label} ${e.where}`; e.label = tr(e.label); e.where = tr(e.where); }
+  for (const m of MILESTONES) { m.en = m.label; m.label = tr(m.label); }
+  for (const w of SPACE_WEATHER) { w.en = `${w.label} ${w.note}`; w.label = tr(w.label); w.note = tr(w.note); }
   for (const g of PRESET_GROUPS) g.title = tr(g.title);
   for (const a of Object.values(ALIGN_KINDS)) { a.label = tr(a.label); a.help = tr(a.help); }
   for (const k of Object.keys(G_LABEL)) G_LABEL[k] = tr(G_LABEL[k]);

@@ -10,6 +10,7 @@ HelioFleet places SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, Solar Orbiter, Parker
 
 ## Features
 
+- **Event search:** one box above the presets searches eclipses, mission milestones, every DONKI flare, CME and storm, and the upcoming calendar. It matches flare classes (`X9`), locations (`S07W33`), active regions (`12673`), dates (`2024-05`), names (`Gannon`, `Parker perihelion`) and storm levels (`G5`); every word must match, case and accents are ignored, and the nearest events come first.
 - **Two frames:** Earth-fixed (Heliocentric Earth Ecliptic, Earth at the bottom) or inertial ecliptic J2000.
 - **Two views:** from ecliptic north, or edge-on to show orbital inclination (Solar Orbiter's climb out of the ecliptic).
 - **Trails:** the past path fades and the future path is dotted. In the Earth-fixed frame the trail is the true co-rotating track.
