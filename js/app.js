@@ -114,8 +114,8 @@ function writeURL() {
     for (const k of ['theme', 'embed', 'lang']) if (cur.has(k)) q.set(k, cur.get(k));
     if (S.spot) q.set('spot', [S.spot.sys[0], S.spot.lon, S.spot.lat, ...(S.spotOnMap ? [] : [0])].join(','));
     history.replaceState(null, '', `?${q}`);
+    // The sky view keeps its own layers; only the moment and language carry over
     const sky = new URLSearchParams({ t: q.get('t') });
-    if (S.fov.size) sky.set('fov', [...S.fov].join(','));
     if (q.has('lang')) sky.set('lang', q.get('lang'));
     $('sky-link').href = `sky.html?${sky}`;
     if (EMBED) {

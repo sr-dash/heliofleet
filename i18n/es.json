@@ -104,7 +104,6 @@
  "Earth-facing": "Cara a la Tierra",
  "Earth-fixed": "Fijo a la Tierra",
  "Earth-fixed (HEE)": "Fijo a la Tierra (HEE)",
- "Earth’s view of these fields ↗": "Estos campos vistos desde la Tierra ↗",
  "Eclipse": "Eclipse",
  "Eclipses": "Eclipses",
  "Edge-on": "De canto",
@@ -463,5 +462,6 @@
  "traced from Earth": "trazado desde la Tierra",
  "where the observer sees it": "donde lo ve el observador",
  "{a}° from Earth, seen from the Sun": "a {a}° de la Tierra, visto desde el Sol",
- "{d} au from the Sun": "a {d} au del Sol"
+ "{d} au from the Sun": "a {d} au del Sol",
+ "Fields of view seen from Earth or a spacecraft ↗": "Campos de visión vistos desde la Tierra o una nave ↗"
 }

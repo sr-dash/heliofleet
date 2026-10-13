@@ -73,8 +73,8 @@ function writeURL() {
     const cur = new URLSearchParams(location.search);
     for (const k of ['lang', 'theme']) if (cur.has(k)) q.set(k, cur.get(k));
     history.replaceState(null, '', `?${q}`);
+    // The map keeps its own layers; only the moment and language carry over
     const map = new URLSearchParams({ t: `${isoMinute(S.jd)}Z` });
-    if (S.fov.size) map.set('fov', [...S.fov].join(','));
     if (cur.has('lang')) map.set('lang', cur.get('lang'));
     $('map-back').href = `./?${map}`;
     $('map-link').href = `./?${map}`;

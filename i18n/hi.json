@@ -104,7 +104,6 @@
  "Earth-facing": "पृथ्वी की ओर",
  "Earth-fixed": "पृथ्वी-स्थिर",
  "Earth-fixed (HEE)": "पृथ्वी-स्थिर (HEE)",
- "Earth’s view of these fields ↗": "इन दृष्टि-क्षेत्रों का पृथ्वी से दृश्य ↗",
  "Eclipse": "ग्रहण",
  "Eclipses": "ग्रहण",
  "Edge-on": "किनारे से",
@@ -463,5 +462,6 @@
  "traced from Earth": "पृथ्वी से अनुरेखित",
  "where the observer sees it": "जहाँ प्रेक्षक उसे देखता है",
  "{a}° from Earth, seen from the Sun": "सूर्य से देखने पर पृथ्वी से {a}° दूर",
- "{d} au from the Sun": "सूर्य से {d} au"
+ "{d} au from the Sun": "सूर्य से {d} au",
+ "Fields of view seen from Earth or a spacecraft ↗": "पृथ्वी या किसी अंतरिक्ष यान से दिखते दृष्टि-क्षेत्र ↗"
 }
