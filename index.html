@@ -189,7 +189,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=708e8ba4f5">
   <script>
     try {
       const q = new URLSearchParams(location.search);
@@ -327,6 +327,11 @@
           <span class="field-label">Solar-wind speed <output id="wind-out">400 km/s</output></span>
           <input type="range" id="wind" min="250" max="800" step="10" value="400">
         </label>
+        <div class="field fov-field">
+          <span class="field-label">Instrument fields of view</span>
+          <div class="fov-list" id="fov-list"></div>
+          <p class="fov-note">Drawn in the ecliptic plane. Coronagraphs are centred on the Sun; STEREO HI looks toward the Earth side of the Sun, SoloHI to solar east and WISPR along Parker’s direction of travel.</p>
+        </div>
       </section>
 
       <section class="panel">
@@ -537,7 +542,7 @@
   <footer class="colophon">
     <p data-i18n-html="colophon-data">Ephemerides from <a href="https://ssd.jpl.nasa.gov/horizons/">JPL Horizons</a>, sampled daily (Parker every 3 h) and interpolated; predictions beyond each mission's tracking data are planning trajectories. Heliographic coordinates follow the IAU solar rotation model, as in SunPy.</p>
     <p data-i18n-html="colophon-events">Flares, CMEs and geomagnetic storms, including the CME speeds, directions and widths used for the fronts on the map, come from the Space Weather Database Of Notifications, Knowledge, Information (<a href="https://ccmc.gsfc.nasa.gov/DONKI/">DONKI</a>), developed and maintained by the <a href="https://ccmc.gsfc.nasa.gov/">Community Coordinated Modeling Center</a> at NASA Goddard Space Flight Center.</p>
-    <p data-i18n-html="colophon-credit">Made by <a href="https://sr-dash.github.io/" rel="author">Dr. Soumyaranjan Dash</a> · <a href="https://sr-dash.github.io/software/">More software</a> · <a href="https://github.com/sr-dash/heliofleet">Source on GitHub</a></p>
+    <p data-i18n-html="colophon-credit">Made by <a href="https://sr-dash.github.io/" rel="author">Dr. Soumyaranjan Dash</a> · <a href="https://sr-dash.github.io/software/">More software</a> · <a href="https://github.com/sr-dash/heliofleet">Source on GitHub</a> · <a href="https://github.com/sr-dash/heliofleet/issues/new/choose">Suggest a feature or report a problem</a></p>
   </footer>
 
   <noscript>
@@ -556,6 +561,9 @@
   <div class="toast" id="toast" role="status" hidden></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-  <script type="module" src="js/app.js"></script>
+  <!-- assets:start (written by scripts/stamp_assets.py) -->
+  <script type="importmap">{"imports":{"./js/animate.js":"./js/animate.js?v=0a5fd6979e","./js/app.js":"./js/app.js?v=b36bd86c49","./js/bodyinfo.js":"./js/bodyinfo.js?v=d96ce73256","./js/cards.js":"./js/cards.js?v=44c966981e","./js/catalog.js":"./js/catalog.js?v=43b4d14cab","./js/coverage.js":"./js/coverage.js?v=7e64d1c926","./js/ephem.js":"./js/ephem.js?v=56c0c10b78","./js/events.js":"./js/events.js?v=f9807e6265","./js/export.js":"./js/export.js?v=d57fc7647f","./js/frames.js":"./js/frames.js?v=fe79e81831","./js/i18n.js":"./js/i18n.js?v=b27b772be8","./js/instruments.js":"./js/instruments.js?v=b96df13d1d","./js/render.js":"./js/render.js?v=1e1f5b4368","./js/ribbon.js":"./js/ribbon.js?v=ee457569eb","./js/scene.js":"./js/scene.js?v=34a1e85666","./js/tools.js":"./js/tools.js?v=f21c405613","./js/workbench.js":"./js/workbench.js?v=b219063990"}}</script>
+  <!-- assets:end -->
+  <script type="module" src="js/app.js?v=b36bd86c49"></script>
 </body>
 </html>

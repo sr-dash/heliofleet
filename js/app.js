@@ -13,7 +13,10 @@ import {
 import { ALIGN_KINDS } from './tools.js';
 import { initWorkbench } from './workbench.js';
 import { initCards } from './cards.js';
-import { coverageRows, coverageSummary, drawCoverage, coverageHeight } from './coverage.js';
+import {
+  coverageRows, coverageSummary, drawCoverage, coverageHeight, coverageNote,
+} from './coverage.js';
+import { INSTRUMENTS, INSTRUMENT } from './instruments.js';
 import {
   LANGUAGES, detectLang, loadLang, lang, saveLang, tr, translatePage,
 } from './i18n.js';
@@ -39,6 +42,7 @@ const S = {
   spotOnMap: true,
   cmes: true,
   covsys: 'stonyhurst',
+  fov: new Set(),
 };
 let cards;
 let covHighlight = null;
@@ -74,6 +78,7 @@ function readURL() {
   if (q.has('planets')) S.planets = q.get('planets') !== '0';
   if (q.has('spirals')) S.spirals = q.get('spirals') === '1';
   if (q.has('cme')) S.cmes = q.get('cme') !== '0';
+  if (q.has('fov')) q.get('fov').split(',').filter((k) => INSTRUMENT[k]).forEach((k) => S.fov.add(k));
   if (q.has('hide')) q.get('hide').split(',').filter((k) => BODIES[k]).forEach((k) => S.hidden.add(k));
   // spot=c,LON,LAT (Carrington) or s,LON,LAT (Stonyhurst); a trailing ,0 hides it on the map
   const sp = (q.get('spot') || '').split(',');
@@ -102,6 +107,7 @@ function writeURL() {
     if (S.wind !== 400) q.set('wind', S.wind);
     if (S.hidden.size) q.set('hide', [...S.hidden].join(','));
     if (!S.cmes) q.set('cme', '0');
+    if (S.fov.size) q.set('fov', [...S.fov].join(','));
     // Embed and theme come from whoever wrote the link; keep them as they are.
     const cur = new URLSearchParams(location.search);
     for (const k of ['theme', 'embed', 'lang']) if (cur.has(k)) q.set(k, cur.get(k));
@@ -160,7 +166,7 @@ const wrap360 = (a) => ((a % 360) + 360) % 360;
 const wrap180 = (a) => ((((a + 180) % 360) + 360) % 360) - 180;
 function paintCoverage() {
   const cv = $('coverage');
-  if (!scene || !cv.clientWidth) return;
+  if (!scene || !cv?.clientWidth) return;
   const rows = coverageRows(scene, S.hidden);
   const sum = coverageSummary(rows);
   cv.style.height = `${coverageHeight(rows.length)}px`;
@@ -169,13 +175,7 @@ function paintCoverage() {
   let spotLon = null;
   if (S.spot) spotLon = S.spot.sys === 'carrington' ? wrap180(S.spot.lon - L0) : S.spot.lon;
   covGeom = { ...drawCoverage(ctx, w, h, rows, sum, theme, { sys: S.covsys, L0, spotLon, highlight: covHighlight }), L0 };
-  const sys = tr(S.covsys === 'carrington' ? 'Carrington' : 'Stonyhurst');
-  const gapLon = sum.gap ? (S.covsys === 'carrington' ? wrap360(sum.gap.centre + L0) : sum.gap.centre) : null;
-  $('coverage-note').innerHTML = [
-    tr('Along the solar equator the fleet sees <b>{seen}%</b> of the Sun, and <b>{well}%</b> within 60° of some observer’s disk centre.', { seen: sum.pctSeen, well: sum.pctWell }),
-    sum.gap ? tr('The largest unseen stretch is <b>{width}°</b> wide, centred at {sys} {lon}°.', { width: sum.gap.width, sys, lon: gapLon.toFixed(0) }) : tr('No longitude on the equator is hidden from every observer.'),
-    tr('Solid bands are within 60° of disk centre, pale bands reach the limb, and red marks longitudes no one sees. Click the strip to mark a longitude.'),
-  ].join(' ');
+  $('coverage-note').innerHTML = coverageNote(sum, S.covsys, L0);
 }
 function focusCoverage(key, scroll = true) {
   covHighlight = key;
@@ -580,6 +580,30 @@ function ribbonMarks() {
   ];
 }
 
+// Field-of-view checkboxes, one row per spacecraft
+function buildFovList() {
+  const box = $('fov-list');
+  const groups = [...new Set(INSTRUMENTS.map((i) => i.sc))];
+  for (const sc of groups) {
+    const row = document.createElement('div');
+    row.className = 'fov-group';
+    row.style.setProperty('--c', `var(--c-${sc})`);
+    row.innerHTML = `<span class="fov-sc">${BODIES[sc].short}</span>${INSTRUMENTS.filter((i) => i.sc === sc).map((i) => `<label><input type="checkbox" value="${i.id}"${S.fov.has(i.id) ? ' checked' : ''}>${i.name}</label>`).join('')}`;
+    box.appendChild(row);
+  }
+  box.addEventListener('change', (e) => {
+    const id = e.target.value;
+    if (e.target.checked) S.fov.add(id); else S.fov.delete(id);
+    update();
+  });
+}
+function toggleFov(id) {
+  if (S.fov.has(id)) S.fov.delete(id); else S.fov.add(id);
+  const cb = $('fov-list').querySelector(`input[value="${id}"]`);
+  if (cb) cb.checked = S.fov.has(id);
+  update();
+}
+
 function buildLegend() {
   const ul = $('legend');
   for (const key of ['earth', ...SPACECRAFT, ...PLANETS]) {
@@ -849,6 +873,7 @@ async function main() {
   const syncPlanetLegend = buildLegend();
   syncPlanetLegend();
   buildPresets();
+  buildFovList();
   syncControls();
   initMapGestures();
 
@@ -941,6 +966,7 @@ async function main() {
     jump: (jd) => { stopPlay(); S.jd = jd; update(); },
     hide: (key) => document.querySelector(`.legend button[data-key="${key}"]`)?.click(),
     coverage: (key, scroll = true) => focusCoverage(key, scroll),
+    toggleFov,
   });
   inset.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') cards.hover(e.clientX, e.clientY); });
   inset.addEventListener('pointerleave', () => cards.leave());

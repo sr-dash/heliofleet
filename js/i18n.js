@@ -32,7 +32,8 @@ export async function loadLang(lang) {
     document.head.appendChild(link);
   }
   try {
-    const r = await fetch(`i18n/${LANG}.json`);
+    // Revalidate each load: translations change with releases, not monthly
+    const r = await fetch(`i18n/${LANG}.json`, { cache: 'no-cache' });
     DICT = r.ok ? await r.json() : {};
   } catch {
     DICT = {};

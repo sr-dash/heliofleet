@@ -27,7 +27,10 @@ export function covers(key, jd) {
 function loadChunk(key, year) {
   const id = `${key}/${year}`;
   if (chunks.has(id)) return chunks.get(id);
-  const p = fetch(`data/${id}.json`)
+  // The data version changes with each monthly update, so chunks cache
+  // normally in between and never mix old and new files after an update.
+  const v = manifest?.generated ? `?v=${encodeURIComponent(manifest.generated)}` : '';
+  const p = fetch(`data/${id}.json${v}`)
     .then((r) => (r.ok ? r.json() : null))
     .catch(() => null)
     .then((c) => {

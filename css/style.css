@@ -318,6 +318,19 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .toggle { display: flex; align-items: center; gap: 9px; padding: 4px 0; cursor: pointer; font-size: 14px; }
 .toggle input { width: 16px; height: 16px; accent-color: var(--accent); margin: 0; }
 .field-range { margin: 6px 0 0; }
+.fov-field { margin-top: 12px; }
+.fov-list { display: grid; gap: 5px; }
+.fov-group { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+.fov-sc { min-width: 92px; font-weight: 600; font-size: 13px; color: var(--c); }
+.fov-group label {
+  display: inline-flex; align-items: center; gap: 5px; cursor: pointer;
+  border: 1px solid var(--line); border-radius: 999px; padding: 2px 9px 2px 6px; font-size: 12.5px; background: var(--surface-2);
+}
+.fov-group input { accent-color: var(--accent); margin: 0; }
+.fov-group label:has(input:checked) { border-color: var(--c); }
+.fov-note { margin: 2px 0 0; font-size: 12px; color: var(--muted); line-height: 1.45; }
+.card-fov { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 10px; }
+.card-fov button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface); }
 .field-range[hidden] { display: none; }
 
 .tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin-bottom: 10px; }
@@ -458,11 +471,11 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .card-facts dt { color: var(--muted); }
 .card-facts dd { margin: 0; text-align: right; font: 12.5px "IBM Plex Mono", monospace; }
 .card-near { margin: 10px 0 0; display: flex; flex-wrap: wrap; gap: 4px; }
-.card-near button, .card-actions button, .card-links a {
+.card-near button, .card-actions button, .card-fov button, .card-links a {
   border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); border-radius: 7px;
   padding: 4px 9px; font: 500 12.5px "Instrument Sans", "Noto Sans Devanagari", sans-serif; cursor: pointer; text-decoration: none;
 }
-.card-near button:hover, .card-actions button:hover, .card-links a:hover { border-color: var(--accent); }
+.card-near button:hover, .card-actions button:hover, .card-fov button:hover, .card-links a:hover { border-color: var(--accent); }
 .card-actions, .card-links { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
 .card-links a::after { content: " ↗"; color: var(--muted); }
 

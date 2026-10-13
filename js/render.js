@@ -194,6 +194,29 @@ export function drawMap(ctx, W, H, scene, s, th, view, opts = {}) {
     ctx.globalAlpha = 1;
   }
 
+  // Instrument fields of view: faint wedges in the spacecraft's colour
+  const fovLabels = [];
+  for (const f of scene.fovs ?? []) {
+    const col = th.color[f.sc];
+    for (const poly of f.polys) {
+      ctx.beginPath();
+      poly.forEach((q, i) => { const [x, y] = map(q); if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y); });
+      ctx.closePath();
+      ctx.fillStyle = col;
+      ctx.globalAlpha = 0.09;
+      ctx.fill();
+      ctx.globalAlpha = 0.55;
+      ctx.strokeStyle = col;
+      ctx.lineWidth = 1 * k;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+    const [lx, ly] = map(f.at);
+    if (lx > 0 && lx < W && ly > 0 && ly < H) {
+      fovLabels.push({ text: f.label, x: lx, y: ly, r: 2 * k, size: 10.5 * k, key: f.sc, color: col, fov: true });
+    }
+  }
+
   // Parker spirals
   for (const [key, pts] of Object.entries(scene.spirals)) {
     if (s.hidden.has(key)) continue;
@@ -208,6 +231,7 @@ export function drawMap(ctx, W, H, scene, s, th, view, opts = {}) {
   }
 
   // CME fronts: faint wedge from the Sun, solid leading edge
+  const cmeLabels = [];
   for (const c of scene.cmes ?? []) {
     ctx.beginPath();
     ctx.moveTo(ox, oy);
@@ -224,11 +248,7 @@ export function drawMap(ctx, W, H, scene, s, th, view, opts = {}) {
     ctx.globalAlpha = 1;
     const [ax, ay] = map(c.apex);
     if (ax > 0 && ax < W && ay > 0 && ay < H) {
-      ctx.font = `600 ${11 * k}px ${FONT_SANS}`;
-      ctx.fillStyle = th.cme;
-      ctx.textAlign = ax >= ox ? 'left' : 'right';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(c.label, ax + (ax >= ox ? 8 : -8) * k, ay - 8 * k);
+      cmeLabels.push({ text: c.label, x: ax, y: ay, r: 6 * k, size: 11 * k, key: 'cme', color: th.cme, cme: true });
     }
   }
 
@@ -297,6 +317,7 @@ export function drawMap(ctx, W, H, scene, s, th, view, opts = {}) {
   const labels = [];
   const near = order.filter((b) => BODIES[b.key].near).reverse();
   const hits = [];
+  labels.push(...cmeLabels, ...fovLabels);
   if (near.length && s.labels) {
     const [x, y] = map(scene.bodies[0].xy);
     labels.push({
@@ -319,7 +340,7 @@ export function drawMap(ctx, W, H, scene, s, th, view, opts = {}) {
   }
   if (labels.length) {
     // Spacecraft first so they win the best spots, then Earth, then planets.
-    const rank = (l) => (l.planet ? 3 : l.group ? 2 : l.key === 'earth' ? 1 : 0);
+    const rank = (l) => (l.fov ? 5 : l.planet ? 4 : l.group ? 3 : l.cme ? 2 : l.key === 'earth' ? 1 : 0);
     labels.sort((a, b) => rank(a) - rank(b));
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
@@ -330,14 +351,14 @@ export function drawMap(ctx, W, H, scene, s, th, view, opts = {}) {
       const cy = Math.max(rect.y, Math.min(l.y, rect.y + rect.h));
       if (Math.hypot(cx - l.x, cy - l.y) > l.r + 4) {
         ctx.beginPath(); ctx.moveTo(l.x, l.y); ctx.lineTo(cx, cy);
-        ctx.strokeStyle = th.color[l.key]; ctx.globalAlpha = 0.6; ctx.lineWidth = 1; ctx.stroke(); ctx.globalAlpha = 1;
+        ctx.strokeStyle = l.color ?? th.color[l.key]; ctx.globalAlpha = 0.6; ctx.lineWidth = 1; ctx.stroke(); ctx.globalAlpha = 1;
       }
-      ctx.font = `${l.planet || l.group ? 400 : 600} ${l.size}px ${FONT_SANS}`;
+      ctx.font = `${l.planet || l.group || l.fov ? 400 : 600} ${l.size}px ${FONT_SANS}`;
       ctx.fillStyle = th.bg;
       ctx.globalAlpha = 0.75;
       ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
       ctx.globalAlpha = 1;
-      ctx.fillStyle = l.planet || l.group ? th.muted : th.color[l.key];
+      ctx.fillStyle = l.color ?? (l.planet || l.group ? th.muted : th.color[l.key]);
       ctx.fillText(l.text, rect.x + 3, rect.y + rect.h / 2 + 0.5);
     }
   }

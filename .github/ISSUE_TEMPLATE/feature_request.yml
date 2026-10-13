@@ -1,0 +1,21 @@
+name: Feature request
+description: Suggest something that would make HelioFleet more useful for your work.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What would you like to do?
+      description: Describe the task or question you have, such as planning an observation or comparing two spacecraft.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: How could HelioFleet help?
+      description: Optional. A sketch of the feature, or a tool that already does something similar.
+  - type: input
+    id: link
+    attributes:
+      label: Example moment
+      description: Optional. A HelioFleet link where the feature would have helped.

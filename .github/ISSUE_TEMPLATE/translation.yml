@@ -1,0 +1,18 @@
+name: Translation fix
+description: Improve the Hindi or Spanish wording, or offer a new language.
+labels: [translation]
+body:
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language
+      options: [हिन्दी (Hindi), Español (Spanish), A new language]
+    validations:
+      required: true
+  - type: textarea
+    id: text
+    attributes:
+      label: Current text and suggested text
+      description: Copy the text as it appears on the page and write your suggestion. The files are i18n/hi.json and i18n/es.json if you prefer a pull request.
+    validations:
+      required: true

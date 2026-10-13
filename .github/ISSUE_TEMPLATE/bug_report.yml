@@ -1,0 +1,24 @@
+name: Something looks wrong
+description: A position, number, date or part of the page that is incorrect or broken.
+labels: [bug]
+body:
+  - type: input
+    id: link
+    attributes:
+      label: Link to the moment
+      description: Use "Copy link to this moment" on the page so the date and view come with it.
+      placeholder: https://sr-dash.github.io/heliofleet/?t=2024-04-08T18:17Z
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What is wrong
+      description: What you see, and what you expected. For positions, say where the reference value comes from (for example JPL Horizons or SunPy).
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device
+      placeholder: Chrome 130 on macOS, Safari on iPhone, ...

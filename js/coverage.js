@@ -28,12 +28,13 @@ export function coverageRows(scene, hidden) {
   const near = scene.bodies.filter((b) => BODIES[b.key].near && !hidden.has(b.key));
   const rows = [{
     key: 'earth', label: near.length ? tr('Earth & near-Earth fleet') : BODIES.earth.short,
-    lon: earth.lon, lat: earth.lat, dist: earth.dist, members: near.map((b) => b.key),
+    lon: earth.lon, lat: earth.lat, dist: earth.dist, members: near.map((b) => b.key), imager: true,
   }];
   for (const b of scene.bodies) {
     const m = BODIES[b.key];
-    if (m.kind !== 'sc' || m.near || hidden.has(b.key)) continue;
-    rows.push({ key: b.key, label: m.short, lon: b.lon, lat: b.lat, dist: b.dist, lost: b.st === 'lost' });
+    // A spacecraft out of contact (STEREO-B after 2014) observes nothing
+    if (m.kind !== 'sc' || m.near || hidden.has(b.key) || b.st === 'lost') continue;
+    rows.push({ key: b.key, label: m.short, lon: b.lon, lat: b.lat, dist: b.dist, imager: !!m.imager });
   }
   for (const r of rows) {
     r.full = halfWidth(R_SUN_AU / r.dist, r.lat);
@@ -43,8 +44,10 @@ export function coverageRows(scene, hidden) {
 }
 
 // Observer counts in 1-degree Stonyhurst bins, and the share of the
-// equator seen at all and seen well.
-export function coverageSummary(rows) {
+// equator seen at all and seen well. Only observers with a solar-disk imager
+// count; the others are drawn for their geometry alone.
+export function coverageSummary(allRows) {
+  const rows = allRows.filter((r) => r.imager);
   const seen = new Array(360).fill(0);
   const well = new Array(360).fill(0);
   for (let i = 0; i < 360; i++) {
@@ -123,13 +126,15 @@ export function drawCoverage(ctx, W, H, rows, sum, th, opts) {
   const [lo, hi] = carr ? [0, 360] : [-180, 180];
   const axisVal = (stony) => (carr ? wrap360(stony + opts.L0) : wrap180(stony));
   const px = (v) => LEFT + ((v - lo) / 360) * plotW;
-  const band = (lon, w, y, h) => {
+  const band = (lon, w, y, h, outline = false) => {
     if (w <= 0) return;
     const c = axisVal(lon);
     for (const shift of [-360, 0, 360]) {
       const a0 = Math.max(lo, c - w + shift);
       const a1 = Math.min(hi, c + w + shift);
-      if (a1 > a0) ctx.fillRect(px(a0), y, px(a1) - px(a0), h);
+      if (a1 <= a0) continue;
+      if (outline) ctx.strokeRect(px(a0) + 0.5, y + 0.5, px(a1) - px(a0) - 1, h - 1);
+      else ctx.fillRect(px(a0), y, px(a1) - px(a0), h);
     }
   };
 
@@ -143,15 +148,23 @@ export function drawCoverage(ctx, W, H, rows, sum, th, opts) {
       ctx.fillRect(0, y, W, ROW);
       ctx.globalAlpha = 1;
     }
-    ctx.fillStyle = r.lost ? th.muted : col;
+    ctx.fillStyle = col;
     ctx.font = `${hl ? 700 : 600} ${11.5 * k}px ${FONT_SANS}`;
     ctx.textAlign = 'right';
     ctx.fillText(r.label, LEFT - 10 * k, y + ROW / 2, LEFT - 14 * k);
-    ctx.fillStyle = col;
-    ctx.globalAlpha = 0.3;
-    band(r.lon, r.full, y + 3 * k, ROW - 6 * k);
-    ctx.globalAlpha = r.lost ? 0.45 : 0.85;
-    band(r.lon, r.core, y + 3 * k, ROW - 6 * k);
+    if (r.imager) {
+      ctx.fillStyle = col;
+      ctx.globalAlpha = 0.3;
+      band(r.lon, r.full, y + 3 * k, ROW - 6 * k);
+      ctx.globalAlpha = 0.85;
+      band(r.lon, r.core, y + 3 * k, ROW - 6 * k);
+    } else {
+      // No disk imager: outline only, not counted in the fleet total
+      ctx.strokeStyle = col;
+      ctx.lineWidth = 1.2 * k;
+      ctx.globalAlpha = 0.75;
+      band(r.lon, r.full, y + 4 * k, ROW - 8 * k, true);
+    }
     ctx.globalAlpha = 1;
     // Sub-observer point
     ctx.fillStyle = th.ink;
@@ -202,3 +215,14 @@ export function drawCoverage(ctx, W, H, rows, sum, th, opts) {
 }
 
 export const coverageHeight = (n, k = 1) => (6 + 18 * (n + 1) + 8 + 28) * k;
+
+// The sentence under the strip. sys: 'stonyhurst' | 'carrington'.
+export function coverageNote(sum, sys, L0, withHint = true) {
+  const name = tr(sys === 'carrington' ? 'Carrington' : 'Stonyhurst');
+  const gapLon = sum.gap ? (sys === 'carrington' ? wrap360(sum.gap.centre + L0) : sum.gap.centre) : null;
+  return [
+    tr('Along the solar equator, solar imagers see <b>{seen}%</b> of the Sun, and <b>{well}%</b> within 60° of some observer’s disk centre.', { seen: sum.pctSeen, well: sum.pctWell }),
+    sum.gap ? tr('The largest unseen stretch is <b>{width}°</b> wide, centred at {sys} {lon}°.', { width: sum.gap.width, sys: name, lon: gapLon.toFixed(0) }) : tr('No longitude on the equator is hidden from every observer.'),
+    withHint ? tr('Solid bands are within 60° of disk centre, pale bands reach the limb, and red marks longitudes no one sees. Outlined rows have no solar-disk imager and are not counted. Click the strip to mark a longitude.') : '',
+  ].filter(Boolean).join(' ');
+}

@@ -4,10 +4,11 @@
 import { position, covers, info } from './ephem.js';
 import {
   heliographic, footpointLon, parkerSpiral, angleBetween, eclipticLon,
-  toFrame, project, norm, surfaceNormal, AU_KM,
+  toFrame, project, norm, surfaceNormal, AU_KM, R_SUN_AU,
 } from './frames.js';
 import { BODIES, SPACECRAFT, PLANETS, L1_FLEET } from './catalog.js';
 import { activeCMEs } from './events.js';
+import { INSTRUMENT } from './instruments.js';
 import { tr } from './i18n.js';
 
 const jdOf = (iso) => Date.parse(iso) / 864e5 + 2440587.5;
@@ -179,8 +180,48 @@ export function buildScene(jd, s) {
     }
   }
 
+  // Instrument fields of view: wedges from the spacecraft over the
+  // elongation range each camera covers, in the ecliptic plane.
+  const fovs = [];
+  if (s.fov?.size && s.view === 'top') {
+    for (const id of s.fov) {
+      const ins = INSTRUMENT[id];
+      const b = ins && bodies.find((x) => x.key === ins.sc);
+      if (!b || b.st === 'lost' || s.hidden.has(ins.sc)) continue;
+      const p = b.p;
+      const rp = Math.hypot(p[0], p[1]);
+      const u = [-p[0] / rp, -p[1] / rp]; // toward the Sun
+      const east = [-u[1], u[0]]; // z x u: solar east as seen from the spacecraft
+      const toDeg = (v) => (ins.unit === 'rs' ? (Math.atan((v * R_SUN_AU) / b.dist) * 180) / Math.PI : v);
+      const e0 = toDeg(ins.inner);
+      const e1 = toDeg(ins.outer);
+      let sides = [1, -1];
+      if (ins.side === 'east') sides = [1];
+      if (ins.side === 'ram') {
+        const a = helioPosition(ins.sc, jd - 1 / 24);
+        const c = helioPosition(ins.sc, jd + 1 / 24);
+        sides = [a && c && (c[0] - a[0]) * east[0] + (c[1] - a[1]) * east[1] < 0 ? -1 : 1];
+      }
+      if (ins.side === 'earth') sides = [(earth[0] - p[0]) * east[0] + (earth[1] - p[1]) * east[1] > 0 ? 1 : -1];
+      const L = Math.max(2 * b.dist, 0.6);
+      const ray = (deg, len) => {
+        const a = (deg * Math.PI) / 180;
+        const d = [u[0] * Math.cos(a) - u[1] * Math.sin(a), u[0] * Math.sin(a) + u[1] * Math.cos(a)];
+        return [p[0] + d[0] * len, p[1] + d[1] * len, p[2]];
+      };
+      const polys = sides.map((sg) => {
+        const pts = [p];
+        for (let i = 0; i <= 24; i++) pts.push(ray(sg * (e0 + ((e1 - e0) * i) / 24), L));
+        pts.push(p);
+        return pts.map((q) => xy(q));
+      });
+      const mid = sides[0] * (e0 + e1) / 2;
+      fovs.push({ id, sc: ins.sc, label: `${BODIES[ins.sc].short} ${ins.name}`, polys, at: xy(ray(mid, Math.min(L, 0.45 + 0.4 * b.dist))) });
+    }
+  }
+
   return {
-    jd, earth, bodies, missing, trails, orbits, spirals, spot, cmes,
+    jd, earth, bodies, missing, trails, orbits, spirals, spot, cmes, fovs,
     inset: buildInset(jd, eLon, earthLonAt),
   };
 }

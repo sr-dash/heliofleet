@@ -4,6 +4,7 @@
 import { drawMap, drawInset } from './render.js';
 import { BODIES } from './catalog.js';
 import { tr } from './i18n.js';
+import { coverageRows, coverageSummary, drawCoverage, coverageHeight, coverageNote } from './coverage.js';
 
 const W = 1200;
 const H = 820;
@@ -31,13 +32,17 @@ function wrapText(ctx, text, x, y, width, lh) {
 
 export async function composeSnapshot(scene, s, th, view, meta) {
   await document.fonts.ready;
+  const covRows = coverageRows(scene, s.hidden);
+  const covSum = coverageSummary(covRows);
+  const covH = coverageHeight(covRows.length);
+  const HT = H + 34 + covH + 44; // map section, then the coverage strip
   const cv = document.createElement('canvas');
   cv.width = W * SCALE;
-  cv.height = H * SCALE;
+  cv.height = HT * SCALE;
   const ctx = cv.getContext('2d');
   ctx.scale(SCALE, SCALE);
   ctx.fillStyle = th.page;
-  ctx.fillRect(0, 0, W, H);
+  ctx.fillRect(0, 0, W, HT);
 
   // Map: square on the left
   const M = H - 40;
@@ -181,6 +186,27 @@ export async function composeSnapshot(scene, s, th, view, meta) {
   ctx.fillText(tr('Space-weather events: NASA CCMC DONKI'), X, H - 54, CW);
   ctx.fillText(`${tr('Ephemerides: JPL Horizons')}${meta.stamp ? ` (${tr('updated {date}', { date: meta.stamp })})` : ''} · ${tr('HGS/Carrington from Earth')}`, X, H - 38, CW);
   ctx.fillText('sr-dash.github.io/heliofleet', X, H - 22);
+
+  // Solar coverage strip
+  const L0 = scene.bodies[0].carr;
+  const sys = s.covsys ?? 'stonyhurst';
+  let spotLon = null;
+  if (s.spot) spotLon = s.spot.sys === 'carrington' ? (((s.spot.lon - L0 + 180) % 360 + 360) % 360) - 180 : s.spot.lon;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = th.muted;
+  ctx.font = `600 13px ${SANS}`;
+  ctx.fillText(`${tr('Solar coverage')} · ${tr(sys === 'carrington' ? 'Carrington' : 'Stonyhurst')}`, 20, H + 22);
+  ctx.save();
+  ctx.translate(20, H + 32);
+  ctx.beginPath();
+  ctx.roundRect(0, 0, W - 40, covH, 10);
+  ctx.clip();
+  drawCoverage(ctx, W - 40, covH, covRows, covSum, th, { sys, L0, spotLon });
+  ctx.restore();
+  ctx.fillStyle = th.muted;
+  ctx.font = `400 12px ${SANS}`;
+  wrapText(ctx, coverageNote(covSum, sys, L0, false).replace(/<[^>]+>/g, ''), 20, H + 32 + covH + 18, W - 40, 15);
   return cv;
 }
 
@@ -202,9 +228,11 @@ export async function downloadPNG(cv, base) {
 export function downloadPDF(cv, base, title) {
   const { jsPDF } = window.jspdf ?? {};
   if (!jsPDF) throw new Error(tr('The PDF library did not load. Check your connection and try again.'));
-  const pdf = new jsPDF({ orientation: 'landscape', unit: 'pt', format: [W * 0.75, H * 0.75] });
+  const w = (cv.width / SCALE) * 0.75;
+  const h = (cv.height / SCALE) * 0.75;
+  const pdf = new jsPDF({ orientation: w > h ? 'landscape' : 'portrait', unit: 'pt', format: [w, h] });
   pdf.setProperties({ title, creator: 'HelioFleet' });
-  pdf.addImage(cv.toDataURL('image/jpeg', 0.93), 'JPEG', 0, 0, W * 0.75, H * 0.75);
+  pdf.addImage(cv.toDataURL('image/jpeg', 0.93), 'JPEG', 0, 0, w, h);
   pdf.save(`${base}.pdf`);
 }
 

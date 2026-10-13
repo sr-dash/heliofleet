@@ -1,0 +1,24 @@
+# Checks on every push and pull request; nothing is committed.
+name: Check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: JavaScript syntax
+        run: for f in js/*.js; do node --input-type=module --check < "$f" || exit 1; done
+      - name: Translations complete
+        run: python scripts/check_i18n.py
+      - name: Asset stamps current
+        run: python scripts/stamp_assets.py --check
+      - name: Data files parse
+        run: |
+          python -c "import json,glob; [json.load(open(f)) for f in glob.glob('data/**/*.json', recursive=True) + glob.glob('i18n/*.json')]; print('json ok')"

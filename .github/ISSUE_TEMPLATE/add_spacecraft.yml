@@ -1,0 +1,23 @@
+name: Add a spacecraft or instrument
+description: Ask for a spacecraft, planet or instrument field of view to be added.
+labels: [data]
+body:
+  - type: input
+    id: name
+    attributes:
+      label: Spacecraft or instrument
+      placeholder: PUNCH, Juno, CCOR-1, ...
+    validations:
+      required: true
+  - type: input
+    id: horizons
+    attributes:
+      label: JPL Horizons ID
+      description: If you know it. Search at https://ssd.jpl.nasa.gov/horizons/
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it would help
+      description: For instruments, include the field of view (inner and outer elongation or solar radii) and a reference.
+    validations:
+      required: true

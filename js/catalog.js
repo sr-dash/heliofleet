@@ -12,6 +12,8 @@ export const L1_FLEET = ['soho', 'aditya', 'ace', 'wind', 'dscovr'];
 
 // hid: JPL Horizons ID. near: sits at Earth's position at map scale.
 // site / data: mission home page and public data archive.
+// imager: carries a solar-disk imager (counted in the solar coverage total;
+// Earth's row stands for SDO, SOHO, Aditya-L1 and ground observatories).
 // geoKey: geocentric series for the inset. derived: no heliocentric series,
 // so the page adds Earth's position to the geocentric one.
 export const BODIES = {
@@ -56,6 +58,7 @@ export const BODIES = {
   },
   solo: {
     name: 'Solar Orbiter', short: 'Solar Orbiter', tag: 'SolO', agency: 'ESA / NASA', kind: 'sc',
+    imager: true,
     hid: '-144', launch: '2020-02-10T04:03Z',
     site: 'https://www.esa.int/Science_Exploration/Space_Science/Solar_Orbiter',
     data: 'https://soar.esac.esa.int/soar/',
@@ -74,12 +77,14 @@ export const BODIES = {
   },
   sta: {
     name: 'STEREO-A', short: 'STEREO-A', tag: 'ST-A', agency: 'NASA', kind: 'sc',
+    imager: true,
     hid: '-234', launch: '2006-10-26T00:52Z',
     site: 'https://stereo.gsfc.nasa.gov/',
     data: 'https://stereo-ssc.nascom.nasa.gov/data.shtml',
   },
   stb: {
     name: 'STEREO-B', short: 'STEREO-B', tag: 'ST-B', agency: 'NASA', kind: 'sc',
+    imager: true,
     hid: '-235', launch: '2006-10-26T00:52Z',
     lost: '2014-10-01T00:00Z',
     ended: '2018-10-17T00:00Z',

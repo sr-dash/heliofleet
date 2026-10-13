@@ -11,7 +11,8 @@ HelioFleet places SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, Solar Orbiter, Parker
 ## Features
 
 - **Spacecraft cards:** hover any body on the map or in the near-Earth panel for its distance, longitude and angle from Earth; click it for a card with heliocentric speed, distance and light time to Earth, the Sun's apparent size, the Sun–spacecraft–Earth angle, the previous and next perihelion, launch date, and links to the mission page and data archive. The card's buttons open the alignment search or data export for that spacecraft, hide it, or highlight its view of the Sun.
-- **Solar coverage:** a strip under the map shows which longitudes along the solar equator each observer sees, in Stonyhurst or Carrington longitude: solid within 60° of disk centre, pale out to the limb. The bottom row counts observers per longitude and marks in red what no one sees, with the share of the Sun covered and the largest gap. Click the strip to mark a longitude on the map.
+- **Instrument fields of view:** toggle the white-light coronagraphs and heliospheric imagers (SOHO LASCO C2/C3; STEREO COR2, HI-1, HI-2; Solar Orbiter Metis and SoloHI; Parker WISPR-I and WISPR-O) to see which parts of the heliosphere each one images. They are drawn in the ecliptic plane from the published elongation ranges: coronagraphs centred on the Sun, STEREO HI toward the Earth side of the Sun (the 2015 and 2023 spacecraft rolls kept them there), SoloHI to solar east and WISPR along Parker's direction of travel. Share a view with `fov=c3,hi1a,...`.
+- **Solar coverage:** a strip under the map shows which longitudes along the solar equator each observer sees, in Stonyhurst or Carrington longitude: solid within 60° of disk centre, pale out to the limb. The bottom row counts observers with a solar-disk imager (Earth with SDO, SOHO and Aditya-L1; STEREO; Solar Orbiter) per longitude and marks in red what no one sees, with the share of the Sun covered and the largest gap. Spacecraft without a disk imager are outlined for their geometry and not counted, and STEREO-B is left out after contact was lost. Click the strip to mark a longitude on the map.
 - **Event search:** one box above the presets searches eclipses, mission milestones, every DONKI flare, CME and storm, and the upcoming calendar. It matches flare classes (`X9`), locations (`S07W33`), active regions (`12673`), dates (`2024-05`), names (`Gannon`, `Parker perihelion`) and storm levels (`G5`); every word must match, case and accents are ignored, and the nearest events come first.
 - **Two frames:** Earth-fixed (Heliocentric Earth Ecliptic, Earth at the bottom) or inertial ecliptic J2000.
 - **Two views:** from ecliptic north, or edge-on to show orbital inclination (Solar Orbiter's climb out of the ecliptic).
@@ -119,6 +120,8 @@ js/animate.js            MP4 / WebM / GIF recording
 js/cards.js              hover tooltips and spacecraft cards
 js/bodyinfo.js           speed, light time, apparent Sun size, perihelia
 js/coverage.js           solar coverage strip
+js/instruments.js        coronagraph and imager fields of view
+scripts/stamp_assets.py  content-hashed asset URLs for index.html
 js/i18n.js               language choice and translation
 i18n/<lang>.json         Hindi and Spanish interface text
 scripts/check_i18n.py    finds untranslated or mismatched strings
@@ -136,6 +139,16 @@ scripts/fetch_ephemeris.py
 - Spacecraft and planet positions: [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/), Solar System Dynamics Group, NASA Jet Propulsion Laboratory.
 - Flares, CMEs and geomagnetic storms, including the CME speeds, directions and widths behind the CME fronts on the map: the Space Weather Database Of Notifications, Knowledge, Information ([DONKI](https://ccmc.gsfc.nasa.gov/DONKI/)), developed and maintained by the [Community Coordinated Modeling Center](https://ccmc.gsfc.nasa.gov/) at NASA Goddard Space Flight Center.
 - Heliographic coordinates follow the IAU solar rotation model as implemented in [SunPy](https://sunpy.org/), which was used to validate them.
+
+### Instrument field-of-view sources
+
+Brueckner et al. 1995, Solar Physics 162, 357 (LASCO); Howard et al. 2008, Space Science Reviews 136, 67 (SECCHI COR2); Eyles et al. 2009, Solar Physics 254, 387 (STEREO HI); Antonucci et al. 2020, A&A 642, A10 (Metis); Howard et al. 2020, A&A 642, A13 (SoloHI); Vourlidas et al. 2016, Space Science Reviews 204, 83 (WISPR).
+
+## Maintenance
+
+- After changing anything in `css/` or `js/`, run `python3 scripts/stamp_assets.py`. It gives every stylesheet and module a content-hashed URL, so visitors never run a mix of old and new files while browsers still hold cached copies.
+- The **Check** workflow runs on every push: JavaScript syntax, `scripts/check_i18n.py`, the asset stamps, and that every data file parses.
+- Feedback comes through the issue forms (feature request, something looks wrong, add a spacecraft or instrument, translation fix) and the Discussions tab, linked from the page footer.
 
 ## Translations
 
