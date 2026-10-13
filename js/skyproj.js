@@ -55,12 +55,14 @@ export function makeSky(observer) {
   };
 }
 
-// Sky direction from Earth of a helioprojective point (Tx, Ty in arcsec)
-export function hpcDirection(earth, tx, ty) {
-  const ax = earthSkyAxes(earth);
+// Sky direction from an observer of a helioprojective point (Tx, Ty in
+// arcsec): Tx is the longitude toward solar west, Ty the latitude toward
+// solar north, both measured from Sun centre, as in SunPy.
+export function hpcDirection(observer, tx, ty) {
+  const ax = earthSkyAxes(observer);
   const a = (tx / 3600) * D;
   const b = (ty / 3600) * D;
-  return unit(add(mul(ax.e, -1), add(mul(ax.west, Math.tan(a)), mul(ax.north, Math.tan(b)))));
+  return add(mul(ax.e, -Math.cos(b) * Math.cos(a)), add(mul(ax.west, Math.cos(b) * Math.sin(a)), mul(ax.north, Math.sin(b))));
 }
 
 // Sky basis at a spacecraft: u toward the Sun, w toward solar east in the
