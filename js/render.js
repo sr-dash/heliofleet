@@ -122,7 +122,7 @@ export function drawMap(ctx, W, H, scene, s, th, view, opts = {}) {
 
   ctx.fillStyle = th.bg;
   ctx.fillRect(0, 0, W, H);
-  if (!scene) return;
+  if (!scene) return [];
 
   // Distance rings, longitude spokes, ecliptic line
   const step = niceStep(view.range * 1.3);
@@ -296,6 +296,7 @@ export function drawMap(ctx, W, H, scene, s, th, view, opts = {}) {
   const order = [...scene.bodies].reverse().filter((b) => !s.hidden.has(b.key));
   const labels = [];
   const near = order.filter((b) => BODIES[b.key].near).reverse();
+  const hits = [];
   if (near.length && s.labels) {
     const [x, y] = map(scene.bodies[0].xy);
     labels.push({
@@ -307,6 +308,7 @@ export function drawMap(ctx, W, H, scene, s, th, view, opts = {}) {
     if (BODIES[b.key].near) continue;
     const [x, y] = map(b.xy);
     const r = (BODIES[b.key].kind === 'planet' && b.key !== 'earth' ? 3.6 : 4.4) * k;
+    hits.push({ key: b.key, x, y, r: Math.max(r * 2.4, 9) });
     drawMarker(ctx, b.key, x, y, r, th.color[b.key], th.bg, b.st);
     if (s.labels) {
       let text = BODIES[b.key].short;
@@ -339,6 +341,7 @@ export function drawMap(ctx, W, H, scene, s, th, view, opts = {}) {
       ctx.fillText(l.text, rect.x + 3, rect.y + rect.h / 2 + 0.5);
     }
   }
+  return hits;
 }
 
 // Near-Earth inset in km, Sun straight up.
@@ -346,7 +349,7 @@ export function drawInset(ctx, W, H, scene, s, th, opts = {}) {
   const k = opts.k ?? 1;
   ctx.fillStyle = th.bg;
   ctx.fillRect(0, 0, W, H);
-  if (!scene) return;
+  if (!scene) return [];
   const ins = scene.inset;
   const spanX = 2.0e6;
   const spanY = 2.75e6;
@@ -414,9 +417,11 @@ export function drawInset(ctx, W, H, scene, s, th, opts = {}) {
     ctx.globalAlpha = 1;
   }
   const tags = [];
+  const hits = [];
   for (const f of fleet) {
     const [ax, ay] = map(f.pos);
     if (ay < -10 || ay > H + 10 || ax < -10 || ax > W + 10) continue;
+    hits.push({ key: f.key, x: ax, y: ay, r: 8 });
     drawMarker(ctx, f.key, ax, ay, 3.4 * k, th.color[f.key], th.bg, 'ok');
     tags.push({ text: BODIES[f.key].tag, x: ax, y: ay, r: 5 * k, size: 10.5 * k, key: f.key });
   }
@@ -439,4 +444,6 @@ export function drawInset(ctx, W, H, scene, s, th, opts = {}) {
     ctx.font = `${10 * k}px ${FONT_SANS}`;
     ctx.fillText(W < 170 * k ? '+ SDO' : tr('+ SDO in GEO'), ox + 12 * k, oy + 14 * k);
   }
+  hits.push({ key: 'earth', x: ox, y: oy, r: 9 });
+  return hits;
 }

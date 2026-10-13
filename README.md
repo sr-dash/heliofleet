@@ -10,6 +10,8 @@ HelioFleet places SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, Solar Orbiter, Parker
 
 ## Features
 
+- **Spacecraft cards:** hover any body on the map or in the near-Earth panel for its distance, longitude and angle from Earth; click it for a card with heliocentric speed, distance and light time to Earth, the Sun's apparent size, the Sun–spacecraft–Earth angle, the previous and next perihelion, launch date, and links to the mission page and data archive. The card's buttons open the alignment search or data export for that spacecraft, hide it, or highlight its view of the Sun.
+- **Solar coverage:** a strip under the map shows which longitudes along the solar equator each observer sees, in Stonyhurst or Carrington longitude: solid within 60° of disk centre, pale out to the limb. The bottom row counts observers per longitude and marks in red what no one sees, with the share of the Sun covered and the largest gap. Click the strip to mark a longitude on the map.
 - **Event search:** one box above the presets searches eclipses, mission milestones, every DONKI flare, CME and storm, and the upcoming calendar. It matches flare classes (`X9`), locations (`S07W33`), active regions (`12673`), dates (`2024-05`), names (`Gannon`, `Parker perihelion`) and storm levels (`G5`); every word must match, case and accents are ignored, and the nearest events come first.
 - **Two frames:** Earth-fixed (Heliocentric Earth Ecliptic, Earth at the bottom) or inertial ecliptic J2000.
 - **Two views:** from ecliptic north, or edge-on to show orbital inclination (Solar Orbiter's climb out of the ecliptic).
@@ -114,6 +116,9 @@ js/tools.js              exports, SunPy code, alignment search, spot visibility
 js/workbench.js          the research-tools tabs and the code/citation sheet
 js/events.js             DONKI events, CME fronts, upcoming events
 js/animate.js            MP4 / WebM / GIF recording
+js/cards.js              hover tooltips and spacecraft cards
+js/bodyinfo.js           speed, light time, apparent Sun size, perihelia
+js/coverage.js           solar coverage strip
 js/i18n.js               language choice and translation
 i18n/<lang>.json         Hindi and Spanish interface text
 scripts/check_i18n.py    finds untranslated or mismatched strings

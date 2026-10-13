@@ -361,6 +361,8 @@
           <button id="zoom-reset" aria-label="Reset view" title="Reset view">⟲</button>
         </div>
         <p class="loading" id="loading">Loading ephemerides…</p>
+        <div class="map-tip" id="map-tip" hidden></div>
+        <aside class="body-card" id="body-card" aria-live="polite" hidden></aside>
         <div class="embed-bar" id="embed-bar">
           <button data-step="-1" aria-label="Back one day">−1 d</button>
           <button id="embed-play" aria-pressed="false" aria-label="Play"><span class="play-icon" aria-hidden="true"></span></button>
@@ -370,6 +372,17 @@
         </div>
       </div>
       <ul class="legend" id="legend" aria-label="Show or hide bodies"></ul>
+      <section class="coverage" id="coverage-panel" aria-labelledby="coverage-title">
+        <div class="coverage-head">
+          <h2 class="panel-title" id="coverage-title">Solar coverage</h2>
+          <div class="seg" data-setting="covsys">
+            <button data-value="stonyhurst" title="Longitude measured from the Earth–Sun line">Stonyhurst</button>
+            <button data-value="carrington" title="Longitude fixed to the rotating Sun">Carrington</button>
+          </div>
+        </div>
+        <canvas id="coverage" aria-label="Longitudes on the solar equator seen by each observer"></canvas>
+        <p class="coverage-note" id="coverage-note"></p>
+      </section>
     </section>
 
     <section class="readout workbench" aria-label="Research tools">

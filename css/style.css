@@ -427,6 +427,56 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .lg-mark.planet { border-radius: 50%; }
 .lg-agency { color: var(--muted); font-size: 12px; }
 
+/* ---------- map hover tip and body card ---------- */
+.map-tip {
+  position: absolute; z-index: 4; pointer-events: none; max-width: 260px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  padding: 6px 9px; font: 12.5px/1.4 "Instrument Sans", "Noto Sans Devanagari", sans-serif; box-shadow: var(--shadow);
+}
+.map-tip[hidden] { display: none; }
+.map-tip b { display: block; font-weight: 600; }
+.map-tip span { display: block; color: var(--muted); font-family: "IBM Plex Mono", monospace; font-size: 11.5px; }
+#map.over-body { cursor: pointer; }
+.body-card {
+  position: absolute; z-index: 5; left: 12px; bottom: 12px; width: min(340px, calc(100% - 24px));
+  max-height: calc(100% - 110px); overflow: auto;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  padding: 12px 14px 14px; box-shadow: var(--shadow);
+  font: 13px/1.45 "Instrument Sans", "Noto Sans Devanagari", sans-serif;
+}
+.body-card[hidden] { display: none; }
+.card-head { display: flex; align-items: flex-start; gap: 10px; }
+.card-head h3 { margin: 0; font-size: 17px; line-height: 1.2; }
+.card-head small { display: block; color: var(--muted); font-size: 12.5px; font-weight: 400; margin-top: 2px; }
+.card-head .lg-mark { margin-top: 5px; flex: none; }
+.card-close {
+  margin-left: auto; border: 1px solid var(--line); background: var(--surface-2); border-radius: 7px;
+  width: 28px; height: 28px; cursor: pointer; flex: none;
+}
+.card-flag { margin: 8px 0 0; padding: 5px 8px; border-radius: 7px; background: var(--surface-2); color: var(--muted); font-size: 12.5px; }
+.card-facts { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; margin: 10px 0 0; }
+.card-facts dt { color: var(--muted); }
+.card-facts dd { margin: 0; text-align: right; font: 12.5px "IBM Plex Mono", monospace; }
+.card-near { margin: 10px 0 0; display: flex; flex-wrap: wrap; gap: 4px; }
+.card-near button, .card-actions button, .card-links a {
+  border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); border-radius: 7px;
+  padding: 4px 9px; font: 500 12.5px "Instrument Sans", "Noto Sans Devanagari", sans-serif; cursor: pointer; text-decoration: none;
+}
+.card-near button:hover, .card-actions button:hover, .card-links a:hover { border-color: var(--accent); }
+.card-actions, .card-links { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+.card-links a::after { content: " ↗"; color: var(--muted); }
+
+/* ---------- solar coverage strip ---------- */
+.coverage { margin-top: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px 12px; }
+.coverage-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 14px; margin-bottom: 8px; }
+.coverage-head .panel-title { margin: 0; }
+.coverage-head .seg { min-width: 220px; }
+#coverage { display: block; width: 100%; cursor: crosshair; }
+.coverage-note { margin: 8px 0 0; color: var(--muted); font-size: 13px; max-width: 95ch; }
+.coverage-note b { color: var(--ink); font-weight: 600; }
+.coverage.flash { box-shadow: 0 0 0 2px var(--accent); transition: box-shadow 0.3s; }
+.embed .coverage { display: none; }
+
 /* ---------- readout ---------- */
 .workbench { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 0 16px 16px; }
 .wb-tabs { display: flex; flex-wrap: wrap; gap: 2px; border-bottom: 1px solid var(--line); margin: 0 -16px 14px; padding: 0 10px; }

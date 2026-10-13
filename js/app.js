@@ -12,6 +12,8 @@ import {
 } from './catalog.js';
 import { ALIGN_KINDS } from './tools.js';
 import { initWorkbench } from './workbench.js';
+import { initCards } from './cards.js';
+import { coverageRows, coverageSummary, drawCoverage, coverageHeight } from './coverage.js';
 import {
   LANGUAGES, detectLang, loadLang, lang, saveLang, tr, translatePage,
 } from './i18n.js';
@@ -36,7 +38,13 @@ const S = {
   spot: null,
   spotOnMap: true,
   cmes: true,
+  covsys: 'stonyhurst',
 };
+let cards;
+let covHighlight = null;
+let covGeom = null;
+let mapHits = [];
+let insetHits = [];
 const EMBED = document.documentElement.classList.contains('embed');
 const THEMES = ['night', 'eclipse', 'halpha', 'plate'];
 let RANGE = [jdOf('2010-01-01T00:00Z'), jdOf('2030-01-01T00:00Z')];
@@ -128,9 +136,55 @@ function paint() {
   const [ctx, w, h] = fit(map);
   const fig = inset.parentElement;
   const avoid = [{ x: fig.offsetLeft - 4, y: fig.offsetTop - 4, w: fig.offsetWidth + 8, h: fig.offsetHeight + 8 }];
-  drawMap(ctx, w, h, scene, S, theme, S, { reserve: reserve(), avoid });
+  mapHits = drawMap(ctx, w, h, scene, S, theme, S, { reserve: reserve(), avoid }) ?? [];
   const [ictx, iw, ih] = fit(inset);
-  drawInset(ictx, iw, ih, scene, S, theme);
+  insetHits = drawInset(ictx, iw, ih, scene, S, theme) ?? [];
+  paintCoverage();
+}
+
+// Screen positions of every drawn body, inset first because it sits on top.
+function allHits() {
+  const out = [];
+  const add = (cv, list) => {
+    const r = cv.getBoundingClientRect();
+    if (!r.width) return;
+    for (const h of list) out.push({ ...h, cx: r.left + h.x, cy: r.top + h.y });
+  };
+  add(inset, insetHits);
+  add(map, mapHits);
+  return out;
+}
+
+// ---------- solar coverage ----------
+const wrap360 = (a) => ((a % 360) + 360) % 360;
+const wrap180 = (a) => ((((a + 180) % 360) + 360) % 360) - 180;
+function paintCoverage() {
+  const cv = $('coverage');
+  if (!scene || !cv.clientWidth) return;
+  const rows = coverageRows(scene, S.hidden);
+  const sum = coverageSummary(rows);
+  cv.style.height = `${coverageHeight(rows.length)}px`;
+  const [ctx, w, h] = fit(cv);
+  const L0 = scene.bodies[0].carr;
+  let spotLon = null;
+  if (S.spot) spotLon = S.spot.sys === 'carrington' ? wrap180(S.spot.lon - L0) : S.spot.lon;
+  covGeom = { ...drawCoverage(ctx, w, h, rows, sum, theme, { sys: S.covsys, L0, spotLon, highlight: covHighlight }), L0 };
+  const sys = tr(S.covsys === 'carrington' ? 'Carrington' : 'Stonyhurst');
+  const gapLon = sum.gap ? (S.covsys === 'carrington' ? wrap360(sum.gap.centre + L0) : sum.gap.centre) : null;
+  $('coverage-note').innerHTML = [
+    tr('Along the solar equator the fleet sees <b>{seen}%</b> of the Sun, and <b>{well}%</b> within 60° of some observer’s disk centre.', { seen: sum.pctSeen, well: sum.pctWell }),
+    sum.gap ? tr('The largest unseen stretch is <b>{width}°</b> wide, centred at {sys} {lon}°.', { width: sum.gap.width, sys, lon: gapLon.toFixed(0) }) : tr('No longitude on the equator is hidden from every observer.'),
+    tr('Solid bands are within 60° of disk centre, pale bands reach the limb, and red marks longitudes no one sees. Click the strip to mark a longitude.'),
+  ].join(' ');
+}
+function focusCoverage(key, scroll = true) {
+  covHighlight = key;
+  paintCoverage();
+  if (!key || !scroll) return;
+  const panel = $('coverage-panel');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  panel.classList.add('flash');
+  setTimeout(() => panel.classList.remove('flash'), 1200);
 }
 
 // ---------- update cycle ----------
@@ -150,6 +204,7 @@ async function update({ fromInput = false } = {}) {
   renderTable();
   renderSpotChip();
   bench?.refresh();
+  cards?.refresh();
 }
 
 // A marked point on the Sun is shown only when someone chose it; the chip
@@ -262,7 +317,7 @@ function setSeg(name) {
   });
 }
 function syncControls() {
-  ['frame', 'view', 'range'].forEach(setSeg);
+  ['frame', 'view', 'range', 'covsys'].forEach(setSeg);
   $('trail').value = String(S.trailDays);
   $('planets').checked = S.planets;
   $('labels').checked = S.labels;
@@ -602,13 +657,18 @@ function initMapGestures() {
   }, { passive: false });
   const ptrs = new Map();
   let pinch = 0;
+  let down = null;
   map.addEventListener('pointerdown', (e) => {
     map.setPointerCapture(e.pointerId);
     ptrs.set(e.pointerId, [e.clientX, e.clientY]);
+    down = { x: e.clientX, y: e.clientY, moved: false };
     map.classList.add('dragging');
+    cards?.leave();
   });
+  map.addEventListener('pointerleave', () => cards?.leave());
   map.addEventListener('pointermove', (e) => {
-    if (!ptrs.has(e.pointerId)) return;
+    if (!ptrs.has(e.pointerId)) { if (e.pointerType === 'mouse') cards?.hover(e.clientX, e.clientY); return; }
+    if (down && Math.hypot(e.clientX - down.x, e.clientY - down.y) > 5) down.moved = true;
     const prev = ptrs.get(e.pointerId);
     ptrs.set(e.pointerId, [e.clientX, e.clientY]);
     if (ptrs.size === 2) {
@@ -628,6 +688,8 @@ function initMapGestures() {
     ptrs.delete(e.pointerId);
     pinch = 0;
     if (!ptrs.size) map.classList.remove('dragging');
+    if (e.type === 'pointerup' && down && !down.moved && !ptrs.size) cards?.click(e.clientX, e.clientY);
+    down = null;
   };
   map.addEventListener('pointerup', up);
   map.addEventListener('pointercancel', up);
@@ -870,6 +932,30 @@ async function main() {
       };
     },
   });
+  cards = initCards({
+    S,
+    bench,
+    wrap: $('map-wrap'),
+    scene: () => scene,
+    hits: allHits,
+    jump: (jd) => { stopPlay(); S.jd = jd; update(); },
+    hide: (key) => document.querySelector(`.legend button[data-key="${key}"]`)?.click(),
+    coverage: (key, scroll = true) => focusCoverage(key, scroll),
+  });
+  inset.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') cards.hover(e.clientX, e.clientY); });
+  inset.addEventListener('pointerleave', () => cards.leave());
+  inset.addEventListener('click', (e) => cards.click(e.clientX, e.clientY));
+  $('coverage').addEventListener('click', (e) => {
+    if (!covGeom || !scene) return;
+    const r = $('coverage').getBoundingClientRect();
+    const px = e.clientX - r.left;
+    if (px < covGeom.left || px > covGeom.right) return;
+    const stony = covGeom.toStony(px);
+    S.spot = { sys: 'carrington', lon: +wrap360(stony + covGeom.L0).toFixed(1), lat: 0 };
+    S.spotOnMap = true;
+    bench.syncSpot();
+    update();
+  });
   if (EMBED) {
     $('embed-play').addEventListener('click', () => (playing ? stopPlay() : startPlay()));
     $('speed').value = '7';
@@ -897,6 +983,7 @@ async function main() {
   $('spot-edit').addEventListener('click', () => bench.showSpotTool());
   $('spot-clear').addEventListener('click', () => { bench.clearSpot(); update(); });
   document.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape' && cards.isOpen()) { cards.close(); return; }
     if (bench.isOpen() || ev.target.closest('input, select, textarea, #ribbon, [role="tab"]')) return;
     if (ev.key === ' ') { ev.preventDefault(); playing ? stopPlay() : startPlay(); return; }
     const d = { ArrowLeft: -1, ArrowRight: 1 }[ev.key];

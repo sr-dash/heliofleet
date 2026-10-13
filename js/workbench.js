@@ -382,6 +382,18 @@ export function initWorkbench(ctx) {
     refresh() { renderVis(); },
     isOpen: () => sheet.open,
     openSheet,
+    // From a spacecraft's card: open the tools with that body chosen
+    alignWith(key) {
+      select($('tab-align'));
+      if (key !== 'earth') $('align-a').value = key;
+      if ($('align-b').value === $('align-a').value) $('align-b').value = 'earth';
+      document.querySelector('.workbench').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    },
+    seriesFor(key) {
+      select($('tab-series'));
+      box.querySelectorAll('input').forEach((i) => { i.checked = i.value === key; });
+      document.querySelector('.workbench').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    },
     showSpotTool() {
       select($('tab-vis'));
       document.querySelector('.workbench').scrollIntoView({ behavior: 'smooth', block: 'start' });
