@@ -34,7 +34,7 @@ export function createRibbon(svg, tip, { start, end, onScrub, onPick, marks }) {
   const LANE_DY = 11.5;
   const ROW_SW = LANE0 + LANE_DY * (SPACECRAFT.length - 1) + 20;
   const AXIS = ROW_SW + 16;
-  const H = AXIS + 16;
+  const H = AXIS + 16; // keep #ribbon's height in css/style.css in step
   svg.style.height = `${H}px`;
 
   const x = (jd) => LEFT + ((jd - start) / (end - start)) * (W - LEFT - RIGHT);

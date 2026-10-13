@@ -765,7 +765,7 @@ async function snapshot(kind) {
   try {
     const cv = await composeSnapshot(scene, S, theme, S, meta);
     if (kind === 'png') await downloadPNG(cv, base);
-    else downloadPDF(cv, base, `HelioFleet ${meta.date} ${meta.time}`);
+    else await downloadPDF(cv, base, `HelioFleet ${meta.date} ${meta.time}`);
     toast(tr('Saved {file}', { file: `${base}.${kind}` }));
   } catch (err) {
     toast(err.message);

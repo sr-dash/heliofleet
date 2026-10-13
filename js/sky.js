@@ -483,7 +483,7 @@ async function saveSnapshot(kind) {
     const cv2 = await snapshot();
     const base = `heliofleet-sky-${observer().key}-${isoMinute(S.jd).replace(/[-:]/g, '').replace('T', '-')}`;
     if (kind === 'png') await downloadPNG(cv2, base);
-    else downloadPDF(cv2, base, `HelioFleet · ${viewTitle(observer().key)} · ${isoMinute(S.jd)} UTC`);
+    else await downloadPDF(cv2, base, `HelioFleet · ${viewTitle(observer().key)} · ${isoMinute(S.jd)} UTC`);
   } catch (err) {
     toast(err.message);
   }

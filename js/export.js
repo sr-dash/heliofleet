@@ -225,7 +225,23 @@ export async function downloadPNG(cv, base) {
   save(blob, `${base}.png`);
 }
 
-export function downloadPDF(cv, base, title) {
+// The PDF library is loaded the first time someone asks for a PDF.
+const PDF_LIB = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+let pdfLib = null;
+function loadPdfLib() {
+  if (window.jspdf) return Promise.resolve();
+  pdfLib ??= new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = PDF_LIB;
+    s.onload = resolve;
+    s.onerror = () => { pdfLib = null; reject(); };
+    document.head.appendChild(s);
+  });
+  return pdfLib;
+}
+
+export async function downloadPDF(cv, base, title) {
+  await loadPdfLib().catch(() => {});
   const { jsPDF } = window.jspdf ?? {};
   if (!jsPDF) throw new Error(tr('The PDF library did not load. Check your connection and try again.'));
   const w = (cv.width / SCALE) * 0.75;

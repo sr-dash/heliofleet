@@ -96,6 +96,14 @@ for (const c of ref.hpc) {
 }
 report('plane-of-sky placement', worst, 1e-4, 'solar radii', where);
 
+// 5. The timeline's reserved height matches what js/ribbon.js draws, so the
+// page does not jump when it appears
+const { SPACECRAFT } = await import('../js/catalog.js');
+const css = await readFile(ROOT + 'css/style.css', 'utf8');
+const reserved = parseFloat(css.match(/#ribbon \{[^}]*height: ([\d.]+)px/)[1]);
+const drawn = 42 + 11.5 * (SPACECRAFT.length - 1) + 20 + 16 + 16;
+report('timeline height reserved in css/style.css', Math.abs(reserved - drawn), 0.5, 'px', `reserved ${reserved}, drawn ${drawn}`);
+
 if (failed) {
   console.log(`${failed} check(s) failed`);
   process.exit(1);

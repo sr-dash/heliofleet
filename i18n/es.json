@@ -100,7 +100,6 @@
  "Earth (ground-based)": "Tierra (desde el suelo)",
  "Earth's View of the Corona: Instrument Fields of View | HelioFleet": "La corona vista desde la Tierra: campos de visión de los instrumentos | HelioFleet",
  "Earth's view": "Vista desde la Tierra",
- "Earth, Moon, L1 and Aditya-L1": "Tierra, Luna, L1 y Aditya-L1",
  "Earth-facing": "Cara a la Tierra",
  "Earth-fixed": "Fijo a la Tierra",
  "Earth-fixed (HEE)": "Fijo a la Tierra (HEE)",
@@ -466,5 +465,6 @@
  "If HelioFleet helped your research, please cite it. The DOI {latest} always points to the latest version; to cite version {version} specifically, use {v1}. The same metadata is in {cff}.": "Si HelioFleet ha ayudado a tu investigación, por favor cítalo. El DOI {latest} siempre apunta a la última versión; para citar específicamente la versión {version}, usa {v1}. Los mismos metadatos están en {cff}.",
  "If HelioFleet helped your research, please cite it. The DOI {latest} always points to the latest version. The same metadata is in {cff}.": "Si HelioFleet ha ayudado a tu investigación, por favor cítalo. El DOI {latest} siempre apunta a la última versión. Los mismos metadatos están en {cff}.",
  "IMAP, SWFO-L1 and Carruthers launch": "Lanzamiento de IMAP, SWFO-L1 y Carruthers",
- "MAVEN contact lost": "Se pierde el contacto con MAVEN"
+ "MAVEN contact lost": "Se pierde el contacto con MAVEN",
+ "Earth, the Moon, the L1 point and the spacecraft around it": "La Tierra, la Luna, el punto L1 y las naves a su alrededor"
 }
