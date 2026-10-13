@@ -57,6 +57,8 @@ function readURL() {
   if (q.has('fov')) { S.fov = new Set(q.get('fov').split(',').filter((k) => INSTRUMENT[k])); }
   if (q.has('ground')) S.ground = new Set(q.get('ground').split(',').filter(Boolean));
   if (q.has('hl')) S.hl = q.get('hl');
+  // Bodies to leave out of the view, as on the map (hide=sta,bepi)
+  if (q.has('hide')) q.get('hide').split(',').filter((k) => BODIES[k]).forEach((k) => SCENE.hidden.add(k));
   if (OBSERVERS.includes(q.get('obs'))) S.obs = q.get('obs');
 }
 let urlTimer;
@@ -69,6 +71,7 @@ function writeURL() {
     q.set('fov', [...S.fov].join(','));
     if ([...S.ground].sort().join() !== 'cryo,kcor,ucomp') q.set('ground', [...S.ground].join(','));
     if (S.hl) q.set('hl', S.hl);
+    if (SCENE.hidden.size) q.set('hide', [...SCENE.hidden].join(','));
     if (S.obs !== 'earth') q.set('obs', S.obs);
     const cur = new URLSearchParams(location.search);
     for (const k of ['lang', 'theme']) if (cur.has(k)) q.set(k, cur.get(k));
@@ -135,7 +138,7 @@ function paint() {
 }
 
 // Fill and outline a projected grid of plane points; returns its label anchor
-function drawMesh(ctx, map, pts, col, annulus, labelAt) {
+function drawMesh(ctx, map, pts, col, annulus, labelAt, [W, H]) {
   ctx.beginPath();
   for (let i = 0; i < pts.length - 1; i++) {
     for (let j = 0; j < pts[i].length - 1; j++) {
@@ -169,7 +172,22 @@ function drawMesh(ctx, map, pts, col, annulus, labelAt) {
   edge(pts[n]);
   if (!annulus) { edge(pts.map((r) => r[0])); edge(pts.map((r) => r[m])); }
   ctx.globalAlpha = 1;
-  return annulus ? pts[n][Math.round(m * labelAt)] : pts[Math.round(n / 2)][Math.round(m / 2)];
+  if (annulus) return pts[n][Math.round(m * labelAt)];
+  // The visible point nearest the middle of the field, so a field whose
+  // centre is off-screen still gets a label
+  let best = null;
+  let bestD = Infinity;
+  for (let i = 0; i <= n; i++) {
+    for (let j = 0; j <= m; j++) {
+      const v = pts[i][j];
+      if (!v) continue;
+      const [x, y] = map(v);
+      if (x < 12 || x > W - 12 || y < 24 || y > H - 24) continue;
+      const d = (i - n / 2) ** 2 + (j - m / 2) ** 2;
+      if (d < bestD) { bestD = d; best = v; }
+    }
+  }
+  return best;
 }
 
 function draw(ctx, W, H) {
@@ -191,10 +209,14 @@ function draw(ctx, W, H) {
   ctx.font = `10.5px ${MONO}`;
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'left';
+  let lastLabel = -Infinity;
   for (const r of [1.5, 2, 3, 5, 10, 20, 30, 50, 100, 150, 215]) {
     if (r > S.zoom * 1.45 || r < S.zoom * 0.12) continue;
     ctx.beginPath(); ctx.arc(ox, oy, r * ppr, 0, 2 * Math.PI); ctx.stroke();
+    // Label a ring only when it is clear of the last labelled one
+    if (r * ppr - lastLabel < 24) continue;
     ctx.fillText(r === 215 ? '1 au' : `${r} R☉`, ox + r * ppr * 0.71 + 4, oy - r * ppr * 0.71);
+    lastLabel = r * ppr;
   }
   ctx.font = `600 12px ${FONT}`;
   ctx.textAlign = 'center';
@@ -218,7 +240,7 @@ function draw(ctx, W, H) {
     if (!b || b.st === 'lost') continue;
     const pts = trace(b.p, fovGrid(ins, SKY_SHAPES[id], b.p, sideSign(ins, b), b.dist));
     const col = theme.color[ins.sc];
-    const at = drawMesh(ctx, map, pts, col, SKY_SHAPES[id].type === 'annulus', 0.13);
+    const at = drawMesh(ctx, map, pts, col, SKY_SHAPES[id].type === 'annulus', 0.13, [W, H]);
     drawn.fov.push({ ins, b, col, shown: pts.some((r) => r.some(Boolean)) });
     if (at) { const [x, y] = map(at); labels.push({ text: `${BODIES[ins.sc].short} ${ins.name}`, x, y, r: 2, size: 11, color: col }); }
   }
@@ -228,7 +250,7 @@ function draw(ctx, W, H) {
     if (!S.ground.has(g.id)) continue;
     const grid = fovGrid({ unit: 'rs', inner: g.inner, outer: g.outer }, { type: 'annulus' }, earth, 1, norm(earth));
     const gp = trace(earth, grid);
-    const at = drawMesh(ctx, map, gp, theme.color.earth, true, 0.375);
+    const at = drawMesh(ctx, map, gp, theme.color.earth, true, 0.375, [W, H]);
     drawn.ground.push({ g, shown: gp.some((r) => r.some(Boolean)) });
     if (at) { const [x, y] = map(at); labels.push({ text: g.name, x, y, r: 2, size: 11, color: theme.color.earth }); }
   }
@@ -262,7 +284,10 @@ function draw(ctx, W, H) {
       ctx.stroke();
       if (active || hl) {
         const [px, py] = map(poly[0]);
-        labels.push({ text: `Cryo-NIRSP ${d.id}`, x: px, y: py, r: 3, size: 11, color: theme.accent });
+        // Datasets taken together on the same spot share one label
+        const near = labels.find((l) => l.cryo && Math.hypot(l.x - px, l.y - py) < 12);
+        if (near) near.text += `, ${d.id}`;
+        else labels.push({ text: `Cryo-NIRSP ${d.id}`, x: px, y: py, r: 3, size: 11, color: theme.accent, cryo: true });
       }
     }
   }
@@ -271,7 +296,7 @@ function draw(ctx, W, H) {
   const O = obs.p;
   for (const b of scene.bodies) {
     const meta = BODIES[b.key];
-    if (b.key === obs.key || (b.key !== 'earth' && (meta.kind !== 'sc' || meta.near))) continue;
+    if (b.key === obs.key || SCENE.hidden.has(b.key) || (b.key !== 'earth' && (meta.kind !== 'sc' || meta.near))) continue;
     if (obs.key === 'earth' && b.key === 'earth') continue;
     const q = sky.seen(b.p);
     const behind = !q;
