@@ -8,7 +8,7 @@ import { readTheme, placeLabels } from './render.js';
 import { BODIES } from './catalog.js';
 import { INSTRUMENTS, INSTRUMENT } from './instruments.js';
 import { makeSky, fovGrid, hpcDirection, SKY_SHAPES, GROUND, SITES, sunAltitude, observingWindow } from './skyproj.js';
-import { norm } from './frames.js';
+import { norm, angleBetween } from './frames.js';
 import { downloadPNG, downloadPDF } from './export.js';
 import { LANGUAGES, detectLang, loadLang, lang, saveLang, tr, translatePage } from './i18n.js';
 
@@ -43,6 +43,8 @@ const SCENE = { frame: 'hee', view: 'top', trailDays: 0, planets: false, labels:
 let theme;
 let scene = null;
 let cryo = [];
+// What the last drawing showed, for the snapshot key
+let drawn = { fov: [], ground: [], cryo: [], bodies: [] };
 let RANGE = [jdOf('2010-01-01T00:00Z'), jdOf('2030-01-01T00:00Z')];
 
 // ---------- URL ----------
@@ -180,6 +182,7 @@ function draw(ctx, W, H) {
   const sky = makeSky(obs.p);
   const earth = scene.earth;
   const labels = [];
+  drawn = { fov: [], ground: [], cryo: [], bodies: [] };
 
   // Radial grid in solar radii, and the compass of a solar image
   ctx.strokeStyle = theme.grid;
@@ -216,6 +219,7 @@ function draw(ctx, W, H) {
     const pts = trace(b.p, fovGrid(ins, SKY_SHAPES[id], b.p, sideSign(ins, b), b.dist));
     const col = theme.color[ins.sc];
     const at = drawMesh(ctx, map, pts, col, SKY_SHAPES[id].type === 'annulus', 0.13);
+    drawn.fov.push({ ins, b, col, shown: pts.some((r) => r.some(Boolean)) });
     if (at) { const [x, y] = map(at); labels.push({ text: `${BODIES[ins.sc].short} ${ins.name}`, x, y, r: 2, size: 11, color: col }); }
   }
 
@@ -223,7 +227,9 @@ function draw(ctx, W, H) {
   for (const g of GROUND) {
     if (!S.ground.has(g.id)) continue;
     const grid = fovGrid({ unit: 'rs', inner: g.inner, outer: g.outer }, { type: 'annulus' }, earth, 1, norm(earth));
-    const at = drawMesh(ctx, map, trace(earth, grid), theme.color.earth, true, 0.375);
+    const gp = trace(earth, grid);
+    const at = drawMesh(ctx, map, gp, theme.color.earth, true, 0.375);
+    drawn.ground.push({ g, shown: gp.some((r) => r.some(Boolean)) });
     if (at) { const [x, y] = map(at); labels.push({ text: g.name, x, y, r: 2, size: 11, color: theme.color.earth }); }
   }
 
@@ -243,6 +249,7 @@ function draw(ctx, W, H) {
       if (poly.some((v) => !v || Math.abs(v[0]) > far || Math.abs(v[1]) > far)) continue;
       const active = S.jd >= d.j0 && S.jd <= d.j1;
       const hl = S.hl === d.id;
+      drawn.cryo.push({ d, active });
       ctx.beginPath();
       poly.forEach((v, i) => { const [px, py] = map(v); if (i) ctx.lineTo(px, py); else ctx.moveTo(px, py); });
       ctx.closePath();
@@ -291,6 +298,7 @@ function draw(ctx, W, H) {
     ctx.fill();
     ctx.globalAlpha = 1;
     const text = behind ? tr('{name} (behind)', { name }) : inside ? name : `${name} →`;
+    drawn.bodies.push({ b, name, col, where: behind ? 'behind' : inside ? 'in' : 'edge' });
     labels.push({ text, x, y, r: 7, size: 12, color: col, bold: true });
   }
 
@@ -318,16 +326,124 @@ function viewTitle(key) {
 }
 
 // ---------- snapshot ----------
+const fmt = (v, d = 1) => String(Number(v.toFixed(d)));
+// Coronagraphs by field shape; the rest are heliospheric imagers
+const kindOf = (id) => (SKY_SHAPES[id].type === 'annulus' ? tr('coronagraph') : tr('heliospheric imager'));
+
+function wrap(ctx, text, x, y, width, lh, dry) {
+  let line = '';
+  for (const word of text.split(' ')) {
+    const test = line ? `${line} ${word}` : word;
+    if (ctx.measureText(test).width > width && line) {
+      if (!dry) ctx.fillText(line, x, y);
+      line = word;
+      y += lh;
+    } else line = test;
+  }
+  if (line) { if (!dry) ctx.fillText(line, x, y); y += lh; }
+  return y;
+}
+
+// The key beside the snapshot: one entry per layer, saying what it is and
+// where it is seen from. With dry set it only measures; returns the end y.
+function snapshotKey(ctx, x, y, w, obs, dry) {
+  const ob = scene.bodies.find((b) => b.key === obs.key);
+  const head = (t) => {
+    y += 10;
+    ctx.font = `700 13px ${FONT}`;
+    ctx.fillStyle = theme.ink;
+    if (!dry) ctx.fillText(t.toUpperCase(), x, y);
+    y += 8;
+    if (!dry) { ctx.fillStyle = theme.line; ctx.fillRect(x, y - 2, w, 1); }
+    y += 12;
+  };
+  const entry = (col, shape, title, detail) => {
+    if (!dry && col) {
+      ctx.fillStyle = col;
+      ctx.strokeStyle = col;
+      if (shape === 'field') {
+        ctx.globalAlpha = 0.25; ctx.fillRect(x, y - 10, 16, 12); ctx.globalAlpha = 1;
+        ctx.lineWidth = 1.3; ctx.strokeRect(x + 0.5, y - 9.5, 15, 11);
+      } else if (shape === 'ring') {
+        ctx.globalAlpha = 0.25; ctx.fillRect(x, y - 10, 16, 12); ctx.globalAlpha = 1;
+        ctx.setLineDash([3, 2]); ctx.lineWidth = 1.3; ctx.strokeRect(x + 0.5, y - 9.5, 15, 11); ctx.setLineDash([]);
+      } else if (shape === 'earth') {
+        ctx.beginPath(); ctx.arc(x + 8, y - 4, 5, 0, 2 * Math.PI); ctx.fill();
+      } else {
+        ctx.beginPath(); ctx.moveTo(x + 8, y - 9); ctx.lineTo(x + 13, y - 4); ctx.lineTo(x + 8, y + 1); ctx.lineTo(x + 3, y - 4); ctx.closePath(); ctx.fill();
+      }
+    }
+    const tx = col ? x + 24 : x;
+    ctx.font = `600 12.5px ${FONT}`;
+    ctx.fillStyle = col ?? theme.ink;
+    y = wrap(ctx, title, tx, y, w - (tx - x), 16, dry);
+    ctx.font = `400 11.5px ${FONT}`;
+    ctx.fillStyle = theme.muted;
+    y = wrap(ctx, detail, tx, y, w - (tx - x), 14.5, dry) + 5;
+  };
+
+  head(tr('Observer'));
+  entry(null, null, obsName(obs.key), [
+    tr('{d} au from the Sun', { d: fmt(norm(obs.p), 3) }),
+    ob && obs.key !== 'earth' ? tr('Stonyhurst longitude {lon}°, latitude {lat}°', { lon: fmt(ob.lon), lat: fmt(ob.lat) }) : '',
+    obs.key !== 'earth' ? tr('{a}° from Earth, seen from the Sun', { a: fmt(angleBetween(obs.p, scene.earth)) }) : '',
+    tr('Solar north up, west to the right. The disc is the Sun as this observer sees it.'),
+  ].filter(Boolean).join(' · '));
+
+  if (drawn.fov.length) {
+    head(tr('Fields of view'));
+    for (const f of drawn.fov) {
+      const range = f.ins.unit === 'rs' ? `${fmt(f.ins.inner, 2)}–${fmt(f.ins.outer, 2)} R☉` : `${fmt(f.ins.inner)}–${fmt(f.ins.outer)}° ${tr('elongation')}`;
+      const own = f.ins.sc === obs.key;
+      const where = own ? tr('on the observer itself, so it is centred on the Sun')
+        : tr('seen from {sc}, {a}° from the observer around the Sun', { sc: BODIES[f.ins.sc].short, a: fmt(angleBetween(f.b.p, obs.p)) });
+      entry(f.col, 'field', `${BODIES[f.ins.sc].short} ${f.ins.name}`,
+        `${kindOf(f.ins.id)} · ${range} · ${where}${f.shown ? '' : ` · ${tr('outside this view')}`}`);
+    }
+  }
+  if (drawn.ground.length || drawn.cryo.length) {
+    head(tr('Ground'));
+    for (const { g, shown } of drawn.ground) {
+      entry(theme.color.earth, 'ring', g.name, `${tr('coronagraph')} · ${fmt(g.inner, 2)}–${fmt(g.outer, 2)} R☉ · ${tr('traced from Earth')}${shown ? '' : ` · ${tr('outside this view')}`}`);
+    }
+    const list = drawn.cryo.slice(0, 6);
+    for (const { d, active } of list) {
+      entry(theme.accent, 'field', `DKIST Cryo-NIRSP · ${d.wave}`,
+        `${tr(MODES[d.mode] ?? d.mode)} · ${hhmm(d.j0)}–${hhmm(d.j1)} UT · ${d.pid} · ${d.id}${active ? ` · ${tr('observing at this moment')}` : ''}`);
+    }
+    if (drawn.cryo.length > list.length) entry(null, null, '', tr('and {n} more Cryo-NIRSP datasets within 12 hours', { n: drawn.cryo.length - list.length }));
+  }
+
+  if (drawn.bodies.length) {
+    head(tr('Bodies'));
+    for (const { b, name, col, where } of drawn.bodies) {
+      const state = where === 'behind' ? tr('behind the observer; the marker shows its direction')
+        : where === 'edge' ? tr('outside the view; the arrow points toward it') : tr('where the observer sees it');
+      entry(col, b.key === 'earth' ? 'earth' : 'sc', name, `${tr('{d} au from the Sun', { d: fmt(norm(b.p), 3) })} · ${state}`);
+    }
+  }
+
+  head(tr('How to read it'));
+  ctx.font = `400 11.5px ${FONT}`;
+  ctx.fillStyle = theme.muted;
+  y = wrap(ctx, tr('Each field is filled where the instrument looks and outlined at its edges, in the colour of its spacecraft. Lines of sight are followed to where they cross the plane through Sun centre perpendicular to the line from the Sun to the observer, so fields from spacecraft far from the observer are stretched. Heliospheric imager outlines are approximate; see the README for sources.'), x, y, w, 14.5, dry);
+  return y;
+}
+
 async function snapshot() {
   await document.fonts.ready;
   const SIZE = 1000;
   const TOP = 74;
   const PAD = 20;
+  const KEY = 400;
   const obs = observer();
-  const note = tr('Lines of sight are followed to where they cross the plane through Sun centre perpendicular to the line from the Sun to the observer. MLSO and DKIST fields are traced from Earth.');
-  const W = SIZE + 2 * PAD;
-  const HT = TOP + SIZE + 70;
+  const W = SIZE + KEY + 3 * PAD;
   const cv2 = document.createElement('canvas');
+  const probe = cv2.getContext('2d');
+  probe.textBaseline = 'alphabetic';
+  paint(); // refresh what was drawn before measuring the key
+  const keyEnd = snapshotKey(probe, 0, TOP, KEY, obs, true);
+  const HT = Math.max(TOP + SIZE, keyEnd) + 54;
   cv2.width = W * 2;
   cv2.height = HT * 2;
   const ctx = cv2.getContext('2d');
@@ -341,7 +457,7 @@ async function snapshot() {
   ctx.fillText(`HelioFleet · ${viewTitle(obs.key)}`, PAD, 38);
   ctx.font = `500 14px ${MONO}`;
   ctx.fillStyle = theme.muted;
-  ctx.fillText(`${isoMinute(S.jd).replace('T', ' ')} UTC · ${hudText(obs).replace('\n', ' · ')}`, PAD, 60, SIZE);
+  ctx.fillText(`${isoMinute(S.jd).replace('T', ' ')} UTC · ${hudText(obs).replace('\n', ' · ')}`, PAD, 60, W - 2 * PAD);
   ctx.save();
   ctx.translate(PAD, TOP);
   ctx.beginPath();
@@ -354,10 +470,10 @@ async function snapshot() {
   ctx.beginPath();
   ctx.roundRect(PAD + 0.5, TOP + 0.5, SIZE - 1, SIZE - 1, 12);
   ctx.stroke();
+  snapshotKey(ctx, SIZE + 2 * PAD, TOP - 10, KEY, obs, false);
   ctx.fillStyle = theme.muted;
   ctx.font = `400 12px ${FONT}`;
-  ctx.fillText(note, PAD, TOP + SIZE + 24, SIZE);
-  ctx.fillText(`${tr('Positions from JPL Horizons. Fields of view from the instrument papers.')}  sr-dash.github.io/heliofleet/sky.html`, PAD, TOP + SIZE + 44, SIZE);
+  ctx.fillText(`${tr('Positions from JPL Horizons. Fields of view from the instrument papers.')}  sr-dash.github.io/heliofleet/sky.html`, PAD, HT - 22, W - 2 * PAD);
   paint(); // the HUD follows the on-screen view again
   return cv2;
 }
