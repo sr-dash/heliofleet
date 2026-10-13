@@ -68,7 +68,7 @@ Positions come from [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/), as helio
 | BepiColombo | -121 | 2018-10-21 to 2027-04-10 |
 | MAVEN | -202 | 2013-11-19 to 2026-03-01; Mars orbit |
 
-Timeline: 2010-01-01 to 2030-11-19. Data last updated 2026-10-12; next scheduled update 2026-11-01.
+Timeline: 2010-01-01 to 2030-11-19. Data last updated 2026-10-13; next scheduled update 2026-11-01.
 <!-- coverage:end -->
 
 Positions past each mission's latest tracking data are planning trajectories.
