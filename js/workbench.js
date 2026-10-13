@@ -7,6 +7,7 @@ import {
   sceneRows, toCSV, toJSON, timeSeries, sunpyCode, ALIGN_KINDS, findAlignments,
   windowsCSV, visibility, citationText, ALL_KEYS,
 } from './tools.js';
+import { recordAnimation, videoSupport, LIMITS } from './animate.js';
 
 const $ = (id) => document.getElementById(id);
 const day = (jd) => dateFromJD(jd + 1e-6).toISOString().slice(0, 10);
@@ -44,6 +45,7 @@ export function initWorkbench(ctx) {
     }
     if (tab.id === 'tab-align') primeAlign();
     if (tab.id === 'tab-series') primeSeries();
+    if (tab.id === 'tab-anim') primeAnim();
   };
   tabs.forEach((t, i) => {
     t.addEventListener('click', () => select(t));
@@ -288,6 +290,73 @@ export function initWorkbench(ctx) {
     }
   });
 
+  // ---------- animation ----------
+  const fmt = videoSupport();
+  if (fmt === 'webm') $('anim-video-opt').textContent = 'WebM video';
+  let animPrimed = false;
+  function primeAnim() {
+    if (animPrimed) return;
+    animPrimed = true;
+    const [lo, hi] = ctx.range();
+    $('anim-from').value = day(Math.max(lo, S.jd - 30));
+    $('anim-to').value = day(Math.min(hi, S.jd + 30));
+    animEstimate();
+  }
+  function animPlan() {
+    const [lo, hi] = ctx.range();
+    const jd0 = Math.max(lo, jdOfDay($('anim-from').value));
+    const jd1 = Math.min(hi, jdOfDay($('anim-to').value));
+    const step = parseFloat($('anim-step').value);
+    const fps = parseInt($('anim-fps').value, 10);
+    const [width, height] = $('anim-size').value.split('x').map(Number);
+    const format = $('anim-format').value;
+    const frames = jd1 >= jd0 ? Math.floor((jd1 - jd0) / step + 1e-9) + 1 : 0;
+    return { jd0, jd1, step, fps, width, height, format, frames };
+  }
+  function animEstimate() {
+    const p = animPlan();
+    const limit = p.format === 'gif' ? LIMITS.gif : LIMITS.video;
+    const kind = p.format === 'gif' ? 'GIF' : fmt === 'mp4' ? 'MP4 (H.264)' : 'WebM';
+    $('anim-help').textContent = p.frames
+      ? `${p.frames} frames, ${(p.frames / p.fps).toFixed(1)} s of ${kind}${p.frames > limit ? ` — over the ${limit}-frame limit for this format` : ''}. Uses the current frame, view, zoom, trails, overlays and theme.${fmt === 'webm' && p.format === 'video' ? ' This browser records WebM in real time.' : ''}`
+      : 'Set a start date on or before the end date.';
+  }
+  $('anim-form').addEventListener('input', animEstimate);
+  let abort = null;
+  $('anim-cancel').addEventListener('click', () => abort?.abort());
+  $('anim-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const p = animPlan();
+    if (!p.frames) { animEstimate(); return; }
+    abort = new AbortController();
+    $('anim-go').disabled = true;
+    $('anim-cancel').hidden = false;
+    $('anim-progress').hidden = false;
+    $('anim-bar').value = 0;
+    $('anim-status').textContent = 'Loading ephemerides…';
+    try {
+      const { blob, ext } = await recordAnimation({
+        ...p,
+        S: { ...S, hidden: new Set(S.hidden) },
+        theme: ctx.theme(),
+        meta: ctx.frameMeta,
+        signal: abort.signal,
+        onProgress: (i, n) => {
+          $('anim-bar').value = i / n;
+          $('anim-status').textContent = `Frame ${i} of ${n}`;
+        },
+      });
+      save(blob, `heliofleet_${day(p.jd0)}_${day(p.jd1)}.${ext}`, blob.type);
+      $('anim-status').textContent = `Saved ${(blob.size / 1e6).toFixed(1)} MB ${ext.toUpperCase()}`;
+    } catch (err) {
+      $('anim-status').textContent = err.name === 'AbortError' ? 'Cancelled' : err.message;
+    } finally {
+      $('anim-go').disabled = false;
+      $('anim-cancel').hidden = true;
+      abort = null;
+    }
+  });
+
   // ---------- citation ----------
   $('cite').addEventListener('click', () => {
     const { apa, bib } = citationText();
@@ -302,5 +371,13 @@ export function initWorkbench(ctx) {
   return {
     refresh() { renderVis(); },
     isOpen: () => sheet.open,
+    openSheet,
+    syncSpot() {
+      if (!S.spot) return;
+      $('vis-sys').value = S.spot.sys;
+      $('vis-lon').value = S.spot.lon;
+      $('vis-lat').value = S.spot.lat;
+      $('vis-map').checked = S.spotOnMap;
+    },
   };
 }

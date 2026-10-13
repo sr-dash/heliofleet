@@ -194,3 +194,96 @@ export function downloadPDF(cv, base, title) {
   pdf.addImage(cv.toDataURL('image/jpeg', 0.93), 'JPEG', 0, 0, W * 0.75, H * 0.75);
   pdf.save(`${base}.pdf`);
 }
+
+// One animation frame. Wide frames put the map on the left and the date,
+// context and near-Earth inset beside it; square or tall frames overlay the
+// date on the map. Text scales with the frame.
+export function composeFrame(ctx, W, H, scene, s, th, meta) {
+  const k = Math.min(W, H) / 720;
+  ctx.fillStyle = th.page;
+  ctx.fillRect(0, 0, W, H);
+  ctx.textBaseline = 'alphabetic';
+  if (W / H >= 1.3) {
+    const M = H;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, M, M);
+    ctx.clip();
+    drawMap(ctx, M, M, scene, s, th, s, { k });
+    ctx.restore();
+    const X = M + 34 * k;
+    const CW = W - X - 30 * k;
+    let y = 74 * k;
+    ctx.textAlign = 'left';
+    ctx.fillStyle = th.ink;
+    ctx.font = `800 ${46 * k}px ${DISPLAY}`;
+    ctx.fillText('HELIOFLEET', X, y);
+    y += 56 * k;
+    ctx.font = `500 ${34 * k}px ${MONO}`;
+    ctx.fillText(meta.date, X, y);
+    y += 34 * k;
+    ctx.fillStyle = th.accent;
+    ctx.font = `400 ${22 * k}px ${MONO}`;
+    ctx.fillText(meta.time, X, y);
+    y += 32 * k;
+    ctx.fillStyle = th.muted;
+    ctx.font = `500 ${15 * k}px ${SANS}`;
+    if (meta.context) y = wrapText(ctx, meta.context, X, y, CW, 20 * k) + 4 * k;
+    y = wrapText(ctx, meta.frame, X, y, CW, 20 * k) + 14 * k;
+    const IW = Math.min(CW, 230 * k);
+    const IH = Math.min(IW * 1.25, H - y - 70 * k);
+    if (IH > 120 * k) {
+      ctx.save();
+      ctx.translate(X, y);
+      ctx.beginPath();
+      ctx.roundRect(0, 0, IW, IH, 10 * k);
+      ctx.clip();
+      drawInset(ctx, IW, IH, scene, s, th, { k: Math.max(0.8, k) });
+      ctx.restore();
+      ctx.strokeStyle = th.line;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(X + 0.5, y + 0.5, IW - 1, IH - 1, 10 * k);
+      ctx.stroke();
+    }
+    ctx.fillStyle = th.muted;
+    ctx.font = `400 ${13 * k}px ${SANS}`;
+    ctx.fillText('Ephemerides: JPL Horizons', X, H - 46 * k);
+    ctx.fillText('sr-dash.github.io/heliofleet', X, H - 26 * k);
+    return;
+  }
+  const IW = 170 * k;
+  const IH = 212 * k;
+  const ix = W - IW - 14 * k;
+  const iy = 14 * k;
+  drawMap(ctx, W, H, scene, s, th, s, { k, avoid: [{ x: ix - 6, y: iy - 6, w: IW + 12, h: IH + 12 }] });
+  ctx.save();
+  ctx.translate(ix, iy);
+  ctx.beginPath();
+  ctx.roundRect(0, 0, IW, IH, 10 * k);
+  ctx.clip();
+  drawInset(ctx, IW, IH, scene, s, th, { k: Math.max(0.8, k * 0.9) });
+  ctx.restore();
+  ctx.strokeStyle = th.line;
+  ctx.beginPath();
+  ctx.roundRect(ix + 0.5, iy + 0.5, IW - 1, IH - 1, 10 * k);
+  ctx.stroke();
+  ctx.textAlign = 'left';
+  ctx.fillStyle = th.ink;
+  ctx.font = `800 ${30 * k}px ${DISPLAY}`;
+  ctx.fillText('HELIOFLEET', 20 * k, 44 * k);
+  ctx.font = `500 ${24 * k}px ${MONO}`;
+  ctx.fillText(meta.date, 20 * k, 76 * k);
+  ctx.fillStyle = th.accent;
+  ctx.font = `400 ${17 * k}px ${MONO}`;
+  ctx.fillText(meta.time, 20 * k, 100 * k);
+  if (meta.context) {
+    ctx.fillStyle = th.muted;
+    ctx.font = `500 ${14 * k}px ${SANS}`;
+    ctx.fillText(meta.context, 20 * k, 122 * k);
+  }
+  ctx.fillStyle = th.muted;
+  ctx.font = `400 ${12 * k}px ${SANS}`;
+  ctx.textAlign = 'right';
+  ctx.fillText('sr-dash.github.io/heliofleet · JPL Horizons', W - 16 * k, H - 16 * k);
+}

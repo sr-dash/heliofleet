@@ -1,9 +1,13 @@
-import { loadManifest, ensure, info, jdFromDate, dateFromJD } from './ephem.js';
+import { loadManifest, ensure, info, position, jdFromDate, dateFromJD } from './ephem.js';
+import { heliographic } from './frames.js';
+import {
+  loadEvents, events, upcoming, parseLocation, flareFlux, G_LABEL, KIND_LABEL,
+} from './events.js';
 import { buildScene, needs } from './scene.js';
 import { drawMap, drawInset, readTheme, mapGeometry } from './render.js';
 import { createRibbon } from './ribbon.js';
 import { composeSnapshot, downloadPNG, downloadPDF } from './export.js';
-import { BODIES, SPACECRAFT, PLANETS, PRESET_GROUPS } from './catalog.js';
+import { BODIES, SPACECRAFT, PLANETS, PRESET_GROUPS, SPACE_WEATHER } from './catalog.js';
 import { initWorkbench } from './workbench.js';
 
 const $ = (id) => document.getElementById(id);
@@ -25,7 +29,10 @@ const S = {
   hidden: new Set(),
   spot: null,
   spotOnMap: true,
+  cmes: true,
 };
+const EMBED = document.documentElement.classList.contains('embed');
+const THEMES = ['night', 'eclipse', 'halpha', 'plate'];
 let RANGE = [jdOf('2010-01-01T00:00Z'), jdOf('2030-01-01T00:00Z')];
 let STAMP = '';
 const inRange = (iso) => jdOf(iso) >= RANGE[0] && jdOf(iso) <= RANGE[1] + 1;
@@ -52,6 +59,7 @@ function readURL() {
   S.wind = num('wind', 250, 800) ?? S.wind;
   if (q.has('planets')) S.planets = q.get('planets') !== '0';
   if (q.has('spirals')) S.spirals = q.get('spirals') === '1';
+  if (q.has('cme')) S.cmes = q.get('cme') !== '0';
   if (q.has('hide')) q.get('hide').split(',').filter((k) => BODIES[k]).forEach((k) => S.hidden.add(k));
   // spot=c,LON,LAT (Carrington) or s,LON,LAT (Stonyhurst); a trailing ,0 hides it on the map
   const sp = (q.get('spot') || '').split(',');
@@ -79,8 +87,17 @@ function writeURL() {
     if (S.spirals) q.set('spirals', '1');
     if (S.wind !== 400) q.set('wind', S.wind);
     if (S.hidden.size) q.set('hide', [...S.hidden].join(','));
+    if (!S.cmes) q.set('cme', '0');
+    // Embed and theme come from whoever wrote the link; keep them as they are.
+    const cur = new URLSearchParams(location.search);
+    for (const k of ['theme', 'embed']) if (cur.has(k)) q.set(k, cur.get(k));
     if (S.spot) q.set('spot', [S.spot.sys[0], S.spot.lon, S.spot.lat, ...(S.spotOnMap ? [] : [0])].join(','));
     history.replaceState(null, '', `?${q}`);
+    if (EMBED) {
+      const full = new URLSearchParams(q);
+      full.delete('embed');
+      $('embed-open').href = `${location.pathname}?${full}`;
+    }
   }, 250);
 }
 
@@ -131,10 +148,10 @@ async function update({ fromInput = false } = {}) {
 // ---------- clock & context ----------
 const PRESETS = PRESET_GROUPS.flatMap((g) => g.items.map((it) => ({ ...it, group: g.id, jd: jdOf(it.t) })));
 const presetGroups = () => PRESET_GROUPS.map((g) => ({ ...g, items: g.items.filter((it) => inRange(it.t)) }));
-function nearestPreset() {
+function nearestPreset(jd = S.jd) {
   let best = null;
   for (const p of PRESETS) {
-    const d = Math.abs(p.jd - S.jd);
+    const d = Math.abs(p.jd - jd);
     if (d < 0.5 && (!best || d < best.d)) best = { ...p, d };
   }
   return best;
@@ -150,6 +167,7 @@ function renderClock() {
   $('clock-time').textContent = `${iso.slice(11)} UTC`;
   const p = nearestPreset();
   $('clock-ctx').textContent = contextLine(p);
+  if (EMBED) $('embed-date').textContent = `${iso.slice(0, 10)} ${iso.slice(11)} UTC`;
   document.querySelectorAll('.chip').forEach((c) => {
     c.setAttribute('aria-current', p && c.dataset.t === p.t ? 'true' : 'false');
   });
@@ -232,38 +250,137 @@ function syncControls() {
   $('planets').checked = S.planets;
   $('labels').checked = S.labels;
   $('spirals').checked = S.spirals;
+  $('cmes').checked = S.cmes;
   $('wind').value = S.wind;
   $('wind-out').textContent = `${S.wind} km/s`;
   $('wind-field').hidden = !S.spirals;
   renderHud();
 }
 
+const fmtUT = (iso) => iso.replace('T', ' ').replace('Z', ' UT');
+const GLYPH = {
+  eclipse: (hybrid) => `<svg class="chip-glyph" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8.5" fill="none" stroke="var(--sun)" stroke-opacity=".5" ${hybrid ? 'stroke-dasharray="2 2"' : ''}/><circle cx="10" cy="10" r="5.5" fill="var(--plot-bg)" stroke="var(--sun)" stroke-width="1.6"/></svg>`,
+  milestone: (body) => `<svg class="chip-glyph" viewBox="0 0 20 20"><circle cx="10" cy="10" r="5" fill="var(--plot-bg)" stroke="var(--c-${body})" stroke-width="2.2"/></svg>`,
+  flare: '<svg class="chip-glyph" viewBox="0 0 20 20"><path d="M10 4 L16 15 L4 15 Z" fill="var(--accent)"/></svg>',
+  cme: '<svg class="chip-glyph" viewBox="0 0 20 20"><circle cx="10" cy="10" r="5.5" fill="none" stroke="var(--c-psp)" stroke-width="2"/></svg>',
+  storm: '<svg class="chip-glyph" viewBox="0 0 20 20"><path d="M10 3 L17 10 L10 17 L3 10 Z" fill="var(--c-earth)"/></svg>',
+  perihelion: '<svg class="chip-glyph" viewBox="0 0 20 20"><circle cx="10" cy="10" r="3" fill="var(--sun)"/><path d="M3 15 Q10 1 17 15" fill="none" stroke="var(--muted)" stroke-width="1.6"/></svg>',
+  alignment: '<svg class="chip-glyph" viewBox="0 0 20 20"><circle cx="4" cy="10" r="2.5" fill="var(--sun)"/><path d="M8 10 H17" stroke="var(--muted)" stroke-width="1.6" stroke-dasharray="2 2"/><path d="M12 7 L15 10 L12 13 L9 10 Z" fill="var(--ink)"/></svg>',
+  quadrature: '<svg class="chip-glyph" viewBox="0 0 20 20"><path d="M4 16 V5 M4 16 H15" fill="none" stroke="var(--muted)" stroke-width="1.6"/><circle cx="4" cy="16" r="2.5" fill="var(--sun)"/></svg>',
+  conjunction: '<svg class="chip-glyph" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6" fill="var(--sun)" opacity=".8"/><path d="M1 10 H19" stroke="var(--ink)" stroke-width="1.4" stroke-dasharray="2 2"/></svg>',
+};
+
+function chip({ glyph, title, sub, date, future, t, onClick }) {
+  const b = document.createElement('button');
+  b.className = `chip${future ? ' future' : ''}`;
+  if (t) b.dataset.t = t;
+  b.innerHTML = `${glyph}<span class="chip-name">${title}${sub ? `<small>${sub}</small>` : ''}</span><span class="chip-date">${date}</span>`;
+  b.addEventListener('click', onClick);
+  return b;
+}
+
+const jump = (jd) => { stopPlay(); S.jd = jd; update(); };
+
+// Jump to a flare's peak and mark its source region in Carrington longitude,
+// so the marker rotates with the Sun as you step through time.
+async function focusFlare(f) {
+  stopPlay();
+  const loc = parseLocation(f.loc);
+  if (loc) {
+    await ensure(['earth'], f.jd - 1, f.jd + 1);
+    const e = position('earth', f.jd);
+    const L0 = heliographic(e, e, f.jd).carr;
+    S.spot = { sys: 'carrington', lon: +((((loc.lon + L0) % 360) + 360) % 360).toFixed(1), lat: loc.lat };
+    S.spotOnMap = true;
+    bench?.syncSpot();
+    toast(`${f.cls} flare at ${f.loc}: source region marked on the map`);
+  }
+  S.jd = f.jd;
+  update();
+}
+
+function weatherItems(kind, year) {
+  const ev = events();
+  const inYear = (t) => !year || t.startsWith(year);
+  const rangeOK = (jd) => jd >= RANGE[0] && jd <= RANGE[1] + 1;
+  if (kind === 'highlights') {
+    return SPACE_WEATHER.filter((it) => inRange(it.t) && inYear(it.t)).map((it) => ({
+      glyph: GLYPH.flare, title: it.label, sub: it.note, date: it.t.slice(0, 10), t: it.t,
+      onClick: () => jump(jdOf(it.t)),
+    }));
+  }
+  if (!ev) return null;
+  if (kind === 'xflares' || kind === 'flares') {
+    return ev.flares.filter((f) => (kind === 'flares' || f.cls[0] === 'X') && inYear(f.t) && rangeOK(f.jd)).reverse().map((f) => ({
+      glyph: GLYPH.flare, title: `${f.cls} flare`, date: f.t.slice(0, 10),
+      sub: [f.loc, f.ar ? `AR ${f.ar}` : null].filter(Boolean).join(' · '),
+      onClick: () => focusFlare(f),
+    }));
+  }
+  if (kind === 'cmes') {
+    return ev.cmes.filter((c) => inYear(c.t) && rangeOK(c.jd)).reverse().map((c) => ({
+      glyph: GLYPH.cme, title: `CME, ${c.speed.toLocaleString('en-US')} km/s`, date: c.t.slice(0, 10),
+      sub: [c.lon !== null ? `toward HGS ${c.lon >= 0 ? 'W' : 'E'}${Math.abs(c.lon)}°` : 'no direction fit', c.src].filter(Boolean).join(' · '),
+      onClick: () => jump((c.jd21 ?? c.jd) + 0.25),
+    }));
+  }
+  return ev.storms.filter((g) => inYear(g.t) && rangeOK(g.jd)).reverse().map((g) => ({
+    glyph: GLYPH.storm, title: `${G_LABEL[g.g]} geomagnetic storm`, date: g.t.slice(0, 10),
+    sub: `Kp ${g.kp.toFixed(2)}`, onClick: () => jump(g.jd),
+  }));
+}
+
+function upcomingItems() {
+  const up = upcoming();
+  if (!up) return null;
+  const now = jdFromDate(new Date()) - 0.5;
+  return up.events.filter((e) => e.t >= now && e.t <= RANGE[1]).slice(0, 120).map((e) => ({
+    glyph: GLYPH[e.kind], title: e.title, sub: KIND_LABEL[e.kind], date: isoMinute(e.t).slice(0, 10), future: true,
+    onClick: () => { jump(e.t); toast(e.detail); },
+  }));
+}
+
 function buildPresets() {
   const tabs = $('preset-tabs');
   const chips = $('preset-chips');
+  const filters = $('preset-filters');
+  const foot = $('preset-foot');
   const today = jdFromDate(new Date());
+  let current = 'eclipses';
+  const ev = events();
+  if (ev) {
+    const years = [...new Set(ev.flares.concat(ev.cmes, ev.storms).map((e) => e.t.slice(0, 4)))].sort().reverse();
+    for (const y of years) $('sw-year').add(new Option(y, y));
+  }
   const show = (id) => {
+    current = id;
     tabs.querySelectorAll('button').forEach((b) => b.setAttribute('aria-selected', b.dataset.id === id ? 'true' : 'false'));
-    const g = presetGroups().find((x) => x.id === id);
+    filters.hidden = id !== 'weather';
+    foot.hidden = id !== 'upcoming';
     chips.replaceChildren();
-    for (const it of g.items) {
-      const b = document.createElement('button');
-      b.className = `chip${jdOf(it.t) > today ? ' future' : ''}`;
-      b.dataset.t = it.t;
-      const glyph = id === 'eclipses'
-        ? `<svg class="chip-glyph" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8.5" fill="none" stroke="var(--sun)" stroke-opacity=".5" ${it.hybrid ? 'stroke-dasharray="2 2"' : ''}/><circle cx="10" cy="10" r="5.5" fill="var(--plot-bg)" stroke="var(--sun)" stroke-width="1.6"/></svg>`
-        : id === 'milestones'
-          ? `<svg class="chip-glyph" viewBox="0 0 20 20"><circle cx="10" cy="10" r="5" fill="var(--plot-bg)" stroke="var(--c-${it.body})" stroke-width="2.2"/></svg>`
-          : '<svg class="chip-glyph" viewBox="0 0 20 20"><path d="M10 4 L16 15 L4 15 Z" fill="var(--accent)"/></svg>';
-      const sub = it.where ?? it.note ?? '';
-      const title = id === 'eclipses' ? `${it.label}${it.hybrid ? ' (hybrid)' : ''}` : it.label;
-      b.innerHTML = `${glyph}<span class="chip-name">${title}${sub ? `<small>${sub}</small>` : ''}</span><span class="chip-date">${it.t.slice(0, 10)}</span>`;
-      b.addEventListener('click', () => { stopPlay(); S.jd = jdOf(it.t); update(); });
-      chips.appendChild(b);
+    let items;
+    if (id === 'weather') items = weatherItems($('sw-kind').value, $('sw-year').value);
+    else if (id === 'upcoming') items = upcomingItems();
+    else {
+      const g = presetGroups().find((x) => x.id === id);
+      items = g.items.map((it) => ({
+        glyph: id === 'eclipses' ? GLYPH.eclipse(it.hybrid) : GLYPH.milestone(it.body),
+        title: id === 'eclipses' ? `${it.label}${it.hybrid ? ' (hybrid)' : ''}` : it.label,
+        sub: it.where ?? it.note ?? '', date: it.t.slice(0, 10), t: it.t, future: jdOf(it.t) > today,
+        onClick: () => jump(jdOf(it.t)),
+      }));
+    }
+    if (!items) {
+      chips.innerHTML = '<p class="tool-help">The event list could not be loaded. Reload the page to try again.</p>';
+    } else if (!items.length) {
+      chips.innerHTML = '<p class="tool-help">Nothing matches these filters.</p>';
+    } else {
+      for (const it of items.slice(0, 400)) chips.appendChild(chip(it));
     }
     renderClock();
   };
-  for (const g of PRESET_GROUPS) {
+  const groups = [...PRESET_GROUPS, { id: 'upcoming', title: 'Upcoming' }];
+  for (const g of groups) {
     const b = document.createElement('button');
     b.role = 'tab';
     b.dataset.id = g.id;
@@ -271,7 +388,34 @@ function buildPresets() {
     b.addEventListener('click', () => show(g.id));
     tabs.appendChild(b);
   }
-  show('eclipses');
+  $('sw-kind').addEventListener('change', () => show('weather'));
+  $('sw-year').addEventListener('change', () => show('weather'));
+  const base = `${location.host}${location.pathname.replace(/[^/]*$/, '')}calendar.ics`;
+  foot.innerHTML = `<a href="webcal://${base}">Subscribe in your calendar</a><a href="calendar.ics" download>Download .ics</a><span>Perihelia, alignments, quadratures, solar conjunctions and eclipses, refreshed monthly.</span>`;
+  show(current);
+}
+
+// Space-weather markers for the timeline: X flares, storms G4+, CMEs 2000 km/s+
+function ribbonMarks() {
+  const ev = events();
+  if (!ev) return undefined;
+  return () => [
+    ...ev.flares.filter((f) => f.cls[0] === 'X').map((f) => ({
+      jd: f.jd, kind: 'flare', size: Math.min(1, Math.log10(flareFlux(f.cls) / 1e-4)),
+      html: `<b>${f.cls} flare</b><span>${fmtUT(f.t)}</span><span>${[f.loc, f.ar ? `AR ${f.ar}` : null].filter(Boolean).join(' · ')}</span>`,
+      pick: () => focusFlare(f),
+    })),
+    ...ev.cmes.filter((c) => c.speed >= 2000).map((c) => ({
+      jd: c.jd, kind: 'cme', size: Math.min(1, (c.speed - 2000) / 1500),
+      html: `<b>CME, ${c.speed.toLocaleString('en-US')} km/s</b><span>${fmtUT(c.t)}</span>${c.src ? `<span>Source ${c.src}</span>` : ''}`,
+      pick: () => jump((c.jd21 ?? c.jd) + 0.25),
+    })),
+    ...ev.storms.filter((g) => g.g >= 4).map((g) => ({
+      jd: g.jd, kind: 'storm', size: g.g === 5 ? 1 : 0.5,
+      html: `<b>${G_LABEL[g.g]} geomagnetic storm</b><span>${fmtUT(g.t)}</span><span>Kp ${g.kp.toFixed(2)}</span>`,
+      pick: () => jump(g.jd),
+    })),
+  ];
 }
 
 function buildLegend() {
@@ -313,6 +457,7 @@ function tick(t) {
 function startPlay() {
   playing = true;
   $('play').setAttribute('aria-pressed', 'true');
+  $('embed-play').setAttribute('aria-pressed', 'true');
   $('play').querySelector('.play-label').textContent = 'Pause';
   last = performance.now();
   requestAnimationFrame(tick);
@@ -321,6 +466,7 @@ function stopPlay() {
   if (!playing) return;
   playing = false;
   $('play').setAttribute('aria-pressed', 'false');
+  $('embed-play').setAttribute('aria-pressed', 'false');
   $('play').querySelector('.play-label').textContent = 'Play';
   update();
 }
@@ -431,7 +577,10 @@ async function main() {
   readURL();
   theme = readTheme();
   setTheme(document.documentElement.dataset.theme, false);
+  const urlTheme = new URLSearchParams(location.search).get('theme');
+  if (THEMES.includes(urlTheme)) setTheme(urlTheme, false);
   let manifest;
+  const eventsReady = loadEvents();
   try {
     manifest = await loadManifest();
   } catch (err) {
@@ -444,6 +593,7 @@ async function main() {
   $('dt').min = isoMinute(e.start);
   $('dt').max = isoMinute(e.end);
 
+  await eventsReady;
   const syncPlanetLegend = buildLegend();
   syncPlanetLegend();
   buildPresets();
@@ -455,6 +605,7 @@ async function main() {
     end: RANGE[1],
     onScrub: (jd) => { stopPlay(); S.jd = jd; update(); },
     onPick: (jd) => { stopPlay(); S.jd = jd; update(); },
+    marks: ribbonMarks(),
   });
 
   $('dt').addEventListener('change', (ev) => {
@@ -485,6 +636,7 @@ async function main() {
   $('planets').addEventListener('change', (ev) => { S.planets = ev.target.checked; syncPlanetLegend(); update(); });
   $('labels').addEventListener('change', (ev) => { S.labels = ev.target.checked; paint(); });
   $('spirals').addEventListener('change', (ev) => { S.spirals = ev.target.checked; syncControls(); update(); });
+  $('cmes').addEventListener('change', (ev) => { S.cmes = ev.target.checked; update(); });
   $('wind').addEventListener('input', (ev) => {
     S.wind = parseInt(ev.target.value, 10);
     $('wind-out').textContent = `${S.wind} km/s`;
@@ -493,6 +645,9 @@ async function main() {
   document.querySelectorAll('[data-theme-pick]').forEach((b) => b.addEventListener('click', () => {
     setTheme(b.dataset.themePick);
     ribbon.draw();
+    // A picked theme replaces one that came in on the link
+    const q = new URLSearchParams(location.search);
+    if (q.has('theme') && !EMBED) { q.delete('theme'); history.replaceState(null, '', `?${q}`); }
   }));
   $('dl-png').addEventListener('click', () => snapshot('png'));
   $('dl-pdf').addEventListener('click', () => snapshot('pdf'));
@@ -514,6 +669,35 @@ async function main() {
     range: () => RANGE,
     jump: (jd) => { stopPlay(); S.jd = jd; update(); },
     redraw: () => update(),
+    theme: () => theme,
+    frameMeta: (jd) => {
+      const iso = isoMinute(jd);
+      return {
+        date: iso.slice(0, 10),
+        time: `${iso.slice(11)} UTC`,
+        context: contextLine(nearestPreset(jd)),
+        frame: `${S.frame === 'hee' ? 'Earth-fixed (HEE)' : 'Inertial ecliptic J2000'}, ${S.view === 'top' ? 'from ecliptic north' : 'edge-on'}`,
+      };
+    },
+  });
+  if (EMBED) {
+    $('embed-play').addEventListener('click', () => (playing ? stopPlay() : startPlay()));
+    $('speed').value = '7';
+  }
+  $('embed-code').addEventListener('click', () => {
+    clearTimeout(urlTimer);
+    const q = new URLSearchParams(location.search);
+    q.set('t', `${isoMinute(S.jd)}Z`);
+    q.set('embed', '1');
+    q.delete('theme');
+    const base = 'https://sr-dash.github.io/heliofleet/';
+    const tag = (extra) => `<iframe src="${base}?${q}${extra}" title="HelioFleet: spacecraft positions around the Sun" width="100%" height="560" style="border:0;border-radius:12px" loading="lazy"></iframe>`;
+    bench.openSheet('Embed on your site',
+      'Paste this into a web page, wiki or course site to show the current map. Viewers can zoom, pan and step through time, and open the full HelioFleet in a new tab. Add <code>&amp;theme=plate</code> (or <code>night</code>, <code>eclipse</code>, <code>halpha</code>) to fix the colours.',
+      [
+        { heading: 'This moment', text: tag(''), wrap: true },
+        { heading: 'Light theme', text: tag('&theme=plate'), wrap: true },
+      ]);
   });
   document.addEventListener('keydown', (ev) => {
     if (bench.isOpen() || ev.target.closest('input, select, textarea, #ribbon, [role="tab"]')) return;

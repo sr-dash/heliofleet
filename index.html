@@ -118,6 +118,10 @@
           "Search for radial alignments, quadratures and magnetic connections between spacecraft",
           "Visibility of any Carrington or Stonyhurst location from every observer",
           "CSV and JSON export of coordinates and time series, with SunPy cross-check code",
+          "Flares, CMEs and geomagnetic storms from NASA DONKI, with CME fronts on the map",
+          "Subscribable calendar of perihelia, alignments, quadratures, solar conjunctions and eclipses",
+          "MP4 and GIF animation export",
+          "Embeddable map view for other websites",
           "PNG and PDF snapshot export"
         ],
         "isBasedOn": {
@@ -170,7 +174,9 @@
   <link rel="stylesheet" href="css/style.css">
   <script>
     try {
-      const t = localStorage.getItem('heliofleet-theme');
+      const q = new URLSearchParams(location.search);
+      if (q.get('embed') === '1') document.documentElement.classList.add('embed');
+      const t = ['night', 'eclipse', 'halpha', 'plate'].includes(q.get('theme')) ? q.get('theme') : localStorage.getItem('heliofleet-theme');
       if (t) document.documentElement.dataset.theme = t;
       else if (matchMedia('(prefers-color-scheme: light)').matches) document.documentElement.dataset.theme = 'plate';
     } catch (e) {}
@@ -241,7 +247,18 @@
       <section class="panel">
         <h2 class="panel-title">Preset moments</h2>
         <div class="tabs" role="tablist" id="preset-tabs"></div>
+        <div class="preset-filters" id="preset-filters" hidden>
+          <select id="sw-kind" aria-label="Event type">
+            <option value="highlights">Highlights</option>
+            <option value="xflares">X-class flares</option>
+            <option value="flares">Flares, M5 and above</option>
+            <option value="cmes">CMEs, 1000 km/s and above</option>
+            <option value="storms">Storms, G3 and above</option>
+          </select>
+          <select id="sw-year" aria-label="Year"><option value="">All years</option></select>
+        </div>
         <div class="chips" id="preset-chips"></div>
+        <p class="preset-foot" id="preset-foot" hidden></p>
       </section>
 
       <section class="panel">
@@ -280,6 +297,7 @@
         </label>
         <label class="toggle"><input type="checkbox" id="planets" checked><span>Inner planets</span></label>
         <label class="toggle"><input type="checkbox" id="labels" checked><span>Labels</span></label>
+        <label class="toggle"><input type="checkbox" id="cmes" checked><span>CME fronts</span></label>
         <label class="toggle"><input type="checkbox" id="spirals"><span>Parker spirals</span></label>
         <label class="field field-range" id="wind-field">
           <span class="field-label">Solar-wind speed <output id="wind-out">400 km/s</output></span>
@@ -294,6 +312,7 @@
           <button id="dl-pdf" class="btn-primary">Download PDF</button>
         </div>
         <button id="copy-link" class="btn-ghost wide">Copy link to this moment</button>
+        <button id="embed-code" class="btn-ghost wide">Embed on your site</button>
         <button id="cite" class="btn-ghost wide">Cite HelioFleet</button>
       </section>
     </aside>
@@ -312,6 +331,13 @@
           <button id="zoom-reset" aria-label="Reset view" title="Reset view">⟲</button>
         </div>
         <p class="loading" id="loading">Loading ephemerides…</p>
+        <div class="embed-bar" id="embed-bar">
+          <button data-step="-1" aria-label="Back one day">−1 d</button>
+          <button id="embed-play" aria-pressed="false" aria-label="Play"><span class="play-icon" aria-hidden="true"></span></button>
+          <button data-step="1" aria-label="Forward one day">+1 d</button>
+          <span class="embed-date" id="embed-date"></span>
+          <a class="embed-open" id="embed-open" href="./" target="_blank" rel="noopener">HelioFleet ↗</a>
+        </div>
       </div>
       <ul class="legend" id="legend" aria-label="Show or hide bodies"></ul>
     </section>
@@ -322,6 +348,7 @@
         <button role="tab" id="tab-align" aria-controls="panel-align" aria-selected="false" tabindex="-1">Find alignments</button>
         <button role="tab" id="tab-vis" aria-controls="panel-vis" aria-selected="false" tabindex="-1">Who sees this spot</button>
         <button role="tab" id="tab-series" aria-controls="panel-series" aria-selected="false" tabindex="-1">Export data</button>
+        <button role="tab" id="tab-anim" aria-controls="panel-anim" aria-selected="false" tabindex="-1">Animation</button>
       </div>
 
       <div class="wb-panel" role="tabpanel" id="panel-coords" aria-labelledby="tab-coords">
@@ -417,6 +444,49 @@
           <div id="series-bodies"></div>
         </fieldset>
         <p class="tool-help" id="series-help">Each row gives the heliocentric ecliptic J2000 position, Stonyhurst and Carrington coordinates, separation from Earth and the Parker-spiral footpoint at the current wind speed. Column definitions are written at the top of the file.</p>
+      </div>
+
+      <div class="wb-panel" role="tabpanel" id="panel-anim" aria-labelledby="tab-anim" hidden>
+        <form class="tool-form" id="anim-form">
+          <label class="field"><span class="field-label">From</span>
+            <input type="date" id="anim-from" required></label>
+          <label class="field"><span class="field-label">To</span>
+            <input type="date" id="anim-to" required></label>
+          <label class="field"><span class="field-label">Each frame</span>
+            <select id="anim-step">
+              <option value="0.0416666667">1 hour</option>
+              <option value="0.125">3 hours</option>
+              <option value="0.25">6 hours</option>
+              <option value="1" selected>1 day</option>
+              <option value="3">3 days</option>
+              <option value="7">1 week</option>
+            </select></label>
+          <label class="field"><span class="field-label">Frame rate</span>
+            <select id="anim-fps">
+              <option value="12">12 fps</option>
+              <option value="24" selected>24 fps</option>
+              <option value="30">30 fps</option>
+            </select></label>
+          <label class="field"><span class="field-label">Size</span>
+            <select id="anim-size">
+              <option value="1280x720" selected>1280 × 720</option>
+              <option value="1920x1080">1920 × 1080</option>
+              <option value="1080x1080">1080 × 1080 square</option>
+              <option value="800x450">800 × 450 small</option>
+            </select></label>
+          <label class="field"><span class="field-label">Format</span>
+            <select id="anim-format">
+              <option value="video" id="anim-video-opt">MP4 video</option>
+              <option value="gif">GIF</option>
+            </select></label>
+          <button type="submit" class="btn-primary" id="anim-go">Record</button>
+          <button type="button" class="btn-ghost" id="anim-cancel" hidden>Cancel</button>
+        </form>
+        <div class="anim-progress" id="anim-progress" hidden>
+          <progress id="anim-bar" max="1" value="0"></progress>
+          <span id="anim-status"></span>
+        </div>
+        <p class="tool-help" id="anim-help"></p>
       </div>
     </section>
   </main>

@@ -28,6 +28,23 @@ Below the map, four tabs work on the same geometry as the map:
 - **Find alignments:** searches a date range for radial alignments of two spacecraft, quadratures with Earth, or magnetic connections (Parker-spiral footpoints within a tolerance). Each window lists its start, end and closest moment, with a button to jump there and a CSV of all windows.
 - **Who sees this spot:** enter a Carrington or Stonyhurst location, such as an active region or flare site. Every observer gets its angle from disk centre, μ, and whether the spot is on disk, near the limb or behind it. The spot can be marked on the map and shared with `spot=c,LON,LAT` (Carrington) or `spot=s,LON,LAT` (Stonyhurst) in the URL.
 - **Export data:** a time series for chosen bodies, dates and cadence (1 hour to 1 week) as CSV or JSON. Column definitions are written at the top of each file.
+- **Animation:** records a date range as MP4 (H.264, encoded in the browser), WebM where MP4 encoding is unavailable, or GIF, at 800 × 450 up to 1920 × 1080, using the current view, overlays and theme.
+
+### Space-weather events
+
+The timeline and the **Space weather** presets carry events from NASA's [DONKI](https://ccmc.gsfc.nasa.gov/DONKI/) catalogue: flares of class M5 and above, CMEs of 1000 km/s and above, and geomagnetic storms of G3 and above. Choosing a flare jumps to its peak and marks its source region in Carrington longitude, so the marker rotates with the Sun as you step through time. CMEs appear on the map as fronts launched along their DONKI cone-model direction and width, moving out at the measured speed from their 21.5 solar-radius time; this constant-speed picture ignores drag, so real arrivals are usually later. `cme=0` in the URL hides them.
+
+### Calendar
+
+[calendar.ics](https://sr-dash.github.io/heliofleet/calendar.ics) lists upcoming perihelia (Parker Solar Probe, Solar Orbiter), radial alignments within 3° (between spacecraft or on the Sun–Earth line), quadratures with Earth within 1°, solar conjunctions within 2° of the Sun's centre as seen from Earth, and total solar eclipses. Subscribe with `webcal://sr-dash.github.io/heliofleet/calendar.ics`; each event links back to that moment in HelioFleet. The same events fill the **Upcoming** presets tab.
+
+### Embedding
+
+Add `embed=1` to any HelioFleet link to get the map alone, with a small time bar and a link to the full site, for use in an `<iframe>`. `theme=plate` (or `night`, `eclipse`, `halpha`) fixes the colours. The **Embed on your site** button writes the code for the current moment:
+
+```html
+<iframe src="https://sr-dash.github.io/heliofleet/?t=2024-04-08T18:17Z&embed=1" title="HelioFleet: spacecraft positions around the Sun" width="100%" height="560" style="border:0;border-radius:12px" loading="lazy"></iframe>
+```
 
 Keyboard: `←` / `→` step a day (`Shift` for an hour), `Space` plays and pauses, and the timeline takes arrow keys when focused.
 
@@ -58,7 +75,7 @@ Positions past each mission's latest tracking data are planning trajectories.
 
 ### Monthly updates
 
-The [Update ephemeris](.github/workflows/update-ephemeris.yml) workflow runs at 06:17 UTC on the first day of each month. It asks Horizons how far each spacecraft's ephemeris now reaches and refetches every year from the previous one onward. That replaces predictions with fitted trajectories and appends new years when a mission publishes a longer prediction. The timeline grows with the latest spacecraft, and the page shows when the data was last updated and when the next update is due. It can also be run by hand from the Actions tab.
+The [Update ephemeris](.github/workflows/update-ephemeris.yml) workflow runs at 06:17 UTC on the first day of each month. It also merges the last 150 days of DONKI events (`scripts/fetch_events.py`) and rebuilds the calendar (`scripts/build_calendar.py`). For the ephemerides, it asks Horizons how far each spacecraft's ephemeris now reaches and refetches every year from the previous one onward. That replaces predictions with fitted trajectories and appends new years when a mission publishes a longer prediction. The timeline grows with the latest spacecraft, and the page shows when the data was last updated and when the next update is due. It can also be run by hand from the Actions tab.
 
 To run the same update locally:
 
@@ -93,6 +110,10 @@ js/export.js             PNG / PDF snapshot
 js/catalog.js            spacecraft, eclipses, milestones, events
 js/tools.js              exports, SunPy code, alignment search, spot visibility
 js/workbench.js          the research-tools tabs and the code/citation sheet
+js/events.js             DONKI events, CME fronts, upcoming events
+js/animate.js            MP4 / WebM / GIF recording
+scripts/fetch_events.py  DONKI flares, CMEs and storms -> data/events.json
+scripts/build_calendar.py  calendar.ics and data/upcoming.json
 data/<body>/<year>.json  ephemeris chunks; data/manifest.json indexes them
 assets/                  icons and the social preview image
 site.webmanifest, sitemap.xml, favicon.ico

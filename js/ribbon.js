@@ -2,6 +2,9 @@
 // eclipses above, space-weather events below, and a draggable cursor.
 
 import { BODIES, SPACECRAFT, ECLIPSES, MILESTONES, SPACE_WEATHER } from './catalog.js';
+
+// marks(): optional event markers for the space-weather row, each
+// { jd, kind: 'flare' | 'cme' | 'storm', size (0-1), html, pick() }.
 import { info } from './ephem.js';
 import { dataKeys } from './scene.js';
 
@@ -17,7 +20,7 @@ function el(name, attrs = {}, parent) {
   return e;
 }
 
-export function createRibbon(svg, tip, { start, end, onScrub, onPick }) {
+export function createRibbon(svg, tip, { start, end, onScrub, onPick, marks }) {
   let W = 0;
   let cursor;
   let cursorLabel;
@@ -148,13 +151,30 @@ export function createRibbon(svg, tip, { start, end, onScrub, onPick }) {
       marker(g, ec.t, `<b>${ec.hybrid ? 'Hybrid' : 'Total'} eclipse · ${ec.label}</b><span>${fmt(ec.t)}</span><span>${ec.where}</span>`);
     }
 
-    for (const ev of SPACE_WEATHER) {
-      if (jdOf(ev.t) < start || jdOf(ev.t) > end + 1) continue;
+    // Space-weather row: DONKI events when available, else the curated list.
+    const evs = marks?.() ?? SPACE_WEATHER.map((ev) => ({
+      jd: jdOf(ev.t), kind: 'flare', size: 0.6,
+      html: `<b>${ev.label}</b><span>${fmt(ev.t)}</span><span>${ev.note}</span>`,
+      pick: () => onPick(jdOf(ev.t)),
+    }));
+    const order = { cme: 0, storm: 1, flare: 2 };
+    for (const ev of [...evs].sort((a, b) => order[a.kind] - order[b.kind] || a.size - b.size)) {
+      if (ev.jd < start || ev.jd > end + 1) continue;
       const g = el('g', {}, svg);
-      const cx = x(jdOf(ev.t));
-      el('path', { d: `M${cx} ${ROW_SW - 6} L${cx + 5} ${ROW_SW + 4} L${cx - 5} ${ROW_SW + 4} Z`, fill: 'var(--accent)' }, g);
-      el('circle', { cx, cy: ROW_SW, r: 10, fill: 'transparent' }, g);
-      marker(g, ev.t, `<b>${ev.label}</b><span>${fmt(ev.t)}</span><span>${ev.note}</span>`);
+      const cx = x(ev.jd);
+      const s = 3 + 3 * ev.size;
+      if (ev.kind === 'flare') {
+        el('path', { d: `M${cx} ${ROW_SW - s - 1} L${cx + s} ${ROW_SW + s - 1} L${cx - s} ${ROW_SW + s - 1} Z`, fill: 'var(--accent)', stroke: 'var(--plot-bg)', 'stroke-width': 0.8 }, g);
+      } else if (ev.kind === 'storm') {
+        el('path', { d: `M${cx} ${ROW_SW - s} L${cx + s} ${ROW_SW} L${cx} ${ROW_SW + s} L${cx - s} ${ROW_SW} Z`, fill: 'var(--c-earth)', stroke: 'var(--plot-bg)', 'stroke-width': 0.8 }, g);
+      } else {
+        el('circle', { cx, cy: ROW_SW, r: s, fill: 'none', stroke: 'var(--c-psp)', 'stroke-width': 1.5 }, g);
+      }
+      el('circle', { cx, cy: ROW_SW, r: 9, fill: 'transparent' }, g);
+      g.addEventListener('pointerdown', (e) => { e.stopPropagation(); ev.pick(); });
+      g.addEventListener('pointerenter', (e) => showTip(e, ev.html));
+      g.addEventListener('pointerleave', hideTip);
+      g.style.cursor = 'pointer';
     }
 
     // Cursor

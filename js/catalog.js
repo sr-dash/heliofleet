@@ -114,7 +114,7 @@ export const SPACE_WEATHER = [
   { t: '2017-09-10T16:06Z', label: 'X8.2 limb flare', note: 'Ground-level enhancement event' },
   { t: '2024-05-10T17:05Z', label: 'Gannon storm onset', note: 'G5 geomagnetic storm' },
   { t: '2024-10-03T12:18Z', label: 'X9.0 flare', note: 'Largest flare of solar cycle 25 so far' },
-  { t: '2025-11-11T10:04Z', label: 'X5.1 flare', note: 'Followed by a G4 storm' },
+  { t: '2025-11-11T10:04Z', label: 'X5.1 flare', note: 'Followed by a G5 storm on 12 November' },
 ];
 
 export const PRESET_GROUPS = [

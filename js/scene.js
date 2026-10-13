@@ -7,6 +7,7 @@ import {
   toFrame, project, norm, surfaceNormal, AU_KM,
 } from './frames.js';
 import { BODIES, SPACECRAFT, PLANETS, L1_FLEET } from './catalog.js';
+import { activeCMEs } from './events.js';
 
 const jdOf = (iso) => Date.parse(iso) / 864e5 + 2440587.5;
 const L1_KM = 1.4915e6;
@@ -154,8 +155,31 @@ export function buildScene(jd, s) {
     spot = { dir: xy(n), label: `Spot · ${sys} ${s.spot.lon}°, ${lat}` };
   }
 
+  // CME fronts from DONKI cone-model fits, moved out at constant speed and
+  // drawn in the ecliptic plane across the cone's half-width.
+  const cmes = [];
+  if (s.cmes && s.view === 'top') {
+    for (const c of activeCMEs(jd)) {
+      const e21 = position('earth', c.jd21);
+      if (!e21) continue;
+      const n = surfaceNormal(c.lon, c.lat, 'stonyhurst', e21, c.jd21);
+      const phi = Math.atan2(n[1], n[0]);
+      const half = ((c.half ?? 30) * Math.PI) / 180;
+      const arc = [];
+      for (let i = 0; i <= 24; i++) {
+        const a = phi - half + (2 * half * i) / 24;
+        arc.push(xy([c.r * Math.cos(a), c.r * Math.sin(a), 0]));
+      }
+      cmes.push({
+        id: c.id, arc, speed: c.speed,
+        apex: xy([c.r * Math.cos(phi), c.r * Math.sin(phi), 0]),
+        label: `CME ${c.speed.toLocaleString('en-US')} km/s`,
+      });
+    }
+  }
+
   return {
-    jd, earth, bodies, missing, trails, orbits, spirals, spot,
+    jd, earth, bodies, missing, trails, orbits, spirals, spot, cmes,
     inset: buildInset(jd, eLon, earthLonAt),
   };
 }

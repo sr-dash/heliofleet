@@ -17,7 +17,7 @@ export function readTheme(el = document.documentElement) {
     bg: v('--plot-bg'), page: v('--bg'), line: v('--line'), accent: v('--accent'),
     ink: v('--ink'), muted: v('--muted'), grid: v('--grid'),
     sun: v('--sun'), glow: v('--sun-glow'), sunStyle: v('--sun-style') || 'glow',
-    spiral: v('--spiral'), moon: v('--c-moon'), color,
+    spiral: v('--spiral'), moon: v('--c-moon'), cme: v('--cme') || v('--accent'), color,
   };
 }
 
@@ -204,6 +204,31 @@ export function drawMap(ctx, W, H, scene, s, th, view, opts = {}) {
     ctx.stroke();
     ctx.setLineDash([]);
     ctx.globalAlpha = 1;
+  }
+
+  // CME fronts: faint wedge from the Sun, solid leading edge
+  for (const c of scene.cmes ?? []) {
+    ctx.beginPath();
+    ctx.moveTo(ox, oy);
+    for (const p of c.arc) { const [x, y] = map(p); ctx.lineTo(x, y); }
+    ctx.closePath();
+    ctx.fillStyle = th.cme;
+    ctx.globalAlpha = 0.09;
+    ctx.fill();
+    ctx.globalAlpha = 0.9;
+    polyline(ctx, c.arc, map);
+    ctx.strokeStyle = th.cme;
+    ctx.lineWidth = 2.2 * k;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    const [ax, ay] = map(c.apex);
+    if (ax > 0 && ax < W && ay > 0 && ay < H) {
+      ctx.font = `600 ${11 * k}px ${FONT_SANS}`;
+      ctx.fillStyle = th.cme;
+      ctx.textAlign = ax >= ox ? 'left' : 'right';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(c.label, ax + (ax >= ox ? 8 : -8) * k, ay - 8 * k);
+    }
   }
 
   // Sun–Earth line
