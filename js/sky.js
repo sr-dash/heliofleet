@@ -1,12 +1,15 @@
-// Earth's view: instrument fields of view projected onto Earth's plane of the
-// sky, with ground-based coronagraphs and DKIST Cryo-NIRSP footprints.
+// The sky seen from Earth or a spacecraft: instrument fields of view projected
+// onto the chosen observer's plane of the sky, with ground-based coronagraphs
+// and DKIST Cryo-NIRSP footprints traced from Earth the same way.
 
 import { loadManifest, ensure, jdFromDate, dateFromJD, info } from './ephem.js';
 import { buildScene, needs, helioPosition } from './scene.js';
 import { readTheme, placeLabels } from './render.js';
 import { BODIES } from './catalog.js';
 import { INSTRUMENTS, INSTRUMENT } from './instruments.js';
-import { makeSky, fovGrid, SKY_SHAPES, GROUND, SITES, sunAltitude, observingWindow } from './skyproj.js';
+import { makeSky, fovGrid, hpcDirection, SKY_SHAPES, GROUND, SITES, sunAltitude, observingWindow } from './skyproj.js';
+import { norm } from './frames.js';
+import { downloadPNG, downloadPDF } from './export.js';
 import { LANGUAGES, detectLang, loadLang, lang, saveLang, tr, translatePage } from './i18n.js';
 
 const $ = (id) => document.getElementById(id);
@@ -16,6 +19,8 @@ const hhmm = (jd) => isoMinute(jd).slice(11);
 const FONT = '"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif';
 const MONO = '"IBM Plex Mono", ui-monospace, monospace';
 const DEFAULT_FOV = ['c2', 'c3', 'cor2a', 'hi1a', 'metis', 'solohi', 'wispri'];
+// Observers offered in the "View from" list
+const OBSERVERS = ['earth', 'solo', 'psp', 'bepi', 'sta', 'stb', 'maven'];
 const MODES = {
   spectroscopy: 'Spectroscopy',
   spectropolarimetry: 'Spectropolarimetry',
@@ -32,6 +37,7 @@ const S = {
   fov: new Set(DEFAULT_FOV),
   ground: new Set(['kcor', 'ucomp', 'cryo']),
   hl: null,
+  obs: 'earth',
 };
 const SCENE = { frame: 'hee', view: 'top', trailDays: 0, planets: false, labels: true, spirals: false, wind: 400, hidden: new Set(), cmes: false, fov: new Set() };
 let theme;
@@ -49,6 +55,7 @@ function readURL() {
   if (q.has('fov')) { S.fov = new Set(q.get('fov').split(',').filter((k) => INSTRUMENT[k])); }
   if (q.has('ground')) S.ground = new Set(q.get('ground').split(',').filter(Boolean));
   if (q.has('hl')) S.hl = q.get('hl');
+  if (OBSERVERS.includes(q.get('obs'))) S.obs = q.get('obs');
 }
 let urlTimer;
 function writeURL() {
@@ -60,6 +67,7 @@ function writeURL() {
     q.set('fov', [...S.fov].join(','));
     if ([...S.ground].sort().join() !== 'cryo,kcor,ucomp') q.set('ground', [...S.ground].join(','));
     if (S.hl) q.set('hl', S.hl);
+    if (S.obs !== 'earth') q.set('obs', S.obs);
     const cur = new URLSearchParams(location.search);
     for (const k of ['lang', 'theme']) if (cur.has(k)) q.set(k, cur.get(k));
     history.replaceState(null, '', `?${q}`);
@@ -112,14 +120,65 @@ function cryoInWindow() {
   return cryo.filter((d) => d.j1 >= S.jd - 0.5 && d.j0 <= S.jd + 0.5);
 }
 
+// The observer actually used: the chosen one when it has a position, else Earth
+function observer() {
+  const b = S.obs !== 'earth' && scene?.bodies.find((x) => x.key === S.obs);
+  return b ? { key: S.obs, p: b.p } : { key: 'earth', p: scene.earth };
+}
+const obsName = (key) => (key === 'earth' ? tr('Earth') : BODIES[key].short);
+
 function paint() {
   const [ctx, W, H] = fit();
+  draw(ctx, W, H);
+}
+
+// Fill and outline a projected grid of plane points; returns its label anchor
+function drawMesh(ctx, map, pts, col, annulus, labelAt) {
+  ctx.beginPath();
+  for (let i = 0; i < pts.length - 1; i++) {
+    for (let j = 0; j < pts[i].length - 1; j++) {
+      const c = [pts[i][j], pts[i + 1][j], pts[i + 1][j + 1], pts[i][j + 1]];
+      if (c.some((v) => !v)) continue;
+      c.forEach((v, k) => { const [x, y] = map(v); if (k) ctx.lineTo(x, y); else ctx.moveTo(x, y); });
+      ctx.closePath();
+    }
+  }
+  ctx.fillStyle = col;
+  ctx.globalAlpha = 0.1;
+  ctx.fill('nonzero');
+  ctx.globalAlpha = 0.75;
+  ctx.strokeStyle = col;
+  ctx.lineWidth = 1.3;
+  const edge = (list) => {
+    let open = false;
+    let prev = null;
+    ctx.beginPath();
+    for (const v of list) {
+      if (!v || (prev && Math.hypot(v[0] - prev[0], v[1] - prev[1]) > S.zoom * 1.5)) { open = false; prev = v; continue; }
+      const [x, y] = map(v);
+      if (open) ctx.lineTo(x, y); else { ctx.moveTo(x, y); open = true; }
+      prev = v;
+    }
+    ctx.stroke();
+  };
+  const n = pts.length - 1;
+  const m = pts[0].length - 1;
+  edge(pts[0]);
+  edge(pts[n]);
+  if (!annulus) { edge(pts.map((r) => r[0])); edge(pts.map((r) => r[m])); }
+  ctx.globalAlpha = 1;
+  return annulus ? pts[n][Math.round(m * labelAt)] : pts[Math.round(n / 2)][Math.round(m / 2)];
+}
+
+function draw(ctx, W, H) {
   ctx.fillStyle = theme.bg;
   ctx.fillRect(0, 0, W, H);
   if (!scene) return;
   const { ppr, ox, oy } = geom(W, H);
   const map = ([x, y]) => [ox + x * ppr, oy - y * ppr];
-  const sky = makeSky(scene.earth);
+  const obs = observer();
+  const sky = makeSky(obs.p);
+  const earth = scene.earth;
   const labels = [];
 
   // Radial grid in solar radii, and the compass of a solar image
@@ -144,89 +203,48 @@ function paint() {
   ctx.textAlign = 'right';
   ctx.fillText(tr('W'), W - 10, H / 2);
 
-  // Projected fields of view
+  // Projected fields of view, traced from each instrument's spacecraft
   const far = S.zoom * 25;
+  const trace = (P, grid) => grid.map((row) => row.map((d) => {
+    const q = d && sky.hit(P, d);
+    return q && Math.abs(q[0]) < far && Math.abs(q[1]) < far ? q : null;
+  }));
   for (const id of S.fov) {
     const ins = INSTRUMENT[id];
     const b = scene.bodies.find((x) => x.key === ins.sc);
     if (!b || b.st === 'lost') continue;
-    const grid = fovGrid(ins, SKY_SHAPES[id], b.p, sideSign(ins, b), b.dist);
-    const pts = grid.map((row) => row.map((d) => {
-      const q = d && sky.hit(b.p, d);
-      return q && Math.abs(q[0]) < far && Math.abs(q[1]) < far ? q : null;
-    }));
+    const pts = trace(b.p, fovGrid(ins, SKY_SHAPES[id], b.p, sideSign(ins, b), b.dist));
     const col = theme.color[ins.sc];
-    ctx.beginPath();
-    for (let i = 0; i < pts.length - 1; i++) {
-      for (let j = 0; j < pts[i].length - 1; j++) {
-        const c = [pts[i][j], pts[i + 1][j], pts[i + 1][j + 1], pts[i][j + 1]];
-        if (c.some((v) => !v)) continue;
-        c.forEach((v, k) => { const [x, y] = map(v); if (k) ctx.lineTo(x, y); else ctx.moveTo(x, y); });
-        ctx.closePath();
-      }
-    }
-    ctx.fillStyle = col;
-    ctx.globalAlpha = 0.1;
-    ctx.fill('nonzero');
-    ctx.globalAlpha = 0.75;
-    ctx.strokeStyle = col;
-    ctx.lineWidth = 1.3;
-    const edge = (list) => {
-      let open = false;
-      let prev = null;
-      ctx.beginPath();
-      for (const v of list) {
-        if (!v || (prev && Math.hypot(v[0] - prev[0], v[1] - prev[1]) > S.zoom * 1.5)) { open = false; prev = v; continue; }
-        const [x, y] = map(v);
-        if (open) ctx.lineTo(x, y); else { ctx.moveTo(x, y); open = true; }
-        prev = v;
-      }
-      ctx.stroke();
-    };
-    const n = pts.length - 1;
-    const m = pts[0].length - 1;
-    edge(pts[0]);
-    edge(pts[n]);
-    if (SKY_SHAPES[id].type !== 'annulus') { edge(pts.map((r) => r[0])); edge(pts.map((r) => r[m])); }
-    ctx.globalAlpha = 1;
-    const at = SKY_SHAPES[id].type === 'annulus' ? pts[n][Math.round(m * 0.13)] : pts[Math.round(n / 2)][Math.round(m / 2)];
+    const at = drawMesh(ctx, map, pts, col, SKY_SHAPES[id].type === 'annulus', 0.13);
     if (at) { const [x, y] = map(at); labels.push({ text: `${BODIES[ins.sc].short} ${ins.name}`, x, y, r: 2, size: 11, color: col }); }
   }
 
-  // Ground-based coronagraphs (MLSO)
+  // Ground-based coronagraphs (MLSO), traced from Earth
   for (const g of GROUND) {
     if (!S.ground.has(g.id)) continue;
-    ctx.beginPath();
-    ctx.arc(ox, oy, g.outer * ppr, 0, 2 * Math.PI);
-    ctx.arc(ox, oy, g.inner * ppr, 0, 2 * Math.PI, true);
-    ctx.fillStyle = theme.color.earth;
-    ctx.globalAlpha = 0.12;
-    ctx.fill();
-    ctx.globalAlpha = 0.9;
-    ctx.strokeStyle = theme.color.earth;
-    ctx.setLineDash([4, 3]);
-    ctx.beginPath(); ctx.arc(ox, oy, g.outer * ppr, 0, 2 * Math.PI); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.globalAlpha = 1;
-    labels.push({ text: g.name, x: ox - g.outer * ppr * 0.71, y: oy - g.outer * ppr * 0.71, r: 2, size: 11, color: theme.color.earth });
+    const grid = fovGrid({ unit: 'rs', inner: g.inner, outer: g.outer }, { type: 'annulus' }, earth, 1, norm(earth));
+    const at = drawMesh(ctx, map, trace(earth, grid), theme.color.earth, true, 0.375);
+    if (at) { const [x, y] = map(at); labels.push({ text: g.name, x, y, r: 2, size: 11, color: theme.color.earth }); }
   }
 
-  // Sun
+  // Sun, at the size this observer sees it
   ctx.beginPath();
-  ctx.arc(ox, oy, Math.max(ppr, 3), 0, 2 * Math.PI);
+  ctx.arc(ox, oy, Math.max(ppr * sky.limb, 3), 0, 2 * Math.PI);
   ctx.fillStyle = theme.sunStyle === 'eclipse' ? theme.bg : theme.sun;
   ctx.fill();
   ctx.strokeStyle = theme.sun;
   ctx.lineWidth = 1.2;
   ctx.stroke();
 
-  // DKIST Cryo-NIRSP footprints within half a day of the moment
+  // DKIST Cryo-NIRSP footprints within half a day of the moment, traced from Earth
   if (S.ground.has('cryo')) {
     for (const d of cryoInWindow()) {
+      const poly = d.x.map((x, i) => sky.hit(earth, hpcDirection(earth, x, d.y[i])));
+      if (poly.some((v) => !v || Math.abs(v[0]) > far || Math.abs(v[1]) > far)) continue;
       const active = S.jd >= d.j0 && S.jd <= d.j1;
       const hl = S.hl === d.id;
       ctx.beginPath();
-      d.x.forEach((x, i) => { const [px, py] = map([x / d.rsun, d.y[i] / d.rsun]); if (i) ctx.lineTo(px, py); else ctx.moveTo(px, py); });
+      poly.forEach((v, i) => { const [px, py] = map(v); if (i) ctx.lineTo(px, py); else ctx.moveTo(px, py); });
       ctx.closePath();
       ctx.fillStyle = theme.accent;
       ctx.globalAlpha = active || hl ? 0.45 : 0.15;
@@ -236,19 +254,25 @@ function paint() {
       ctx.lineWidth = hl ? 2.2 : 1.2;
       ctx.stroke();
       if (active || hl) {
-        const [px, py] = map([d.x[0] / d.rsun, d.y[0] / d.rsun]);
+        const [px, py] = map(poly[0]);
         labels.push({ text: `Cryo-NIRSP ${d.id}`, x: px, y: py, r: 3, size: 11, color: theme.accent });
       }
     }
   }
 
-  // Spacecraft where Earth sees them
+  // Earth and the spacecraft, where the observer sees them
+  const O = obs.p;
   for (const b of scene.bodies) {
     const meta = BODIES[b.key];
-    if (meta.kind !== 'sc' || meta.near) continue;
-    const q = sky.toPlane(b.p);
-    let [x, y] = map(q);
-    const inside = x > 8 && x < W - 8 && y > 8 && y < H - 8;
+    if (b.key === obs.key || (b.key !== 'earth' && (meta.kind !== 'sc' || meta.near))) continue;
+    if (obs.key === 'earth' && b.key === 'earth') continue;
+    const q = sky.seen(b.p);
+    const behind = !q;
+    // Bodies behind the observer get an edge marker in their direction
+    const rel = [b.p[0] - O[0], b.p[1] - O[1], b.p[2] - O[2]];
+    let [x, y] = q ? map(q) : [ox + (rel[0] * sky.ax.west[0] + rel[1] * sky.ax.west[1] + rel[2] * sky.ax.west[2]) * 1e6,
+      oy - (rel[0] * sky.ax.north[0] + rel[1] * sky.ax.north[1] + rel[2] * sky.ax.north[2]) * 1e6];
+    const inside = !behind && x > 8 && x < W - 8 && y > 8 && y < H - 8;
     const col = theme.color[b.key];
     if (!inside) {
       // Clamp to the edge along the line from the centre
@@ -258,13 +282,16 @@ function paint() {
       x = ox + dx * s;
       y = oy + dy * s;
     }
+    const name = b.key === 'earth' ? tr('Earth') : meta.short;
     ctx.fillStyle = col;
     ctx.globalAlpha = b.st === 'lost' ? 0.5 : 1;
     ctx.beginPath();
-    ctx.moveTo(x, y - 5); ctx.lineTo(x + 5, y); ctx.lineTo(x, y + 5); ctx.lineTo(x - 5, y); ctx.closePath();
+    if (b.key === 'earth') ctx.arc(x, y, 5, 0, 2 * Math.PI);
+    else { ctx.moveTo(x, y - 5); ctx.lineTo(x + 5, y); ctx.lineTo(x, y + 5); ctx.lineTo(x - 5, y); ctx.closePath(); }
     ctx.fill();
     ctx.globalAlpha = 1;
-    labels.push({ text: inside ? meta.short : `${meta.short} →`, x, y, r: 7, size: 12, color: col, bold: true });
+    const text = behind ? tr('{name} (behind)', { name }) : inside ? name : `${name} →`;
+    labels.push({ text, x, y, r: 7, size: 12, color: col, bold: true });
   }
 
   ctx.textAlign = 'left';
@@ -279,7 +306,71 @@ function paint() {
     ctx.fillStyle = l.color;
     ctx.fillText(l.text, l.rect.x + 3, l.rect.y + l.rect.h / 2 + 0.5);
   }
-  $('sky-hud').textContent = `${tr('Plane of the sky seen from Earth')}\n${tr('solar north up, west to the right')}`;
+  $('sky-hud').textContent = hudText(obs);
+}
+
+function hudText(obs) {
+  return `${tr('Plane of the sky seen from {name}', { name: obsName(obs.key) })} · ${(norm(obs.p)).toFixed(3)} au\n${tr('solar north up, west to the right')}`;
+}
+
+function viewTitle(key) {
+  return key === 'earth' ? tr("Earth's view") : tr('View from {name}', { name: obsName(key) });
+}
+
+// ---------- snapshot ----------
+async function snapshot() {
+  await document.fonts.ready;
+  const SIZE = 1000;
+  const TOP = 74;
+  const PAD = 20;
+  const obs = observer();
+  const note = tr('Lines of sight are followed to where they cross the plane through Sun centre perpendicular to the line from the Sun to the observer. MLSO and DKIST fields are traced from Earth.');
+  const W = SIZE + 2 * PAD;
+  const HT = TOP + SIZE + 70;
+  const cv2 = document.createElement('canvas');
+  cv2.width = W * 2;
+  cv2.height = HT * 2;
+  const ctx = cv2.getContext('2d');
+  ctx.scale(2, 2);
+  ctx.fillStyle = theme.page;
+  ctx.fillRect(0, 0, W, HT);
+  ctx.fillStyle = theme.ink;
+  ctx.textBaseline = 'alphabetic';
+  ctx.textAlign = 'left';
+  ctx.font = `700 26px "Big Shoulders Display", ${FONT}`;
+  ctx.fillText(`HelioFleet · ${viewTitle(obs.key)}`, PAD, 38);
+  ctx.font = `500 14px ${MONO}`;
+  ctx.fillStyle = theme.muted;
+  ctx.fillText(`${isoMinute(S.jd).replace('T', ' ')} UTC · ${hudText(obs).replace('\n', ' · ')}`, PAD, 60, SIZE);
+  ctx.save();
+  ctx.translate(PAD, TOP);
+  ctx.beginPath();
+  ctx.roundRect(0, 0, SIZE, SIZE, 12);
+  ctx.clip();
+  draw(ctx, SIZE, SIZE);
+  ctx.restore();
+  ctx.strokeStyle = theme.line;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.roundRect(PAD + 0.5, TOP + 0.5, SIZE - 1, SIZE - 1, 12);
+  ctx.stroke();
+  ctx.fillStyle = theme.muted;
+  ctx.font = `400 12px ${FONT}`;
+  ctx.fillText(note, PAD, TOP + SIZE + 24, SIZE);
+  ctx.fillText(`${tr('Positions from JPL Horizons. Fields of view from the instrument papers.')}  sr-dash.github.io/heliofleet/sky.html`, PAD, TOP + SIZE + 44, SIZE);
+  paint(); // the HUD follows the on-screen view again
+  return cv2;
+}
+
+async function saveSnapshot(kind) {
+  try {
+    const cv2 = await snapshot();
+    const base = `heliofleet-sky-${observer().key}-${isoMinute(S.jd).replace(/[-:]/g, '').replace('T', '-')}`;
+    if (kind === 'png') await downloadPNG(cv2, base);
+    else downloadPDF(cv2, base, `HelioFleet · ${viewTitle(observer().key)} · ${isoMinute(S.jd)} UTC`);
+  } catch (err) {
+    toast(err.message);
+  }
 }
 
 // ---------- panels ----------
@@ -348,6 +439,22 @@ function renderCryo() {
   $('cryo-next').disabled = !cryo.some((d) => d.j0 > S.jd + 0.5);
 }
 
+function renderObservers() {
+  const sel = $('obs');
+  sel.replaceChildren(...OBSERVERS.map((k) => {
+    const o = document.createElement('option');
+    o.value = k;
+    o.textContent = obsName(k);
+    o.disabled = k !== 'earth' && !scene?.bodies.some((b) => b.key === k);
+    return o;
+  }));
+  sel.value = S.obs;
+  const eff = scene ? observer().key : 'earth';
+  $('sky-title').textContent = viewTitle(eff);
+  $('obs-note').hidden = eff === S.obs;
+  $('obs-note').textContent = eff === S.obs ? '' : tr('{name} has no position on this date, so the view is from Earth.', { name: obsName(S.obs) });
+}
+
 function renderClock() {
   const iso = isoMinute(S.jd);
   $('clock-date').textContent = iso.slice(0, 10);
@@ -366,6 +473,7 @@ async function update() {
   scene = buildScene(S.jd, SCENE);
   $('loading').hidden = !!scene;
   paint();
+  renderObservers();
   renderSites();
   renderCryo();
 }
@@ -468,6 +576,9 @@ async function main() {
     const d = cryo.find((x) => x.j0 > S.jd + 0.5);
     if (d) { S.jd = (d.j0 + d.j1) / 2; S.hl = d.id; update(); toast(tr('Jumped to {date}', { date: isoMinute(d.j0).replace('T', ' ') })); }
   });
+  $('obs').addEventListener('change', (e) => { S.obs = e.target.value; S.cx = 0; S.cy = 0; update(); });
+  $('dl-png').addEventListener('click', () => saveSnapshot('png'));
+  $('dl-pdf').addEventListener('click', () => saveSnapshot('pdf'));
   new ResizeObserver(() => paint()).observe($('sky-wrap'));
   await update();
 }

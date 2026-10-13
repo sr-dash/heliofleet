@@ -1,7 +1,8 @@
-// Earth's plane of the sky: the plane through Sun centre perpendicular to the
-// Sun-Earth line, with solar north up and west to the right, in solar radii.
-// Each instrument's field of view is projected onto it by following its lines
-// of sight from the spacecraft to where they cross the plane.
+// An observer's plane of the sky: the plane through Sun centre perpendicular
+// to the Sun-observer line, with solar north up and west to the right as that
+// observer sees it, in solar radii. Each instrument's field of view is
+// projected onto it by following its lines of sight to where they cross the
+// plane; bodies are placed where the observer sees them (true perspective).
 
 import { R_SUN_AU, earthSkyAxes, dot, norm } from './frames.js';
 
@@ -32,8 +33,9 @@ export const GROUND = [
   { id: 'ucomp', name: 'MLSO UCoMP', inner: 1.05, outer: 2.0, colorVar: '--c-earth' },
 ];
 
-export function makeSky(earth) {
-  const ax = earthSkyAxes(earth);
+export function makeSky(observer) {
+  const ax = earthSkyAxes(observer); // the same construction works for any observer
+  const r = norm(observer) / R_SUN_AU;
   // Plane coordinates (west, north) in solar radii of a heliocentric point
   const toPlane = (X) => [dot(X, ax.west) / R_SUN_AU, dot(X, ax.north) / R_SUN_AU];
   // Where the ray P + t d crosses the plane X.e = 0, or null if it never does
@@ -44,7 +46,21 @@ export function makeSky(earth) {
     if (t <= 0) return null;
     return toPlane(add(P, mul(d, t)));
   };
-  return { ax, toPlane, hit };
+  // Where the observer sees point X, or null if X is behind the observer
+  const seen = (X) => hit(observer, unit(sub(X, observer)));
+  return {
+    ax, toPlane, hit, seen,
+    // The Sun's limb seen from this distance, as a radius on the plane
+    limb: 1 / Math.sqrt(Math.max(1e-6, 1 - 1 / (r * r))),
+  };
+}
+
+// Sky direction from Earth of a helioprojective point (Tx, Ty in arcsec)
+export function hpcDirection(earth, tx, ty) {
+  const ax = earthSkyAxes(earth);
+  const a = (tx / 3600) * D;
+  const b = (ty / 3600) * D;
+  return unit(add(mul(ax.e, -1), add(mul(ax.west, Math.tan(a)), mul(ax.north, Math.tan(b)))));
 }
 
 // Sky basis at a spacecraft: u toward the Sun, w toward solar east in the

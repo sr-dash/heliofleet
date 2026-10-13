@@ -13,7 +13,7 @@
     gtag('config', 'G-8X5BSNF3VV');
   </script>
 
-  <meta name="description" content="The fields of view of coronagraphs and heliospheric imagers on SOHO, STEREO, Solar Orbiter and Parker Solar Probe, projected onto Earth's plane of the sky, with MLSO K-Cor and UCoMP and DKIST Cryo-NIRSP observation footprints for any date.">
+  <meta name="description" content="The fields of view of coronagraphs and heliospheric imagers on SOHO, STEREO, Solar Orbiter and Parker Solar Probe, projected onto the plane of the sky seen from Earth or any spacecraft, with MLSO K-Cor and UCoMP and DKIST Cryo-NIRSP observation footprints for any date.">
   <meta name="author" content="Soumyaranjan Dash">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="canonical" href="https://sr-dash.github.io/heliofleet/sky.html">
@@ -29,7 +29,7 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Soumyaranjan Dash Portfolio">
   <meta property="og:title" content="HelioFleet: Earth's view of the instrument fields of view">
-  <meta property="og:description" content="Coronagraph and heliospheric imager fields projected onto Earth's plane of the sky, with ground-based and DKIST observation footprints.">
+  <meta property="og:description" content="Coronagraph and heliospheric imager fields projected onto the plane of the sky seen from Earth or a spacecraft, with ground-based and DKIST observation footprints.">
   <meta property="og:url" content="https://sr-dash.github.io/heliofleet/sky.html">
   <meta property="og:image" content="https://sr-dash.github.io/heliofleet/assets/og-image.png">
   <meta name="twitter:card" content="summary_large_image">
@@ -59,8 +59,8 @@
         <span aria-hidden="true">/</span>
         <a href="./" id="map-link">HelioFleet</a>
       </nav>
-      <h1 class="wordmark">Earth's view</h1>
-      <p class="tagline">Where each instrument's field of view meets the plane of the sky seen from Earth, with solar north up and west to the right.</p>
+      <h1 class="wordmark" id="sky-title">Earth's view</h1>
+      <p class="tagline">Where each instrument's field of view meets the plane of the sky seen from Earth or from a spacecraft, with solar north up and west to the right.</p>
     </div>
     <div class="clock" aria-live="polite">
       <span class="clock-date" id="clock-date">—</span>
@@ -71,7 +71,9 @@
     </div>
   </header>
 
-  <section class="sky-controls" aria-label="Date and zoom">
+  <section class="sky-controls" aria-label="Observer, date and zoom">
+    <label class="field"><span class="field-label">View from</span>
+      <select id="obs"></select></label>
     <label class="field"><span class="field-label">Date and time (UTC)</span>
       <input type="datetime-local" id="dt" step="60"></label>
     <div class="steppers sky-steps" role="group" aria-label="Step the date">
@@ -95,17 +97,25 @@
   <main class="sky-layout">
     <section class="sky-stage" aria-label="Plane of the sky">
       <div class="map-wrap sky-wrap" id="sky-wrap">
-        <canvas id="sky" aria-label="Fields of view projected on Earth's plane of the sky"></canvas>
+        <canvas id="sky" aria-label="Fields of view projected on the observer's plane of the sky"></canvas>
         <p class="hud" id="sky-hud"></p>
         <p class="loading" id="loading">Loading ephemerides…</p>
       </div>
-      <p class="coverage-note" id="sky-note">Lines of sight from each spacecraft are followed to where they cross the plane through Sun centre perpendicular to the Sun–Earth line. Spacecraft appear where Earth sees them. Fields are drawn from the published elongation ranges; heliospheric imagers use the published field sizes.</p>
+      <p class="coverage-note" id="obs-note" hidden></p>
+      <p class="coverage-note" id="sky-note">Lines of sight from each instrument are followed to where they cross the plane through Sun centre perpendicular to the line from the Sun to the chosen observer. Earth and the spacecraft appear where that observer sees them. MLSO and DKIST fields are traced from Earth in the same way. Fields are drawn from the published elongation ranges; heliospheric imagers use the published field sizes.</p>
     </section>
 
     <aside class="sky-side">
       <section class="panel">
         <h2 class="panel-title">Layers</h2>
         <div class="fov-list" id="sky-layers"></div>
+      </section>
+      <section class="panel">
+        <h2 class="panel-title">Snapshot</h2>
+        <div class="export-row">
+          <button id="dl-png" class="btn-primary">Download PNG</button>
+          <button id="dl-pdf" class="btn-primary">Download PDF</button>
+        </div>
       </section>
       <section class="panel">
         <h2 class="panel-title">Ground observatories</h2>
@@ -130,8 +140,9 @@
 
   <div class="toast" id="toast" role="status" hidden></div>
   <!-- assets:start (written by scripts/stamp_assets.py) -->
-  <script type="importmap">{"imports":{"./js/animate.js":"./js/animate.js?v=0a5fd6979e","./js/app.js":"./js/app.js?v=0fb622cb02","./js/bodyinfo.js":"./js/bodyinfo.js?v=d96ce73256","./js/cards.js":"./js/cards.js?v=376df29bfb","./js/catalog.js":"./js/catalog.js?v=43b4d14cab","./js/coverage.js":"./js/coverage.js?v=7e64d1c926","./js/ephem.js":"./js/ephem.js?v=56c0c10b78","./js/events.js":"./js/events.js?v=f9807e6265","./js/export.js":"./js/export.js?v=d57fc7647f","./js/frames.js":"./js/frames.js?v=c3a2e0d167","./js/helioviewer.js":"./js/helioviewer.js?v=14248f1791","./js/i18n.js":"./js/i18n.js?v=b27b772be8","./js/instruments.js":"./js/instruments.js?v=b96df13d1d","./js/render.js":"./js/render.js?v=2af6e326ec","./js/ribbon.js":"./js/ribbon.js?v=ee457569eb","./js/scene.js":"./js/scene.js?v=34a1e85666","./js/sky.js":"./js/sky.js?v=25786310b3","./js/skyproj.js":"./js/skyproj.js?v=1c2ce7a7a0","./js/tools.js":"./js/tools.js?v=f21c405613","./js/workbench.js":"./js/workbench.js?v=b219063990"}}</script>
+  <script type="importmap">{"imports":{"./js/animate.js":"./js/animate.js?v=0a5fd6979e","./js/app.js":"./js/app.js?v=0fb622cb02","./js/bodyinfo.js":"./js/bodyinfo.js?v=d96ce73256","./js/cards.js":"./js/cards.js?v=376df29bfb","./js/catalog.js":"./js/catalog.js?v=43b4d14cab","./js/coverage.js":"./js/coverage.js?v=7e64d1c926","./js/ephem.js":"./js/ephem.js?v=56c0c10b78","./js/events.js":"./js/events.js?v=f9807e6265","./js/export.js":"./js/export.js?v=d57fc7647f","./js/frames.js":"./js/frames.js?v=c3a2e0d167","./js/helioviewer.js":"./js/helioviewer.js?v=14248f1791","./js/i18n.js":"./js/i18n.js?v=b27b772be8","./js/instruments.js":"./js/instruments.js?v=b96df13d1d","./js/render.js":"./js/render.js?v=2af6e326ec","./js/ribbon.js":"./js/ribbon.js?v=ee457569eb","./js/scene.js":"./js/scene.js?v=34a1e85666","./js/sky.js":"./js/sky.js?v=dd50ad5bb4","./js/skyproj.js":"./js/skyproj.js?v=6c8965c007","./js/tools.js":"./js/tools.js?v=f21c405613","./js/workbench.js":"./js/workbench.js?v=b219063990"}}</script>
   <!-- assets:end -->
-  <script type="module" src="js/sky.js?v=25786310b3"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+  <script type="module" src="js/sky.js?v=dd50ad5bb4"></script>
 </body>
 </html>

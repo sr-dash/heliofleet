@@ -123,7 +123,7 @@ js/bodyinfo.js           speed, light time, apparent Sun size, perihelia
 js/coverage.js           solar coverage strip
 js/instruments.js        coronagraph and imager fields of view
 js/helioviewer.js        Helioviewer.org layers and links
-sky.html, js/sky.js      Earth's view sub-page
+sky.html, js/sky.js      sky view sub-page (Earth or a spacecraft)
 js/skyproj.js            plane-of-sky projection, ground sites, Sun altitude
 data/ground/cryonirsp.json  DKIST Cryo-NIRSP footprints
 scripts/fetch_ground.py  builds it from the Cryo-NIRSP viewer inventory
@@ -148,14 +148,16 @@ scripts/fetch_ephemeris.py
 - Flares, CMEs and geomagnetic storms, including the CME speeds, directions and widths behind the CME fronts on the map: the Space Weather Database Of Notifications, Knowledge, Information ([DONKI](https://ccmc.gsfc.nasa.gov/DONKI/)), developed and maintained by the [Community Coordinated Modeling Center](https://ccmc.gsfc.nasa.gov/) at NASA Goddard Space Flight Center.
 - Heliographic coordinates follow the IAU solar rotation model as implemented in [SunPy](https://sunpy.org/), which was used to validate them.
 
-### Earth's view (sky.html)
+### Earth's view and spacecraft views (sky.html)
 
-A second page, [Earth's view](https://sr-dash.github.io/heliofleet/sky.html), draws the plane of the sky seen from Earth, through Sun centre and perpendicular to the Sun–Earth line, with solar north up and west to the right, as in a solar image. Each instrument's field of view is projected onto it by following its lines of sight from the spacecraft to where they cross that plane, so Earth-side coronagraphs appear as rings while fields from spacecraft far from the Sun–Earth line stretch across the sky. On the same plane:
+A second page, [Earth's view](https://sr-dash.github.io/heliofleet/sky.html), draws the plane of the sky seen from an observer, through Sun centre and perpendicular to the Sun–observer line, with solar north up and west to the right, as in a solar image. The observer is Earth by default; the **View from** list switches to Solar Orbiter, Parker Solar Probe, BepiColombo, STEREO-A, STEREO-B or MAVEN on dates when it has a position (`?obs=solo` in the link). Each instrument's field of view is projected onto that plane by following its lines of sight from its own spacecraft to where they cross it, so the observer's own coronagraphs appear as rings while fields from spacecraft far from the observer's line of sight stretch across the sky. On the same plane:
 
 - **MLSO K-Cor** (1.05–3 R☉) and **UCoMP** (1.05–2 R☉) at Mauna Loa;
 - **DKIST Cryo-NIRSP** observation footprints within 12 hours of the moment, from the [Cryo-NIRSP viewer](https://sr-dash.github.io/cryonirsp-viewer/) inventory (refreshed monthly by `scripts/fetch_ground.py`), each linked to its page in that viewer, with buttons to step to earlier or later observing days;
 - the Sun's altitude and daylight window at Haleakalā (DKIST) and Mauna Loa (MLSO);
-- the spacecraft, placed where Earth sees them.
+- Earth and the spacecraft, placed where the observer sees them in perspective, with an edge marker for those behind the observer.
+
+The MLSO and DKIST fields are traced from Earth in the same way, so from another observer they show where Earth's lines of sight cross that observer's plane of the sky. The page saves PNG and PDF snapshots of the current view.
 
 Heliospheric imagers are modelled as fields of their published size (HI-1 a 20° square, HI-2 a 70° circle, SoloHI a 40° circle, WISPR-I 40° and WISPR-O 58° squares tilted 10° south), so their outlines on this page are approximate.
 
