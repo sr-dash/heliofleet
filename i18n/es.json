@@ -249,6 +249,7 @@
  "Spot": "Punto",
  "Spot · {sys} {lon}°, {lat}": "Punto · {sys} {lon}°, {lat}",
  "Start (UTC)": "Inicio (UTC)",
+ "Start over: today's date and the default view": "Empezar de nuevo: la fecha de hoy y la vista predeterminada",
  "Step the date": "Cambiar la fecha",
  "Stonyhurst": "Stonyhurst",
  "Stonyhurst heliographic (HGS) and Carrington longitudes as seen from Earth. Footpoint is where a nominal Parker spiral at the chosen wind speed meets the Sun.": "Longitudes heliográficas de Stonyhurst (HGS) y de Carrington vistas desde la Tierra. El punto de anclaje es donde una espiral de Parker nominal, a la velocidad de viento elegida, llega al Sol.",
@@ -349,5 +350,6 @@
  "± 45 days": "± 45 días",
  "± 90 days": "± 90 días",
  "· Sun up": "· Sol arriba",
+ "↺ Start over": "↺ Empezar de nuevo",
  "∠ Earth": "∠ Tierra"
 }

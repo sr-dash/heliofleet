@@ -249,6 +249,7 @@
  "Spot": "स्थान",
  "Spot · {sys} {lon}°, {lat}": "स्थान · {sys} {lon}°, {lat}",
  "Start (UTC)": "आरंभ (UTC)",
+ "Start over: today's date and the default view": "नए सिरे से शुरू करें: आज की तिथि और मूल दृश्य",
  "Step the date": "तिथि बदलें",
  "Stonyhurst": "स्टोनीहर्स्ट",
  "Stonyhurst heliographic (HGS) and Carrington longitudes as seen from Earth. Footpoint is where a nominal Parker spiral at the chosen wind speed meets the Sun.": "पृथ्वी से देखे गए स्टोनीहर्स्ट सौर-भौगोलिक (HGS) और कैरिंगटन देशांतर। पादबिंदु वह स्थान है जहाँ चुनी गई सौर पवन गति पर एक नाममात्र पार्कर सर्पिल सूर्य से मिलता है।",
@@ -349,5 +350,6 @@
  "± 45 days": "± 45 दिन",
  "± 90 days": "± 90 दिन",
  "· Sun up": "· सूर्य ऊपर",
+ "↺ Start over": "↺ नए सिरे से शुरू करें",
  "∠ Earth": "∠ पृथ्वी"
 }

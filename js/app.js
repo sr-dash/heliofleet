@@ -633,6 +633,13 @@ function localize() {
   if (canon) canon.href = `https://sr-dash.github.io/heliofleet/?lang=${lang()}`;
 }
 
+// "Start over" links (title and Moment panel) open a clean page: today's
+// date and default settings, keeping only the reader's language.
+function setHomeLinks() {
+  const href = lang() === 'en' ? './' : `./?lang=${lang()}`;
+  document.querySelectorAll('.home-link').forEach((a) => { a.href = href; });
+}
+
 function buildLangSwitch() {
   const box = $('lang-switch');
   for (const [code, name] of Object.entries(LANGUAGES)) {
@@ -689,6 +696,7 @@ async function main() {
   localize();
   translatePage();
   buildLangSwitch();
+  setHomeLinks();
   readURL();
   theme = readTheme();
   setTheme(document.documentElement.dataset.theme, false);
