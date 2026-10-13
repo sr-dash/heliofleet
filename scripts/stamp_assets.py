@@ -20,7 +20,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 # Each page and its entry module
-PAGES = {"index.html": "app.js", "sky.html": "sky.js"}
+PAGES = {"index.html": "app.js", "sky.html": "sky.js", "methods.html": None}  # methods.html: stylesheet only
 
 
 def digest(path):
@@ -31,6 +31,8 @@ def stamped(page, entry):
     html = (ROOT / page).read_text()
     css = digest(ROOT / "css" / "style.css")
     html = re.sub(r'href="css/style\.css(\?v=[0-9a-f]*)?"', f'href="css/style.css?v={css}"', html)
+    if entry is None:
+        return html
     modules = sorted((ROOT / "js").glob("*.js"))
     imports = {f"./js/{m.name}": f"./js/{m.name}?v={digest(m)}" for m in modules}
     html = re.sub(rf'src="js/{re.escape(entry)}(\?v=[0-9a-f]*)?"', f'src="{imports["./js/" + entry][2:]}"', html)

@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Methods and Accuracy | HelioFleet</title>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-8X5BSNF3VV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-8X5BSNF3VV');
+  </script>
+
+  <meta name="description" content="How HelioFleet computes spacecraft positions, heliographic coordinates, Parker-spiral footpoints, alignments, instrument fields of view and the sky view, how it is checked against JPL Horizons and SunPy, and its known limits.">
+  <meta name="author" content="Soumyaranjan Dash">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://sr-dash.github.io/heliofleet/methods.html">
+  <link rel="author" href="https://sr-dash.github.io/">
+  <meta name="google-site-verification" content="wNt-P7enH5ZTT0cjYYqXEN9GRrj-0_OcbZSER57FIK4">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0B1026" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#E6ECF1" media="(prefers-color-scheme: light)">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Soumyaranjan Dash Portfolio">
+  <meta property="og:title" content="HelioFleet: methods and accuracy">
+  <meta property="og:description" content="Data, coordinate frames, derived quantities, validation against JPL Horizons and SunPy, and known limits of HelioFleet.">
+  <meta property="og:url" content="https://sr-dash.github.io/heliofleet/methods.html">
+  <meta property="og:image" content="https://sr-dash.github.io/heliofleet/assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@soumyatheory">
+  <meta name="twitter:creator" content="@soumyatheory">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Fonts load without holding up the first paint; text shows in the fallback font until they arrive -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap"></noscript>
+  <link rel="stylesheet" href="css/style.css?v=76e72596db">
+  <script>
+    try {
+      const q = new URLSearchParams(location.search);
+      const t = ['night', 'eclipse', 'halpha', 'plate'].includes(q.get('theme')) ? q.get('theme') : localStorage.getItem('heliofleet-theme');
+      if (t) document.documentElement.dataset.theme = t;
+      else if (matchMedia('(prefers-color-scheme: light)').matches) document.documentElement.dataset.theme = 'plate';
+    } catch (e) {}
+  </script>
+</head>
+<body class="methods-page">
+  <header class="masthead">
+    <div class="brand">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="https://sr-dash.github.io/" rel="author">Soumyaranjan Dash</a>
+        <span aria-hidden="true">/</span>
+        <a href="https://sr-dash.github.io/software/">Software</a>
+        <span aria-hidden="true">/</span>
+        <a href="./">HelioFleet</a>
+      </nav>
+      <h1 class="wordmark">Methods</h1>
+      <p class="tagline">How HelioFleet computes what it shows, how that is checked, and where its limits are.</p>
+    </div>
+  </header>
+
+  <main class="methods">
+    <nav class="methods-toc" aria-label="On this page">
+      <a href="#data">Data</a>
+      <a href="#frames">Coordinates</a>
+      <a href="#derived">Derived quantities</a>
+      <a href="#events">Events and searches</a>
+      <a href="#fov">Fields of view</a>
+      <a href="#sky-view">Sky view</a>
+      <a href="#validation">Validation</a>
+      <a href="#limits">Known limits</a>
+    </nav>
+
+    <section id="data">
+      <h2>Positions and data</h2>
+      <p>All positions come from <a href="https://ssd.jpl.nasa.gov/horizons/">JPL Horizons</a> as geometric state vectors (no light-time or aberration correction) in the ICRF, referred to the J2000 ecliptic. Spacecraft far from Earth and the planets are stored as heliocentric vectors in au. The spacecraft around the Sun–Earth L1 point (SOHO, ACE, Wind, DSCOVR, IMAP, SWFO-L1, Carruthers and, for the inset, Aditya-L1) and the Moon are stored as geocentric vectors in km; their heliocentric positions are Earth's position plus the geocentric vector.</p>
+      <p>Vectors are sampled on a uniform UT grid and stored as one file per body per year:</p>
+      <table>
+        <thead><tr><th>Series</th><th>Sample step</th></tr></thead>
+        <tbody>
+          <tr><td>Parker Solar Probe</td><td>3 hours</td></tr>
+          <tr><td>Aditya-L1 (geocentric, for the inset)</td><td>2 hours</td></tr>
+          <tr><td>The Moon (geocentric)</td><td>6 hours</td></tr>
+          <tr><td>SOHO, ACE, Wind, DSCOVR, IMAP, SWFO-L1, Carruthers (geocentric)</td><td>12 hours</td></tr>
+          <tr><td>Everything else: Earth, the planets, SDO, Solar Orbiter, BepiColombo, STEREO-A/B, MAVEN, Aditya-L1</td><td>1 day</td></tr>
+        </tbody>
+      </table>
+      <p>Between samples the page interpolates each coordinate with a four-point Lagrange polynomial (cubic) on the two samples either side of the requested time.</p>
+      <p>A workflow refreshes the data on the first of each month. It refetches every year from the previous one onward, so predicted trajectories are replaced by fitted ones as missions publish them, and it appends new years when a mission's Horizons ephemeris is extended. Positions after a mission's last tracking data are planning predictions and can change by large amounts after manoeuvres.</p>
+    </section>
+
+    <section id="frames">
+      <h2>Coordinate frames</h2>
+      <dl>
+        <dt>Earth-fixed map (HEE)</dt>
+        <dd>Heliocentric Earth Ecliptic: the Sun at the centre, the x-axis toward Earth, z toward ecliptic north. Earth stays at the bottom of the map, so spacecraft move relative to the Sun–Earth line.</dd>
+        <dt>Inertial map (HAE)</dt>
+        <dd>The J2000 ecliptic frame of the data, fixed against the stars.</dd>
+        <dt>Stonyhurst (HEEQ)</dt>
+        <dd>Heliographic latitude from the Sun's rotation axis; longitude measured from the central meridian as seen from Earth (the projection of the Sun–Earth line on the solar equator).</dd>
+        <dt>Carrington</dt>
+        <dd>Heliographic longitude fixed to the rotating Sun, from the IAU rotation model: pole at right ascension 286.13° and declination 63.87°, prime meridian W = 84.176° + 14.1844° per day since J2000 (TT). As in SunPy, the Sun is taken as seen from Earth one Sun–Earth light time in the past.</dd>
+      </dl>
+      <p>These are the definitions used by <a href="https://sunpy.org/">SunPy</a>, against which the page is checked (see <a href="#validation">Validation</a>).</p>
+    </section>
+
+    <section id="derived">
+      <h2>Derived quantities</h2>
+      <dl>
+        <dt>Separation from Earth</dt>
+        <dd>The angle between a body and Earth as seen from the Sun.</dd>
+        <dt>Parker-spiral footpoint</dt>
+        <dd>The Stonyhurst longitude where the nominal spiral field line through the body meets the Sun, for a constant radial solar-wind speed <i>v</i>: φ<sub>foot</sub> = φ + Ω (r − R<sub>☉</sub>) / <i>v</i>, with Ω the sidereal Carrington rate (14.1844° per day) and <i>r</i> the body's distance. The spirals on the map use the same relation and ignore latitude, as is customary.</dd>
+        <dt>Speed</dt>
+        <dd>A central difference of the interpolated heliocentric position over ±10 minutes. For Parker at perihelion on 2024-12-24 this gives 190.7 km/s against 190.8 km/s from Horizons.</dd>
+        <dt>Light time and apparent Sun size</dt>
+        <dd>Light time is the body–Earth distance over the speed of light. The Sun's apparent diameter is 2 arcsin(R<sub>☉</sub> / r), with R<sub>☉</sub> = 695,700 km.</dd>
+        <dt>Spot visibility</dt>
+        <dd>A point on the photosphere is visible to an observer when the angle between its local vertical and the line of sight to the observer is below 90°.</dd>
+        <dt>Solar coverage</dt>
+        <dd>A point at longitude φ on the solar equator is visible from an observer at heliographic longitude L, latitude B and distance r when cos B cos(φ − L) &gt; R<sub>☉</sub> / r, and well placed (within 60° of disc centre) when cos B cos(φ − L) &gt; 0.5. Counts use 1° bins and include only observers that carry a solar-disc imager; Earth's row stands for SDO, SOHO, Aditya-L1 and ground observatories.</dd>
+      </dl>
+    </section>
+
+    <section id="events">
+      <h2>Events and searches</h2>
+      <dl>
+        <dt>Alignment search (research tools)</dt>
+        <dd>Steps through the chosen range every 6 hours (every hour when Parker is involved) and reports runs within the tolerance: radial alignment when the Sun-centred angle between two bodies is within 5° by default; quadrature when a spacecraft is 90° ± 5° from Earth as seen from the Sun; magnetic connection when the two footpoint longitudes are within 10° at the chosen wind speed.</dd>
+        <dt>Calendar of upcoming events</dt>
+        <dd>Built monthly on a 3-hour grid: perihelia of Parker and Solar Orbiter (from the stored samples, as minima within ±20 days), radial alignments within 3°, quadratures within 1°, and solar conjunctions when a spacecraft beyond the Sun is within 2° of Sun centre as seen from Earth. Eclipse times are from the NASA eclipse catalogue.</dd>
+        <dt>CME fronts</dt>
+        <dd>From the NASA CCMC <a href="https://ccmc.gsfc.nasa.gov/DONKI/">DONKI</a> cone-model analyses: each CME leaves 21.5 R<sub>☉</sub> at the analysed time and moves at the analysed speed, in the analysed direction and half-width, at constant speed. The front is drawn until it passes 2.2 au. No drag or deceleration is modelled.</dd>
+      </dl>
+    </section>
+
+    <section id="fov">
+      <h2>Instrument fields of view</h2>
+      <p>On the map, each coronagraph and heliospheric imager is drawn in the ecliptic plane as the range of elongation (angle from Sun centre, seen from the spacecraft) that it covers. Coronagraph limits given in solar radii are converted to elongation at the spacecraft's current distance. Coronagraphs are centred on the Sun; STEREO HI looks toward the Earth side of the Sun, SoloHI to solar east, and WISPR along Parker's direction of travel.</p>
+      <table>
+        <thead><tr><th>Instrument</th><th>Range</th><th>Source</th></tr></thead>
+        <tbody>
+          <tr><td>SOHO LASCO C2 / C3</td><td>2.2–6 / 3.7–30 R<sub>☉</sub></td><td>Brueckner et al. 1995, Sol. Phys. 162, 357</td></tr>
+          <tr><td>STEREO COR2</td><td>2.5–15 R<sub>☉</sub></td><td>Howard et al. 2008, Space Sci. Rev. 136, 67</td></tr>
+          <tr><td>STEREO HI-1 / HI-2</td><td>4–24° / 18.7–88.7°</td><td>Eyles et al. 2009, Sol. Phys. 254, 387</td></tr>
+          <tr><td>Solar Orbiter Metis</td><td>1.6–2.9°</td><td>Antonucci et al. 2020, A&amp;A 642, A10</td></tr>
+          <tr><td>Solar Orbiter SoloHI</td><td>5.4–44.9°</td><td>Howard et al. 2020, A&amp;A 642, A13</td></tr>
+          <tr><td>Parker WISPR-I / WISPR-O</td><td>13.5–53° / 50–108°</td><td>Vourlidas et al. 2016, Space Sci. Rev. 204, 83</td></tr>
+          <tr><td>MLSO K-Cor / UCoMP</td><td>1.05–3 / 1.05–2 R<sub>☉</sub></td><td>High Altitude Observatory</td></tr>
+        </tbody>
+      </table>
+      <p>In two dimensions (the sky view), coronagraphs are annuli. Heliospheric imagers are modelled as fields of their published size: HI-1 a 20° square, HI-2 a 70° circle, SoloHI a 40° circle with the inner 5.4° removed, WISPR-I a 40° and WISPR-O a 58° square, both tilted 10° south. These outlines are approximate; roll angles and detector shapes are not modelled.</p>
+    </section>
+
+    <section id="sky-view">
+      <h2>Sky view</h2>
+      <p>The <a href="sky.html">sky view</a> draws the plane through Sun centre perpendicular to the line from the Sun to the chosen observer (Earth or a spacecraft). Solar north (the rotation axis projected on that plane) is up and west is to the right, as in a solar image; coordinates on the plane are in solar radii.</p>
+      <ul>
+        <li>Each field of view is a grid of sky directions from its own spacecraft. Every direction is followed as a straight line of sight to where it crosses the observer's plane; the crossings are drawn as filled cells and outlined at the edges.</li>
+        <li>Earth and the spacecraft are placed where the observer sees them, in true perspective. A body more than 90° from the Sun in the observer's sky never crosses the plane in front of the observer; it gets an edge marker in its direction, labelled "behind".</li>
+        <li>MLSO rings and DKIST Cryo-NIRSP footprints are traced from Earth. Footprints are stored in helioprojective coordinates (Tx, Ty), which are converted to exact sky directions from Earth (Tx toward solar west, Ty toward solar north, measured from Sun centre). From another observer, they show where Earth's lines of sight cross that observer's plane, not where the light originated.</li>
+        <li>The Sun is drawn at the size the observer sees it: on the plane, the limb lies at 1 / √(1 − (R<sub>☉</sub>/r)²) solar radii.</li>
+      </ul>
+      <p>The plane of the sky is a construction for comparing fields of view: features are not confined to it, and a structure in front of or behind the plane appears elsewhere in each instrument's image.</p>
+    </section>
+
+    <section id="validation">
+      <h2>Validation</h2>
+      <p>On every change to the site, an automatic check (<a href="https://github.com/sr-dash/heliofleet/blob/main/tests/validate.mjs"><code>tests/validate.mjs</code></a>) runs the page's own code against reference values from JPL Horizons and SunPy (<a href="https://github.com/sr-dash/heliofleet/blob/main/scripts/make_reference.py"><code>scripts/make_reference.py</code></a>). At the time of writing:</p>
+      <table>
+        <thead><tr><th>Check</th><th>Worst case</th><th>Limit</th></tr></thead>
+        <tbody>
+          <tr><td>Stonyhurst and Carrington coordinates vs SunPy (11 cases, 2010–2024)</td><td>0.0004°</td><td>0.005°</td></tr>
+          <tr><td>Sky-view directions vs SunPy helioprojective coordinates (20 cases, 4 observers)</td><td>0.008″</td><td>0.5″</td></tr>
+          <tr><td>Interpolation vs Horizons between samples: Earth, STEREO-A, L1 spacecraft</td><td>under 10 km</td><td>50 km</td></tr>
+          <tr><td>Interpolation: STEREO-B</td><td>63 km</td><td>130 km</td></tr>
+          <tr><td>Interpolation: Parker near perihelion, Solar Orbiter</td><td>350 km, 220 km</td><td>700 km, 450 km</td></tr>
+          <tr><td>Interpolation: BepiColombo during a Mercury flyby; MAVEN in Mars orbit</td><td>1,360 km; 5,200 km</td><td>2,800 km; 11,000 km</td></tr>
+        </tbody>
+      </table>
+      <p>For scale, 0.001° of heliographic longitude at 1 au is about 2,600 km, and 1 au is about 150 million km. The larger interpolation errors come from daily samples of a spacecraft moving fast around a planet; they are invisible on the map.</p>
+      <p>A separate check (<code>scripts/check_data.py</code>) runs on every change and before each monthly update is committed. It looks for missing files, gaps, impossible jumps, out-of-range distances and ephemerides that have stopped advancing. The page's research tools also print SunPy code that reproduces any exported coordinates.</p>
+    </section>
+
+    <section id="limits">
+      <h2>Known limits</h2>
+      <ul>
+        <li>Positions are geometric. Light time between a spacecraft and Earth is reported but not applied to positions; the Carrington longitude follows SunPy's Earth-observer convention.</li>
+        <li>Predicted trajectories, after each mission's last tracking data, are only as good as the mission's planning ephemeris.</li>
+        <li>STEREO-B has been out of contact since 2014-10-01 and MAVEN since 2025-12-06; their later positions are predictions, drawn faded and excluded from coverage and fields of view.</li>
+        <li>SDO is shown at Earth once its Horizons ephemeris ends, since it stays in geosynchronous orbit.</li>
+        <li>Heliospheric imager outlines are approximate (see <a href="#fov">Fields of view</a>), and the side each one looks to follows a fixed rule rather than the actual spacecraft roll.</li>
+        <li>CME fronts use DONKI's constant-speed cone model and are a guide to where a CME was heading, not a forecast.</li>
+        <li>Daylight windows at Haleakalā and Mauna Loa use a low-precision solar position (about 0.01°) and say nothing about weather or observing schedules.</li>
+        <li>Cryo-NIRSP footprints are the spatial bounds listed in the DKIST inventory, as rectangles in helioprojective coordinates.</li>
+      </ul>
+      <p>Found something that looks wrong? Please <a href="https://github.com/sr-dash/heliofleet/issues/new/choose">open an issue</a>.</p>
+    </section>
+  </main>
+
+  <footer class="colophon">
+    <p>Made by <a href="https://sr-dash.github.io/" rel="author">Dr. Soumyaranjan Dash</a> · <a href="./">HelioFleet map</a> · <a href="sky.html">Sky view</a> · <a href="https://github.com/sr-dash/heliofleet">Source on GitHub</a> · <a href="https://doi.org/10.5281/zenodo.23328187">Cite (DOI 10.5281/zenodo.23328187)</a></p>
+  </footer>
+</body>
+</html>

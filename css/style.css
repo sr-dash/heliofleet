@@ -677,6 +677,21 @@ tbody tr:hover td { background: var(--surface); }
   #inset { height: 170px; }
   .colophon { margin: 20px 16px 0; }
 }
+/* Methods page */
+.methods { max-width: 78ch; padding: 8px 28px 24px; line-height: 1.6; }
+.methods-toc { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 4px 0 8px; font: 500 13px "IBM Plex Mono", monospace; }
+.methods-toc a, .methods a { color: var(--accent); }
+.methods section { padding-top: 14px; border-top: 1px solid var(--line); margin-top: 18px; }
+.methods h2 { font: 700 22px "Big Shoulders Display", sans-serif; letter-spacing: 0.02em; text-transform: uppercase; margin: 0 0 8px; }
+.methods dt { font-weight: 600; margin-top: 10px; }
+.methods dd { margin: 2px 0 0; color: var(--muted); }
+.methods li { margin: 4px 0; }
+.methods table { border-collapse: collapse; width: 100%; font-size: 14px; margin: 10px 0; }
+.methods th, .methods td { text-align: left; padding: 6px 10px 6px 0; border-bottom: 1px solid var(--line); vertical-align: top; white-space: normal; overflow-wrap: break-word; }
+.methods th { font: 500 12px "IBM Plex Mono", monospace; color: var(--muted); }
+.methods code { font: 13px "IBM Plex Mono", monospace; }
+@media (max-width: 860px) { .methods { padding: 8px 16px 20px; } }
+
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }

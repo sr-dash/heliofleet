@@ -127,6 +127,7 @@ js/coverage.js           solar coverage strip
 js/instruments.js        coronagraph and imager fields of view
 js/helioviewer.js        Helioviewer.org layers and links
 sky.html, js/sky.js      sky view sub-page (Earth or a spacecraft)
+methods.html             methods, validation and known limits
 js/skyproj.js            plane-of-sky projection, ground sites, Sun altitude
 data/ground/cryonirsp.json  DKIST Cryo-NIRSP footprints
 scripts/fetch_ground.py  builds it from the Cryo-NIRSP viewer inventory
@@ -176,6 +177,7 @@ Brueckner et al. 1995, Solar Physics 162, 357 (LASCO); Howard et al. 2008, Space
 
 - After changing anything in `css/` or `js/`, run `python3 scripts/stamp_assets.py`. It gives every stylesheet and module a content-hashed URL, so visitors never run a mix of old and new files while browsers still hold cached copies.
 - The **Check** workflow runs on every push: JavaScript syntax, `scripts/check_i18n.py`, the asset stamps, that every data file parses, `scripts/check_data.py` and `tests/validate.mjs` (below).
+- **Methods page:** [methods.html](https://sr-dash.github.io/heliofleet/methods.html) describes the data, frames, derived quantities, searches, fields of view and sky view, with the validation results and known limits. Update its validation table when `tests/reference.json` changes.
 - **Accuracy:** `node tests/validate.mjs` runs the page's own code against reference values from JPL Horizons and SunPy in `tests/reference.json`: interpolation between stored samples, Stonyhurst and Carrington coordinates (within 0.005°; currently 0.0004°), and the sky-view projection (within 0.5″). `scripts/make_reference.py` rebuilds the reference values and needs astropy and sunpy.
 - **Data health:** `scripts/check_data.py` checks every series for missing files, gaps, impossible jumps, out-of-range distances and mismatches with the manifest, and flags missions whose ephemeris has stopped advancing. The monthly update commits nothing unless the new data pass this check and the accuracy test.
 - **Links:** the [Health check](.github/workflows/health.yml) workflow runs `scripts/check_links.py` and the data check on the 15th of each month. A failed update or health check opens an issue labelled `maintenance` (or comments on the open one).
