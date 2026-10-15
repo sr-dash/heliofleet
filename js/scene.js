@@ -8,7 +8,7 @@ import {
 } from './frames.js';
 import { BODIES, SPACECRAFT, PLANETS, L1_FLEET } from './catalog.js';
 import { activeCMEs } from './events.js';
-import { INSTRUMENT } from './instruments.js';
+import { INSTRUMENT, flyingAt, insColor, insLabel } from './instruments.js';
 import { tr } from './i18n.js';
 
 const jdOf = (iso) => Date.parse(iso) / 864e5 + 2440587.5;
@@ -187,7 +187,7 @@ export function buildScene(jd, s) {
     for (const id of s.fov) {
       const ins = INSTRUMENT[id];
       const b = ins && bodies.find((x) => x.key === ins.sc);
-      if (!b || b.st === 'lost' || s.hidden.has(ins.sc)) continue;
+      if (!b || b.st === 'lost' || s.hidden.has(ins.sc) || !flyingAt(ins, jd)) continue;
       const p = b.p;
       const rp = Math.hypot(p[0], p[1]);
       const u = [-p[0] / rp, -p[1] / rp]; // toward the Sun
@@ -216,7 +216,7 @@ export function buildScene(jd, s) {
         return pts.map((q) => xy(q));
       });
       const mid = sides[0] * (e0 + e1) / 2;
-      fovs.push({ id, sc: ins.sc, label: `${BODIES[ins.sc].short} ${ins.name}`, polys, at: xy(ray(mid, Math.min(L, 0.45 + 0.4 * b.dist))) });
+      fovs.push({ id, sc: ins.sc, color: insColor(ins), label: insLabel(ins, BODIES[ins.sc].short), polys, at: xy(ray(mid, Math.min(L, 0.45 + 0.4 * b.dist))) });
     }
   }
 

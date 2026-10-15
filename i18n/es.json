@@ -479,5 +479,18 @@
  "Parker-spiral footpoint of {name} at {v} km/s": "Punto de anclaje de la espiral de Parker de {name} a {v} km/s",
  "The background is the SDO/HMI synoptic radial magnetic field, lightly smoothed (blue negative, red positive, fixed at ±20 G). The dark curve is Earth’s limb and the dashed curves are the limbs of other spacecraft with a solar-disk imager; rings are Parker-spiral footpoints at the chosen solar-wind speed. Hover to grey out Earth’s far side, or another spacecraft’s by pointing at its limb or disk centre; click to mark a point.": "El fondo es el campo magnético radial sinóptico de SDO/HMI, ligeramente suavizado (azul negativo, rojo positivo, fijo en ±20 G). La curva oscura es el limbo de la Tierra y las curvas discontinuas son los limbos de otras naves con un generador de imágenes del disco solar; los anillos son los puntos de anclaje de la espiral de Parker a la velocidad del viento solar elegida. Pasa el cursor para oscurecer la cara oculta de la Tierra, o la de otra nave señalando su limbo o el centro de su disco; haz clic para marcar un punto.",
  "Near side of {name}": "Cara visible desde {name}",
- "Far side of {name} (shaded)": "Cara oculta para {name} (sombreada)"
+ "Far side of {name} (shaded)": "Cara oculta para {name} (sombreada)",
+ "Clear the point": "Quitar el punto",
+ "Click the plane of the sky to mark a point; every instrument whose field contains it is listed here.": "Haz clic en el plano del cielo para marcar un punto; aquí aparece cada instrumento cuyo campo lo contiene.",
+ "Earth orbit": "Órbita terrestre",
+ "In no field of view": "En ningún campo de visión",
+ "In the field of {list}": "En el campo de {list}",
+ "Marked point": "Punto marcado",
+ "Point at {r} R☉ from Sun centre on this plane of the sky ({n} of {m} instruments see it).": "Punto a {r} R☉ del centro del Sol en este plano del cielo ({n} de {m} instrumentos lo ven).",
+ "Who sees this point": "Quién ve este punto",
+ "behind the Sun as seen from it": "detrás del Sol visto desde allí",
+ "in its field": "en su campo",
+ "outside its field ({range})": "fuera de su campo ({range})",
+ "outside its footprint": "fuera de su huella",
+ "{r} R☉ from Sun centre": "a {r} R☉ del centro del Sol"
 }

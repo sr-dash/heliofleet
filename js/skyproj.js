@@ -20,6 +20,10 @@ const unit = (a) => mul(a, 1 / norm(a));
 export const SKY_SHAPES = {
   c2: { type: 'annulus' }, c3: { type: 'annulus' }, cor2a: { type: 'annulus' },
   cor2b: { type: 'annulus' }, metis: { type: 'annulus' },
+  cor1a: { type: 'annulus' }, cor1b: { type: 'annulus' }, velc: { type: 'annulus' }, ccor1: { type: 'annulus' },
+  ccor2: { type: 'annulus' }, aspiics: { type: 'annulus' }, nfi: { type: 'annulus' },
+  // PUNCH's three WFI cameras together cover all position angles
+  wfi: { type: 'annulus' },
   hi1a: { type: 'square', centre: 14, half: 10 }, hi1b: { type: 'square', centre: 14, half: 10 },
   hi2a: { type: 'circle', centre: 53.7, radius: 35 }, hi2b: { type: 'circle', centre: 53.7, radius: 35 },
   solohi: { type: 'circle', centre: 25, radius: 20, cut: 5.4 },
@@ -80,33 +84,70 @@ function dirAt(B, eps, psi) {
   return unit(add(mul(B.u, Math.cos(e)), mul(add(mul(B.w, Math.cos(p)), mul(B.v, Math.sin(p))), Math.sin(e))));
 }
 
-// Grid of sky directions covering one instrument's field: rows x cols of
-// unit vectors, so neighbouring cells can be drawn as quadrilaterals.
-export function fovGrid(ins, shape, P, sideSign, dist) {
+// The frame of one instrument's field: its sky basis and shape parameters.
+// Annuli are elongation ranges; squares and circles are centred on c, with
+// a (toward larger elongation) and b completing an orthonormal set.
+export function fovFrame(ins, shape, P, sideSign, dist) {
   const B = skyBasis(P);
   const toDeg = (v) => (ins.unit === 'rs' ? Math.atan((v * R_SUN_AU) / dist) / D : v);
-  if (shape.type === 'annulus') {
-    const e0 = toDeg(ins.inner);
-    const e1 = toDeg(ins.outer);
-    return grid(10, 72, (i, j) => dirAt(B, e0 + ((e1 - e0) * i) / 10, (360 * j) / 72));
-  }
+  if (shape.type === 'annulus') return { B, type: 'annulus', e0: toDeg(ins.inner), e1: toDeg(ins.outer) };
   // Field centre, offset to the chosen side and in latitude
   const psi0 = sideSign > 0 ? 0 : 180;
   const c0 = dirAt(B, shape.centre, psi0);
   const c = shape.lat ? unit(add(mul(c0, Math.cos(shape.lat * D)), mul(B.v, Math.sin(shape.lat * D)))) : c0;
-  const a = unit(sub(dirAt(B, shape.centre + 1, psi0), c)); // toward larger elongation
+  const a0 = sub(dirAt(B, shape.centre + 1, psi0), c);
+  const a = unit(sub(a0, mul(c, dot(a0, c))));
   const b = cross(c, a);
-  const cut = (d) => (shape.cut && Math.acos(Math.min(1, dot(d, B.u))) / D < shape.cut ? null : d);
-  if (shape.type === 'square') {
-    const h = Math.tan(shape.half * D);
-    return grid(24, 24, (i, j) => cut(unit(add(c, add(mul(a, h * (2 * i / 24 - 1)), mul(b, h * (2 * j / 24 - 1)))))));
+  const f = { B, type: shape.type, c, a, b, cut: shape.cut ?? 0 };
+  if (shape.type === 'square') f.h = Math.tan(shape.half * D);
+  else f.r = shape.radius * D;
+  return f;
+}
+
+// Whether the unit direction d lies in the field
+export function inField(f, d) {
+  const elong = Math.acos(Math.max(-1, Math.min(1, dot(d, f.B.u)))) / D;
+  if (f.type === 'annulus') return elong >= f.e0 && elong <= f.e1;
+  if (f.cut && elong < f.cut) return false;
+  const dc = dot(d, f.c);
+  if (f.type === 'square') return dc > 0 && Math.abs(dot(d, f.a) / dc) <= f.h && Math.abs(dot(d, f.b) / dc) <= f.h;
+  return Math.acos(Math.max(-1, Math.min(1, dc))) <= f.r;
+}
+
+// Grid of sky directions covering one instrument's field: rows x cols of
+// unit vectors, so neighbouring cells can be drawn as quadrilaterals.
+export function fovGrid(ins, shape, P, sideSign, dist) {
+  const f = fovFrame(ins, shape, P, sideSign, dist);
+  const B = f.B;
+  if (f.type === 'annulus') {
+    return grid(10, 72, (i, j) => dirAt(B, f.e0 + ((f.e1 - f.e0) * i) / 10, (360 * j) / 72));
   }
-  const r = shape.radius * D;
+  const { c, a, b } = f;
+  const cut = (d) => (f.cut && Math.acos(Math.min(1, dot(d, B.u))) / D < f.cut ? null : d);
+  if (f.type === 'square') {
+    return grid(24, 24, (i, j) => cut(unit(add(c, add(mul(a, f.h * (2 * i / 24 - 1)), mul(b, f.h * (2 * j / 24 - 1)))))));
+  }
   return grid(16, 48, (i, j) => {
-    const al = (r * i) / 16;
+    const al = (f.r * i) / 16;
     const be = (2 * Math.PI * j) / 48;
     return cut(unit(add(mul(c, Math.cos(al)), mul(add(mul(a, Math.cos(be)), mul(b, Math.sin(be))), Math.sin(al)))));
   });
+}
+
+// How an observer at P sees the heliocentric point X: elongation (deg) from
+// Sun centre, position angle (deg, from solar north toward east) and
+// whether the Sun hides it
+export function viewOf(P, X) {
+  const d = unit(sub(X, P));
+  const ax = earthSkyAxes(P);
+  const elong = Math.acos(Math.max(-1, Math.min(1, -dot(d, ax.e)))) / D;
+  const pa = ((Math.atan2(-dot(d, ax.west), dot(d, ax.north)) / D) + 360) % 360;
+  // Closest approach of the line of sight to Sun centre, before reaching X
+  const t = -dot(P, d);
+  const reach = norm(sub(X, P));
+  const closest = norm(add(P, mul(d, t)));
+  const hidden = norm(X) < R_SUN_AU || (t > 0 && t < reach && closest < R_SUN_AU);
+  return { d, elong, pa, hidden };
 }
 
 function grid(n, m, f) {

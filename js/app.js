@@ -17,7 +17,7 @@ import {
   coverageRows, coverageSummary, coverageNote,
   drawSurface, surfaceHeight, loadSynopticIndex, synopticFor, loadSynoptic, fieldAt, seenBy, surfaceFeet, isVisible,
 } from './coverage.js';
-import { INSTRUMENTS, INSTRUMENT } from './instruments.js';
+import { INSTRUMENTS, INSTRUMENT, insShort } from './instruments.js';
 import { hvUrl, defaultLayer } from './helioviewer.js';
 import {
   LANGUAGES, detectLang, loadLang, lang, saveLang, tr, translatePage,
@@ -643,7 +643,7 @@ function buildFovList() {
     const row = document.createElement('div');
     row.className = 'fov-group';
     row.style.setProperty('--c', `var(--c-${sc})`);
-    row.innerHTML = `<span class="fov-sc">${BODIES[sc].short}</span>${INSTRUMENTS.filter((i) => i.sc === sc).map((i) => `<label><input type="checkbox" value="${i.id}"${S.fov.has(i.id) ? ' checked' : ''}>${i.name}</label>`).join('')}`;
+    row.innerHTML = `<span class="fov-sc">${sc === 'earth' ? tr('Earth orbit') : BODIES[sc].short}</span>${INSTRUMENTS.filter((i) => i.sc === sc).map((i) => `<label><input type="checkbox" value="${i.id}"${S.fov.has(i.id) ? ' checked' : ''}>${insShort(i)}</label>`).join('')}`;
     box.appendChild(row);
   }
   box.addEventListener('change', (e) => {

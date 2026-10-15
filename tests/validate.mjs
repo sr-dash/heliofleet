@@ -104,6 +104,48 @@ const reserved = parseFloat(css.match(/#ribbon \{[^}]*height: ([\d.]+)px/)[1]);
 const drawn = 42 + 11.5 * (SPACECRAFT.length - 1) + 20 + 16 + 16;
 report('timeline height reserved in css/style.css', Math.abs(reserved - drawn), 0.5, 'px', `reserved ${reserved}, drawn ${drawn}`);
 
+// 6. "Who sees this point": the field test agrees with the drawn outlines,
+// and position angles and occultation behave as on a solar image
+{
+  const { INSTRUMENTS } = await import('../js/instruments.js');
+  const { SKY_SHAPES, fovFrame, fovGrid, inField, viewOf } = await import('../js/skyproj.js');
+  const { earthSkyAxes, R_SUN_AU } = await import('../js/frames.js');
+  const P = [0.9, 0.35, 0.02];
+  const dist = norm(P);
+  let bad = 0;
+  let n = 0;
+  for (const ins of INSTRUMENTS) {
+    for (const side of [1, -1]) {
+      const shape = SKY_SHAPES[ins.id];
+      const f = fovFrame(ins, shape, P, side, dist);
+      const g = fovGrid(ins, shape, P, side, dist);
+      // Interior cells of the grid (away from the edges) must test inside
+      for (let i = 1; i < g.length - 1; i++) {
+        for (let j = 1; j < g[i].length - 1; j++) {
+          if (!g[i][j]) continue;
+          n++;
+          if (!inField(f, g[i][j])) bad++;
+        }
+      }
+      // A direction well past the outer edge must test outside
+      if (f.type === 'annulus') {
+        const out = viewOf(P, [0, 0, 0]).d; // Sun centre: inside no annulus
+        n++;
+        if (inField(f, out)) bad++;
+      }
+    }
+  }
+  report('field test matches drawn fields (bad cells)', bad, 0, '', `${n} directions`);
+  const e = [0.98, 0.17, 0];
+  const ax = earthSkyAxes(e);
+  const at = (v, r) => v.map((c) => c * r * R_SUN_AU);
+  const paN = viewOf(e, at(ax.north, 3)).pa;
+  const paE = viewOf(e, at(ax.west.map((c) => -c), 3)).pa;
+  const behind = viewOf(e, at(ax.e.map((c) => -c), 5)).hidden;
+  const ok = Math.abs(((paN + 180) % 360) - 180) < 0.01 && Math.abs(paE - 90) < 0.01 && behind;
+  report('position angle and occultation', ok ? 0 : 1, 0, '', `north ${paN.toFixed(2)}°, east ${paE.toFixed(2)}°, behind ${behind}`);
+}
+
 if (failed) {
   console.log(`${failed} check(s) failed`);
   process.exit(1);

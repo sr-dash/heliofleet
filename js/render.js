@@ -197,7 +197,7 @@ export function drawMap(ctx, W, H, scene, s, th, view, opts = {}) {
   // Instrument fields of view: faint wedges in the spacecraft's colour
   const fovLabels = [];
   for (const f of scene.fovs ?? []) {
-    const col = th.color[f.sc];
+    const col = th.color[f.color ?? f.sc];
     for (const poly of f.polys) {
       ctx.beginPath();
       poly.forEach((q, i) => { const [x, y] = map(q); if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y); });

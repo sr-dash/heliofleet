@@ -41,7 +41,7 @@
   <!-- Fonts load without holding up the first paint; text shows in the fallback font until they arrive -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap"></noscript>
-  <link rel="stylesheet" href="css/style.css?v=1d90c91e63">
+  <link rel="stylesheet" href="css/style.css?v=39bca52958">
   <script>
     try {
       const q = new URLSearchParams(location.search);
@@ -155,9 +155,16 @@
           <tr><td>Solar Orbiter Metis</td><td>1.6–2.9°</td><td>Antonucci et al. 2020, A&amp;A 642, A10</td></tr>
           <tr><td>Solar Orbiter SoloHI</td><td>5.4–44.9°</td><td>Howard et al. 2020, A&amp;A 642, A13</td></tr>
           <tr><td>Parker WISPR-I / WISPR-O</td><td>13.5–53° / 50–108°</td><td>Vourlidas et al. 2016, Space Sci. Rev. 204, 83</td></tr>
+          <tr><td>STEREO COR1</td><td>1.4–4 R<sub>☉</sub></td><td>Thompson et al. 2003, Proc. SPIE 4853, 1</td></tr>
+          <tr><td>Aditya-L1 VELC (imaging)</td><td>1.05–3 R<sub>☉</sub></td><td>Singh et al. 2025, arXiv:2503.21184</td></tr>
+          <tr><td>SWFO-L1 CCOR-2</td><td>3–22 R<sub>☉</sub></td><td>NOAA NCEI</td></tr>
+          <tr><td>Proba-3 ASPIICS</td><td>1.1–3 R<sub>☉</sub></td><td>ESA / SIDC</td></tr>
+          <tr><td>GOES-19 CCOR-1</td><td>3.7–17 R<sub>☉</sub></td><td>NOAA SWPC</td></tr>
+          <tr><td>PUNCH NFI / WFI</td><td>1.5–8° / 3–45°</td><td>DeForest et al. 2025, arXiv:2509.15131</td></tr>
           <tr><td>MLSO K-Cor / UCoMP</td><td>1.05–3 / 1.05–2 R<sub>☉</sub></td><td>High Altitude Observatory</td></tr>
         </tbody>
       </table>
+      <p>Proba-3, GOES-19 and PUNCH are in Earth orbit and are drawn from Earth's position, which makes no visible difference at coronal scales. Each instrument is drawn only from its launch date. ASPIICS has a square field reaching 4.2 R<sub>☉</sub> in its corners and PUNCH WFI is three cameras round the Sun; both are drawn as annuli of the quoted range.</p>
       <p>In two dimensions (the sky view), coronagraphs are annuli. Heliospheric imagers are modelled as fields of their published size: HI-1 a 20° square, HI-2 a 70° circle, SoloHI a 40° circle with the inner 5.4° removed, WISPR-I a 40° and WISPR-O a 58° square, both tilted 10° south. These outlines are approximate; roll angles and detector shapes are not modelled.</p>
     </section>
 
@@ -170,6 +177,7 @@
         <li>MLSO rings and DKIST Cryo-NIRSP footprints are traced from Earth. Footprints are stored in helioprojective coordinates (Tx, Ty), which are converted to exact sky directions from Earth (Tx toward solar west, Ty toward solar north, measured from Sun centre). From another observer, they show where Earth's lines of sight cross that observer's plane, not where the light originated.</li>
         <li>The Sun is drawn at the size the observer sees it: on the plane, the limb lies at 1 / √(1 − (R<sub>☉</sub>/r)²) solar radii.</li>
       </ul>
+      <p><b>Who sees this point.</b> A clicked point is taken on the observer's plane of the sky. For each instrument the page follows the line of sight from its spacecraft to the point and reports the elongation, the equivalent distance from Sun centre in that instrument's sky, and the position angle measured from solar north toward east, as on a solar image. The point is hidden when the line of sight passes within one solar radius of Sun centre before reaching it. It is in an instrument's field when that line of sight lies in the field as drawn; a check confirms that every direction inside each drawn field passes this test. Cryo-NIRSP footprints are tested in helioprojective coordinates from Earth.</p>
       <p>The plane of the sky is a construction for comparing fields of view: features are not confined to it, and a structure in front of or behind the plane appears elsewhere in each instrument's image.</p>
     </section>
 

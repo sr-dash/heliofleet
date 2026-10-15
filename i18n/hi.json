@@ -479,5 +479,18 @@
  "Parker-spiral footpoint of {name} at {v} km/s": "{v} km/s पर {name} का पार्कर-सर्पिल पादबिंदु",
  "The background is the SDO/HMI synoptic radial magnetic field, lightly smoothed (blue negative, red positive, fixed at ±20 G). The dark curve is Earth’s limb and the dashed curves are the limbs of other spacecraft with a solar-disk imager; rings are Parker-spiral footpoints at the chosen solar-wind speed. Hover to grey out Earth’s far side, or another spacecraft’s by pointing at its limb or disk centre; click to mark a point.": "पृष्ठभूमि SDO/HMI का सिनॉप्टिक रेडियल चुंबकीय क्षेत्र है, हल्का समतल किया हुआ (नीला ऋणात्मक, लाल धनात्मक, ±20 G पर स्थिर)। गहरा वक्र पृथ्वी का लिंब है और धराशायी वक्र सौर-चक्र इमेजर वाले अन्य अंतरिक्ष यानों के लिंब हैं; वलय चुनी गई सौर पवन गति पर पार्कर-सर्पिल पादबिंदु हैं। पृथ्वी का दूर का भाग धूसर करने के लिए होवर करें, या किसी अन्य यान का, उसके लिंब या चक्र-केंद्र पर संकेत करके; किसी बिंदु को चिह्नित करने के लिए क्लिक करें।",
  "Near side of {name}": "{name} की ओर का भाग",
- "Far side of {name} (shaded)": "{name} से छिपा भाग (धूसर)"
+ "Far side of {name} (shaded)": "{name} से छिपा भाग (धूसर)",
+ "Clear the point": "बिंदु हटाएँ",
+ "Click the plane of the sky to mark a point; every instrument whose field contains it is listed here.": "कोई बिंदु चिह्नित करने के लिए आकाश-तल पर क्लिक करें; जिन उपकरणों के क्षेत्र में वह है, वे यहाँ सूचीबद्ध होंगे।",
+ "Earth orbit": "पृथ्वी कक्षा",
+ "In no field of view": "किसी दृष्टि-क्षेत्र में नहीं",
+ "In the field of {list}": "{list} के क्षेत्र में",
+ "Marked point": "चिह्नित बिंदु",
+ "Point at {r} R☉ from Sun centre on this plane of the sky ({n} of {m} instruments see it).": "इस आकाश-तल पर सूर्य केंद्र से {r} R☉ पर बिंदु ({m} में से {n} उपकरण इसे देखते हैं)।",
+ "Who sees this point": "यह बिंदु कौन देखता है",
+ "behind the Sun as seen from it": "वहाँ से देखने पर सूर्य के पीछे",
+ "in its field": "इसके क्षेत्र में",
+ "outside its field ({range})": "इसके क्षेत्र ({range}) के बाहर",
+ "outside its footprint": "इसके फ़ुटप्रिंट के बाहर",
+ "{r} R☉ from Sun centre": "सूर्य केंद्र से {r} R☉"
 }

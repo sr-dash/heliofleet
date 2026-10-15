@@ -680,6 +680,14 @@ tbody tr:hover td { background: var(--surface); }
   #inset { height: 170px; }
   .colophon { margin: 20px 16px 0; }
 }
+/* Who sees this point (sky view) */
+.pt-list { list-style: none; margin: 8px 0; padding: 0; display: grid; gap: 6px; font-size: 13px; }
+.pt-list li { display: grid; grid-template-columns: 12px 1fr; column-gap: 8px; align-items: baseline; }
+.pt-list li span:last-child { grid-column: 2; color: var(--muted); font: 12px "IBM Plex Mono", monospace; }
+.pt-list b { font-weight: 600; }
+.pt-sw { width: 10px; height: 10px; border-radius: 2px; background: var(--c); align-self: center; }
+.pt-list .pt-out, .pt-list .pt-hidden { opacity: 0.6; }
+
 /* Methods page */
 .methods { max-width: 78ch; padding: 8px 28px 24px; line-height: 1.6; }
 .methods-toc { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 4px 0 8px; font: 500 13px "IBM Plex Mono", monospace; }
