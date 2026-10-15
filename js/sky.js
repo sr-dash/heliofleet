@@ -207,13 +207,15 @@ function draw(ctx, W, H) {
   const sky = makeSky(obs.p);
   const earth = scene.earth;
   const labels = [];
+  // Text grows with the canvas so labels stay readable on large screens and in snapshots
+  const tk = Math.min(1.45, Math.max(1, Math.min(W, H) / 560));
   drawn = { fov: [], ground: [], cryo: [], bodies: [] };
 
   // Radial grid in solar radii, and the compass of a solar image
   ctx.strokeStyle = theme.grid;
   ctx.fillStyle = theme.muted;
   ctx.lineWidth = 1;
-  ctx.font = `10.5px ${MONO}`;
+  ctx.font = `${10.5 * tk}px ${MONO}`;
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'left';
   let lastLabel = -Infinity;
@@ -225,7 +227,7 @@ function draw(ctx, W, H) {
     ctx.fillText(r === 215 ? '1 au' : `${r} R☉`, ox + r * ppr * 0.71 + 4, oy - r * ppr * 0.71);
     lastLabel = r * ppr;
   }
-  ctx.font = `600 12px ${FONT}`;
+  ctx.font = `600 ${12 * tk}px ${FONT}`;
   ctx.textAlign = 'center';
   ctx.fillStyle = theme.muted;
   ctx.fillText(tr('N'), W / 2, 14);
@@ -249,7 +251,7 @@ function draw(ctx, W, H) {
     const col = theme.color[insColor(ins)];
     const at = drawMesh(ctx, map, pts, col, SKY_SHAPES[id].type === 'annulus', 0.13, [W, H]);
     drawn.fov.push({ ins, b, col, shown: pts.some((r) => r.some(Boolean)) });
-    if (at) { const [x, y] = map(at); labels.push({ text: insLabel(ins, BODIES[ins.sc].short), x, y, r: 2, size: 11, color: col }); }
+    if (at) { const [x, y] = map(at); labels.push({ text: insLabel(ins, BODIES[ins.sc].short), x, y, r: 2, size: 11 * tk, color: col }); }
   }
 
   // Ground-based coronagraphs (MLSO), traced from Earth
@@ -259,7 +261,7 @@ function draw(ctx, W, H) {
     const gp = trace(earth, grid);
     const at = drawMesh(ctx, map, gp, theme.color.earth, true, 0.375, [W, H]);
     drawn.ground.push({ g, shown: gp.some((r) => r.some(Boolean)) });
-    if (at) { const [x, y] = map(at); labels.push({ text: g.name, x, y, r: 2, size: 11, color: theme.color.earth }); }
+    if (at) { const [x, y] = map(at); labels.push({ text: g.name, x, y, r: 2, size: 11 * tk, color: theme.color.earth }); }
   }
 
   // Sun, at the size this observer sees it
@@ -294,7 +296,7 @@ function draw(ctx, W, H) {
         // Datasets taken together on the same spot share one label
         const near = labels.find((l) => l.cryo && Math.hypot(l.x - px, l.y - py) < 12);
         if (near) near.text += `, ${d.id}`;
-        else labels.push({ text: `Cryo-NIRSP ${d.id}`, x: px, y: py, r: 3, size: 11, color: theme.accent, cryo: true });
+        else labels.push({ text: `Cryo-NIRSP ${d.id}`, x: px, y: py, r: 3, size: 11 * tk, color: theme.accent, cryo: true });
       }
     }
   }
@@ -342,12 +344,12 @@ function draw(ctx, W, H) {
     ctx.globalAlpha = 1;
     const text = behind ? tr('{name} (behind)', { name }) : inside ? name : `${name} →`;
     drawn.bodies.push({ b, name, col, where: behind ? 'behind' : inside ? 'in' : 'edge' });
-    labels.push({ text, x, y, r: 7, size: 12, color: col, bold: true });
+    labels.push({ text, x, y, r: 7, size: 12 * tk, color: col, bold: true });
   }
 
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
-  ctx.font = `600 12px ${FONT}`;
+  ctx.font = `600 ${12 * tk}px ${FONT}`;
   for (const l of placeLabels(ctx, labels, W, H)) {
     ctx.font = `${l.bold ? 600 : 500} ${l.size}px ${FONT}`;
     ctx.fillStyle = theme.bg;

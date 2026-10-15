@@ -148,7 +148,9 @@ function paint() {
   const [ctx, w, h] = fit(map);
   const fig = inset.parentElement;
   const avoid = [{ x: fig.offsetLeft - 4, y: fig.offsetTop - 4, w: fig.offsetWidth + 8, h: fig.offsetHeight + 8 }];
-  mapHits = drawMap(ctx, w, h, scene, S, theme, S, { reserve: reserve(), avoid }) ?? [];
+  // Text grows with the map so labels stay readable on large screens
+  const k = Math.min(1.4, Math.max(1, Math.min(w, h) / 600));
+  mapHits = drawMap(ctx, w, h, scene, S, theme, S, { reserve: reserve(), avoid, k }) ?? [];
   const [ictx, iw, ih] = fit(inset);
   insetHits = drawInset(ictx, iw, ih, scene, S, theme) ?? [];
   paintCoverage();
@@ -186,8 +188,8 @@ async function paintCoverage() {
   if (!scene || scene.jd !== jd) return; // a newer moment is already on its way
   const rows = coverageRows(scene, S.hidden);
   const sum = coverageSummary(rows);
-  // Text and markers shrink a little on narrow screens
-  const k = Math.min(1, Math.max(0.72, cv.clientWidth / 760));
+  // Text and markers scale with the map: smaller on phones, larger on wide screens
+  const k = Math.min(1.6, Math.max(0.75, cv.clientWidth / 640));
   cv.style.height = `${surfaceHeight(cv.clientWidth, k)}px`;
   const [ctx, w, h] = fit(cv);
   const L0 = scene.bodies[0].carr;

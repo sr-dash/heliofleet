@@ -34,7 +34,7 @@ export async function composeSnapshot(scene, s, th, view, meta) {
   await document.fonts.ready;
   const covRows = coverageRows(scene, s.hidden);
   const covSum = coverageSummary(covRows);
-  const covH = surfaceHeight(W - 40);
+  const covH = surfaceHeight(W - 40, 1.5);
   const synMeta = synopticFor(scene.jd);
   const synMap = await loadSynoptic(synMeta);
   const HT = H + 34 + covH + 44; // map section, then the solar surface map
@@ -53,7 +53,7 @@ export async function composeSnapshot(scene, s, th, view, meta) {
   ctx.beginPath();
   ctx.roundRect(0, 0, M, M, 12);
   ctx.clip();
-  drawMap(ctx, M, M, scene, s, th, view);
+  drawMap(ctx, M, M, scene, s, th, view, { k: 1.3 });
   ctx.restore();
   ctx.strokeStyle = th.line;
   ctx.lineWidth = 1;
@@ -203,7 +203,7 @@ export async function composeSnapshot(scene, s, th, view, meta) {
   ctx.beginPath();
   ctx.roundRect(0, 0, W - 40, covH, 10);
   ctx.clip();
-  drawSurface(ctx, W - 40, covH, covRows, th, { sys, L0, map: synMap, meta: synMeta, spot, feet: surfaceFeet(scene, s.hidden, L0) });
+  drawSurface(ctx, W - 40, covH, covRows, th, { sys, L0, map: synMap, meta: synMeta, spot, feet: surfaceFeet(scene, s.hidden, L0), k: 1.5 });
   ctx.restore();
   ctx.fillStyle = th.muted;
   ctx.font = `400 12px ${SANS}`;
