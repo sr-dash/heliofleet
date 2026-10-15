@@ -4,7 +4,7 @@
 import { drawMap, drawInset } from './render.js';
 import { BODIES } from './catalog.js';
 import { tr } from './i18n.js';
-import { coverageRows, coverageSummary, drawCoverage, coverageHeight, coverageNote } from './coverage.js';
+import { coverageRows, coverageSummary, coverageNote, drawSurface, surfaceHeight, synopticFor, loadSynoptic } from './coverage.js';
 
 const W = 1200;
 const H = 820;
@@ -34,8 +34,10 @@ export async function composeSnapshot(scene, s, th, view, meta) {
   await document.fonts.ready;
   const covRows = coverageRows(scene, s.hidden);
   const covSum = coverageSummary(covRows);
-  const covH = coverageHeight(covRows.length);
-  const HT = H + 34 + covH + 44; // map section, then the coverage strip
+  const covH = surfaceHeight(W - 40);
+  const synMeta = synopticFor(scene.jd);
+  const synMap = await loadSynoptic(synMeta);
+  const HT = H + 34 + covH + 44; // map section, then the solar surface map
   const cv = document.createElement('canvas');
   cv.width = W * SCALE;
   cv.height = HT * SCALE;
@@ -187,11 +189,10 @@ export async function composeSnapshot(scene, s, th, view, meta) {
   ctx.fillText(`${tr('Ephemerides: JPL Horizons')}${meta.stamp ? ` (${tr('updated {date}', { date: meta.stamp })})` : ''} · ${tr('HGS/Carrington from Earth')}`, X, H - 38, CW);
   ctx.fillText('sr-dash.github.io/heliofleet', X, H - 22);
 
-  // Solar coverage strip
+  // Solar surface map
   const L0 = scene.bodies[0].carr;
   const sys = s.covsys ?? 'stonyhurst';
-  let spotLon = null;
-  if (s.spot) spotLon = s.spot.sys === 'carrington' ? (((s.spot.lon - L0 + 180) % 360 + 360) % 360) - 180 : s.spot.lon;
+  const spot = s.spot ? { carr: s.spot.sys === 'carrington' ? s.spot.lon : (((s.spot.lon + L0) % 360) + 360) % 360, lat: s.spot.lat } : null;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
   ctx.fillStyle = th.muted;
@@ -202,11 +203,11 @@ export async function composeSnapshot(scene, s, th, view, meta) {
   ctx.beginPath();
   ctx.roundRect(0, 0, W - 40, covH, 10);
   ctx.clip();
-  drawCoverage(ctx, W - 40, covH, covRows, covSum, th, { sys, L0, spotLon });
+  drawSurface(ctx, W - 40, covH, covRows, th, { sys, L0, map: synMap, meta: synMeta, spot });
   ctx.restore();
   ctx.fillStyle = th.muted;
   ctx.font = `400 12px ${SANS}`;
-  wrapText(ctx, coverageNote(covSum, sys, L0, false).replace(/<[^>]+>/g, ''), 20, H + 32 + covH + 18, W - 40, 15);
+  wrapText(ctx, `${coverageNote(covSum, sys, L0, false).replace(/<[^>]+>/g, '')} ${tr('Magnetogram: SDO/HMI synoptic radial field, colours fixed at ±20 G. Curves are the limbs of observers with a solar-disk imager; the dark curve is Earth’s.')}`, 20, H + 32 + covH + 18, W - 40, 15);
   return cv;
 }
 

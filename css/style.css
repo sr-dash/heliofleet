@@ -491,11 +491,14 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .card-links a::after { content: " ↗"; color: var(--muted); }
 
 /* ---------- solar coverage strip ---------- */
-.coverage { margin-top: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px 12px; }
+.coverage { position: relative; margin-top: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px 12px; }
 .coverage-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 14px; margin-bottom: 8px; }
 .coverage-head .panel-title { margin: 0; }
 .coverage-head .seg { min-width: 220px; }
 #coverage { display: block; width: 100%; cursor: crosshair; }
+.surf-tip { position: absolute; z-index: 5; pointer-events: none; max-width: 340px; padding: 8px 10px; border-radius: 8px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); font-size: 12.5px; line-height: 1.45; }
+.surf-tip b { display: block; font-weight: 600; color: var(--ink); }
+.surf-tip span { display: block; color: var(--muted); }
 .coverage-note { margin: 8px 0 0; color: var(--muted); font-size: 13px; max-width: 95ch; }
 .coverage-note b { color: var(--ink); font-weight: 600; }
 .coverage.flash { box-shadow: 0 0 0 2px var(--accent); transition: box-shadow 0.3s; }

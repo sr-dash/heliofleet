@@ -14,7 +14,8 @@ import { ALIGN_KINDS } from './tools.js';
 import { initWorkbench } from './workbench.js';
 import { initCards } from './cards.js';
 import {
-  coverageRows, coverageSummary, drawCoverage, coverageHeight, coverageNote,
+  coverageRows, coverageSummary, coverageNote,
+  drawSurface, surfaceHeight, loadSynopticIndex, synopticFor, loadSynoptic, fieldAt, seenBy,
 } from './coverage.js';
 import { INSTRUMENTS, INSTRUMENT } from './instruments.js';
 import { hvUrl, defaultLayer } from './helioviewer.js';
@@ -169,18 +170,52 @@ function allHits() {
 // ---------- solar coverage ----------
 const wrap360 = (a) => ((a % 360) + 360) % 360;
 const wrap180 = (a) => ((((a + 180) % 360) + 360) % 360) - 180;
-function paintCoverage() {
+let covHover = null; // { carr, lat } under the pointer
+let synIndex = null;
+function spotCarr(L0) {
+  if (!S.spot) return null;
+  return { carr: S.spot.sys === 'carrington' ? S.spot.lon : wrap360(S.spot.lon + L0), lat: S.spot.lat };
+}
+async function paintCoverage() {
   const cv = $('coverage');
   if (!scene || !cv?.clientWidth) return;
+  const jd = scene.jd;
+  const meta = synopticFor(jd);
+  const map = await loadSynoptic(meta);
+  if (!scene || scene.jd !== jd) return; // a newer moment is already on its way
   const rows = coverageRows(scene, S.hidden);
   const sum = coverageSummary(rows);
-  cv.style.height = `${coverageHeight(rows.length)}px`;
+  cv.style.height = `${surfaceHeight(cv.clientWidth)}px`;
   const [ctx, w, h] = fit(cv);
   const L0 = scene.bodies[0].carr;
-  let spotLon = null;
-  if (S.spot) spotLon = S.spot.sys === 'carrington' ? wrap180(S.spot.lon - L0) : S.spot.lon;
-  covGeom = { ...drawCoverage(ctx, w, h, rows, sum, theme, { sys: S.covsys, L0, spotLon, highlight: covHighlight }), L0 };
+  const future = !meta && !!synIndex && jd > (synIndex.daily?.t1 ?? Infinity);
+  covGeom = { ...drawSurface(ctx, w, h, rows, theme, { sys: S.covsys, L0, map, meta, future, spot: spotCarr(L0), hover: covHover, highlight: covHighlight }), L0, map };
   $('coverage-note').innerHTML = coverageNote(sum, S.covsys, L0);
+}
+// Readout for the point under the pointer
+function coverageTip(e) {
+  const tip = $('surf-tip');
+  const cv = $('coverage');
+  if (!covGeom || !scene) { tip.hidden = true; return; }
+  const r = cv.getBoundingClientRect();
+  const p = covGeom.at(e.clientX - r.left, e.clientY - r.top);
+  covHover = p;
+  paintCoverage();
+  if (!p) { tip.hidden = true; return; }
+  const stony = wrap180(p.carr - covGeom.L0);
+  const B = fieldAt(covGeom.map, p.carr, p.lat);
+  const who = seenBy(covGeom.obs, p.carr, p.lat);
+  const near = who.some((o) => o.key === 'earth');
+  const bText = B === null ? tr('no magnetogram') : Math.abs(B) >= 19.9 ? `${B > 0 ? '≥ +' : '≤ −'}20 G` : `${B >= 0 ? '+' : '−'}${Math.abs(B).toFixed(1)} G`;
+  tip.innerHTML = `<b>${tr(near ? 'Near side (faces Earth)' : 'Far side (hidden from Earth)')}</b>
+    <span>${tr('Carrington')} ${p.carr.toFixed(1)}°, ${tr('Stonyhurst')} ${stony.toFixed(1)}°, ${tr('latitude')} ${p.lat >= 0 ? '+' : ''}${p.lat.toFixed(1)}°</span>
+    <span>B<sub>r</sub> ${bText}</span>
+    <span>${who.length ? tr('Seen by {list}', { list: who.map((o) => `${o.key === 'earth' ? tr('Earth') : o.label} (μ ${o.mu.toFixed(2)})`).join(', ') }) : tr('Seen by no solar imager')}</span>`;
+  tip.hidden = false;
+  const pr = $('coverage-panel').getBoundingClientRect();
+  const x = e.clientX - pr.left + 14;
+  tip.style.left = `${Math.min(x, pr.width - tip.offsetWidth - 8)}px`;
+  tip.style.top = `${e.clientY - pr.top + 14}px`;
 }
 function focusCoverage(key, scroll = true) {
   covHighlight = key;
@@ -864,6 +899,7 @@ async function main() {
   if (THEMES.includes(urlTheme)) setTheme(urlTheme, false);
   let manifest;
   const eventsReady = loadEvents();
+  const synReady = loadSynopticIndex().then((x) => { synIndex = x; });
   try {
     manifest = await loadManifest();
   } catch (err) {
@@ -877,6 +913,7 @@ async function main() {
   $('dt').max = isoMinute(e.end);
 
   await eventsReady;
+  await synReady;
   const syncPlanetLegend = buildLegend();
   syncPlanetLegend();
   buildPresets();
@@ -978,13 +1015,14 @@ async function main() {
   inset.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') cards.hover(e.clientX, e.clientY); });
   inset.addEventListener('pointerleave', () => cards.leave());
   inset.addEventListener('click', (e) => cards.click(e.clientX, e.clientY));
+  $('coverage').addEventListener('pointermove', coverageTip);
+  $('coverage').addEventListener('pointerleave', () => { covHover = null; $('surf-tip').hidden = true; paintCoverage(); });
   $('coverage').addEventListener('click', (e) => {
     if (!covGeom || !scene) return;
     const r = $('coverage').getBoundingClientRect();
-    const px = e.clientX - r.left;
-    if (px < covGeom.left || px > covGeom.right) return;
-    const stony = covGeom.toStony(px);
-    S.spot = { sys: 'carrington', lon: +wrap360(stony + covGeom.L0).toFixed(1), lat: 0 };
+    const p = covGeom.at(e.clientX - r.left, e.clientY - r.top);
+    if (!p) return;
+    S.spot = { sys: 'carrington', lon: +p.carr.toFixed(1), lat: +p.lat.toFixed(1) };
     S.spotOnMap = true;
     bench.syncSpot();
     update();

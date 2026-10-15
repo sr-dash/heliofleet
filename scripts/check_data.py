@@ -108,6 +108,22 @@ def main():
                 errors.append(f"{key}: ephemeris ends {day(b['end'])}, more than 60 days before next week")
             elif behind > 0:
                 warnings.append(f"{key}: ephemeris ends {day(b['end'])}, less than a week ahead")
+    # Synoptic magnetograms (scripts/fetch_synoptic.py)
+    syn = DATA / "synoptic" / "index.json"
+    if syn.exists():
+        idx = json.loads(syn.read_text())
+        prev = None
+        for m in idx["maps"] + [idx["daily"]]:
+            f = DATA / "synoptic" / m["file"]
+            if not f.exists() or f.stat().st_size < 1000:
+                errors.append(f"synoptic: {m['file']} missing or empty")
+            if not m["t0"] < m["t1"]:
+                errors.append(f"synoptic: {m['file']} has an empty time range")
+            if prev and m["t0"] < prev["t1"] - 0.1:
+                errors.append(f"synoptic: {m['file']} overlaps {prev['file']}")
+            prev = m
+    else:
+        warnings.append("synoptic: data/synoptic/index.json not found")
     for w in warnings:
         print(f"warning: {w}")
     for e in errors:

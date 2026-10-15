@@ -41,7 +41,7 @@
   <!-- Fonts load without holding up the first paint; text shows in the fallback font until they arrive -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap"></noscript>
-  <link rel="stylesheet" href="css/style.css?v=76e72596db">
+  <link rel="stylesheet" href="css/style.css?v=1d90c91e63">
   <script>
     try {
       const q = new URLSearchParams(location.search);
@@ -124,8 +124,10 @@
         <dd>Light time is the body–Earth distance over the speed of light. The Sun's apparent diameter is 2 arcsin(R<sub>☉</sub> / r), with R<sub>☉</sub> = 695,700 km.</dd>
         <dt>Spot visibility</dt>
         <dd>A point on the photosphere is visible to an observer when the angle between its local vertical and the line of sight to the observer is below 90°.</dd>
-        <dt>Solar coverage</dt>
-        <dd>A point at longitude φ on the solar equator is visible from an observer at heliographic longitude L, latitude B and distance r when cos B cos(φ − L) &gt; R<sub>☉</sub> / r, and well placed (within 60° of disc centre) when cos B cos(φ − L) &gt; 0.5. Counts use 1° bins and include only observers that carry a solar-disc imager; Earth's row stands for SDO, SOHO, Aditya-L1 and ground observatories.</dd>
+        <dt>Solar surface map and coverage</dt>
+        <dd>A surface point at Carrington longitude φ and latitude θ is visible from an observer at heliographic longitude L, latitude B and distance r when sin θ sin B + cos θ cos B cos(φ − L) &gt; R<sub>☉</sub> / r; the left side of that inequality is μ, the cosine of the angle from the observer's disc centre. Each observer's limb is the circle where the two sides are equal, drawn on the map; Earth's limb separates the near side from the far side. Only observers that carry a solar-disc imager are shown; Earth stands for SDO, SOHO, Aditya-L1 and ground observatories. The equator statistics below the map use the same test in 1° bins, with "well placed" meaning μ &gt; 0.5 (within 60° of disc centre).</dd>
+        <dt>Synoptic magnetograms</dt>
+        <dd>The background is the SDO/HMI radial-field synoptic map for the Carrington rotation that contains the chosen moment (hmi.Synoptic_Mr_small, from JSOC), and the daily-updated synoptic frame for the rotation in progress. Maps are kept on HMI's native grid, uniform in Carrington longitude and sine latitude, averaged 2 × 2 to 1° in longitude and 1/90 in sine latitude, and clipped to ±20 G, the fixed colour range (matplotlib's <code>bwr</code>). A synoptic map assembles each longitude from observations near central meridian over the rotation, so it is not a snapshot of the Sun at the chosen moment, and the far side shows field observed up to two weeks earlier or later. Dates after the latest daily frame, before HMI's first rotation map (CR 2096, April 2010) and in rotations JSOC does not publish (CR 2119–2127) are left blank.</dd>
       </dl>
     </section>
 
@@ -200,6 +202,7 @@
         <li>CME fronts use DONKI's constant-speed cone model and are a guide to where a CME was heading, not a forecast.</li>
         <li>Daylight windows at Haleakalā and Mauna Loa use a low-precision solar position (about 0.01°) and say nothing about weather or observing schedules.</li>
         <li>Cryo-NIRSP footprints are the spatial bounds listed in the DKIST inventory, as rectangles in helioprojective coordinates.</li>
+        <li>The magnetic field on the surface map is a synoptic reconstruction, not the field at the chosen moment, and is clipped at ±20 G; strong active-region fields saturate the colour scale.</li>
       </ul>
       <p>Found something that looks wrong? Please <a href="https://github.com/sr-dash/heliofleet/issues/new/choose">open an issue</a>.</p>
     </section>
