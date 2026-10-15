@@ -4,7 +4,7 @@
 import { drawMap, drawInset } from './render.js';
 import { BODIES } from './catalog.js';
 import { tr } from './i18n.js';
-import { coverageRows, coverageSummary, coverageNote, drawSurface, surfaceHeight, synopticFor, loadSynoptic } from './coverage.js';
+import { coverageRows, coverageSummary, coverageNote, drawSurface, surfaceHeight, synopticFor, loadSynoptic, surfaceFeet } from './coverage.js';
 
 const W = 1200;
 const H = 820;
@@ -203,11 +203,11 @@ export async function composeSnapshot(scene, s, th, view, meta) {
   ctx.beginPath();
   ctx.roundRect(0, 0, W - 40, covH, 10);
   ctx.clip();
-  drawSurface(ctx, W - 40, covH, covRows, th, { sys, L0, map: synMap, meta: synMeta, spot });
+  drawSurface(ctx, W - 40, covH, covRows, th, { sys, L0, map: synMap, meta: synMeta, spot, feet: surfaceFeet(scene, s.hidden, L0) });
   ctx.restore();
   ctx.fillStyle = th.muted;
   ctx.font = `400 12px ${SANS}`;
-  wrapText(ctx, `${coverageNote(covSum, sys, L0, false).replace(/<[^>]+>/g, '')} ${tr('Magnetogram: SDO/HMI synoptic radial field, colours fixed at ±20 G. Curves are the limbs of observers with a solar-disk imager; the dark curve is Earth’s.')}`, 20, H + 32 + covH + 18, W - 40, 15);
+  wrapText(ctx, `${coverageNote(covSum, sys, L0, false).replace(/<[^>]+>/g, '')} ${tr('Magnetogram: SDO/HMI synoptic radial field, colours fixed at ±20 G. Curves are the limbs of observers with a solar-disk imager; the dark curve is Earth’s. Rings are Parker-spiral footpoints at {v} km/s.', { v: s.wind })}`, 20, H + 32 + covH + 18, W - 40, 15);
   return cv;
 }
 

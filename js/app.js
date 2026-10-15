@@ -15,7 +15,7 @@ import { initWorkbench } from './workbench.js';
 import { initCards } from './cards.js';
 import {
   coverageRows, coverageSummary, coverageNote,
-  drawSurface, surfaceHeight, loadSynopticIndex, synopticFor, loadSynoptic, fieldAt, seenBy,
+  drawSurface, surfaceHeight, loadSynopticIndex, synopticFor, loadSynoptic, fieldAt, seenBy, surfaceFeet, isVisible,
 } from './coverage.js';
 import { INSTRUMENTS, INSTRUMENT } from './instruments.js';
 import { hvUrl, defaultLayer } from './helioviewer.js';
@@ -171,6 +171,7 @@ function allHits() {
 const wrap360 = (a) => ((a % 360) + 360) % 360;
 const wrap180 = (a) => ((((a + 180) % 360) + 360) % 360) - 180;
 let covHover = null; // { carr, lat } under the pointer
+let covActive = null; // observer whose far side is greyed while hovering
 let synIndex = null;
 function spotCarr(L0) {
   if (!S.spot) return null;
@@ -185,32 +186,44 @@ async function paintCoverage() {
   if (!scene || scene.jd !== jd) return; // a newer moment is already on its way
   const rows = coverageRows(scene, S.hidden);
   const sum = coverageSummary(rows);
-  cv.style.height = `${surfaceHeight(cv.clientWidth)}px`;
+  // Text and markers shrink a little on narrow screens
+  const k = Math.min(1, Math.max(0.72, cv.clientWidth / 760));
+  cv.style.height = `${surfaceHeight(cv.clientWidth, k)}px`;
   const [ctx, w, h] = fit(cv);
   const L0 = scene.bodies[0].carr;
   const future = !meta && !!synIndex && jd > (synIndex.daily?.t1 ?? Infinity);
-  covGeom = { ...drawSurface(ctx, w, h, rows, theme, { sys: S.covsys, L0, map, meta, future, spot: spotCarr(L0), hover: covHover, highlight: covHighlight }), L0, map };
+  const feet = surfaceFeet(scene, S.hidden, L0);
+  covGeom = { ...drawSurface(ctx, w, h, rows, theme, { sys: S.covsys, L0, map, meta, future, spot: spotCarr(L0), feet, active: covHover ? covActive : null, highlight: covHighlight, k }), L0, map };
   $('coverage-note').innerHTML = coverageNote(sum, S.covsys, L0);
 }
-// Readout for the point under the pointer
+// Readout for the point under the pointer. Near another observer's limb or
+// disk centre, that observer's far side is greyed; elsewhere, Earth's.
 function coverageTip(e) {
   const tip = $('surf-tip');
   const cv = $('coverage');
   if (!covGeom || !scene) { tip.hidden = true; return; }
   const r = cv.getBoundingClientRect();
-  const p = covGeom.at(e.clientX - r.left, e.clientY - r.top);
+  const px = e.clientX - r.left;
+  const py = e.clientY - r.top;
+  const p = covGeom.at(px, py);
   covHover = p;
+  covActive = p ? (covGeom.nearObserver(px, py) ?? 'earth') : null;
   paintCoverage();
   if (!p) { tip.hidden = true; return; }
+  const name = (o) => (o.key === 'earth' ? tr('Earth') : o.label);
+  const act = covGeom.obs.find((o) => o.key === covActive);
   const stony = wrap180(p.carr - covGeom.L0);
   const B = fieldAt(covGeom.map, p.carr, p.lat);
   const who = seenBy(covGeom.obs, p.carr, p.lat);
-  const near = who.some((o) => o.key === 'earth');
+  const foot = covGeom.nearFoot(px, py);
   const bText = B === null ? tr('no magnetogram') : Math.abs(B) >= 19.9 ? `${B > 0 ? '≥ +' : '≤ −'}20 G` : `${B >= 0 ? '+' : '−'}${Math.abs(B).toFixed(1)} G`;
-  tip.innerHTML = `<b>${tr(near ? 'Near side (faces Earth)' : 'Far side (hidden from Earth)')}</b>
+  const vis = act && isVisible(act, p.carr, p.lat);
+  const head = act ? tr(vis ? 'Near side of {name}' : 'Far side of {name} (shaded)', { name: name(act) }) : '';
+  tip.innerHTML = `<b>${head}</b>
+    ${foot ? `<span class="tip-foot">${tr('Parker-spiral footpoint of {name} at {v} km/s', { name: foot.key === 'earth' ? tr('Earth and the L1 fleet') : BODIES[foot.key].short, v: S.wind })}</span>` : ''}
     <span>${tr('Carrington')} ${p.carr.toFixed(1)}°, ${tr('Stonyhurst')} ${stony.toFixed(1)}°, ${tr('latitude')} ${p.lat >= 0 ? '+' : ''}${p.lat.toFixed(1)}°</span>
     <span>B<sub>r</sub> ${bText}</span>
-    <span>${who.length ? tr('Seen by {list}', { list: who.map((o) => `${o.key === 'earth' ? tr('Earth') : o.label} (μ ${o.mu.toFixed(2)})`).join(', ') }) : tr('Seen by no solar imager')}</span>`;
+    <span>${who.length ? tr('Seen by {list}', { list: who.map((o) => `${name(o)} (μ ${o.mu.toFixed(2)})`).join(', ') }) : tr('Seen by no solar imager')}</span>`;
   tip.hidden = false;
   const pr = $('coverage-panel').getBoundingClientRect();
   const x = e.clientX - pr.left + 14;
