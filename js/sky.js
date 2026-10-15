@@ -99,7 +99,8 @@ function fit() {
   return [ctx, w, h];
 }
 const geom = (W, H) => {
-  const ppr = (Math.min(W, H) / 2 - 22) / S.zoom;
+  // Never negative, even while the canvas has no size yet
+  const ppr = Math.max(1, Math.min(W, H) / 2 - 22) / S.zoom;
   return { ppr, ox: W / 2 - S.cx * ppr, oy: H / 2 + S.cy * ppr };
 };
 
@@ -134,6 +135,8 @@ const obsName = (key) => (key === 'earth' ? tr('Earth') : BODIES[key].short);
 
 function paint() {
   const [ctx, W, H] = fit();
+  // Nothing to draw into while the page is hidden or not laid out yet
+  if (W < 50 || H < 50) return;
   draw(ctx, W, H);
 }
 
