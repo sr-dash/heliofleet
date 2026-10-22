@@ -69,6 +69,13 @@ jobs:
       - name: Fetch DKIST Cryo-NIRSP footprints
         run: python scripts/fetch_ground.py
 
+      # Images for new Cryo-NIRSP runs; a Helioviewer outage only leaves gaps
+      - name: Fetch SDO context images for Cryo-NIRSP
+        continue-on-error: true
+        run: |
+          pip install --quiet pillow numpy
+          python scripts/fetch_context.py
+
       - name: Build the calendar of upcoming events
         run: python scripts/build_calendar.py
 

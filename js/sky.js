@@ -10,6 +10,7 @@ import { INSTRUMENTS, INSTRUMENT, flyingAt, insColor, insLabel, insShort } from 
 import { makeSky, fovGrid, fovFrame, inField, viewOf, hpcDirection, SKY_SHAPES, GROUND, SITES, sunAltitude, observingWindow } from './skyproj.js';
 import { norm, angleBetween, R_SUN_AU } from './frames.js';
 import { downloadPNG, downloadPDF } from './export.js';
+import { CHANNELS, loadContext, contextRuns, drawContext, contextNote, hitTest } from './context.js';
 import { LANGUAGES, detectLang, loadLang, lang, saveLang, tr, translatePage } from './i18n.js';
 
 const $ = (id) => document.getElementById(id);
@@ -39,6 +40,8 @@ const S = {
   hl: null,
   obs: 'earth',
   pt: null, // marked point on the plane of the sky, [x, y] in solar radii
+  img: 'aia171', // SDO image under the Cryo-NIRSP footprints
+  run: null, // observing run chosen in that panel, { key, hl }
 };
 const SCENE = { frame: 'hee', view: 'top', trailDays: 0, planets: false, labels: true, spirals: false, wind: 400, hidden: new Set(), cmes: false, fov: new Set() };
 let theme;
@@ -63,6 +66,7 @@ function readURL() {
   if (OBSERVERS.includes(q.get('obs'))) S.obs = q.get('obs');
   const pt = (q.get('pt') || '').split(',').map(Number);
   if (pt.length === 2 && pt.every(Number.isFinite)) S.pt = pt;
+  if (CHANNELS[q.get('img')]) S.img = q.get('img');
 }
 let urlTimer;
 function writeURL() {
@@ -77,6 +81,7 @@ function writeURL() {
     if (SCENE.hidden.size) q.set('hide', [...SCENE.hidden].join(','));
     if (S.obs !== 'earth') q.set('obs', S.obs);
     if (S.pt) q.set('pt', S.pt.map((v) => v.toFixed(2)).join(','));
+    if (S.img !== 'aia171') q.set('img', S.img);
     const cur = new URLSearchParams(location.search);
     for (const k of ['lang', 'theme']) if (cur.has(k)) q.set(k, cur.get(k));
     history.replaceState(null, '', `?${q}`);
@@ -673,6 +678,59 @@ function renderCryo() {
   $('cryo-next').disabled = !cryo.some((d) => d.j0 > S.jd + 0.5);
 }
 
+// ---------- Cryo-NIRSP on SDO images ----------
+let ctxHits = [];
+let ctxToken = 0;
+async function renderContext() {
+  const sets = await loadContext();
+  const { runs, pick } = contextRuns(cryoInWindow(), S.jd, S.hl);
+  // A run picked from the list holds until another dataset is highlighted
+  const run = (S.run?.hl === S.hl && runs.find((r) => r.key === S.run.key)) || pick;
+  const has = !!run;
+  $('ctx-wrap').hidden = !has;
+  $('ctx-note').hidden = !has;
+  $('ctx-run-field').hidden = runs.length < 2;
+  $('ctx-summary').textContent = !sets.length ? tr('The SDO images could not be loaded.')
+    : has ? '' : tr('No SDO images for Cryo-NIRSP observations within 12 hours. Use the buttons in the Cryo-NIRSP panel to find the nearest observations.');
+  $('ctx-summary').hidden = has;
+  document.querySelectorAll('#ctx-ch button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.value === S.img ? 'true' : 'false'));
+  const sel = $('ctx-run');
+  sel.replaceChildren(...runs.map((r) => {
+    const o = document.createElement('option');
+    o.value = r.key;
+    o.textContent = `${r.t.slice(0, 10)} ${r.t.slice(11, 16)} UT · ${tr('{n} datasets', { n: r.ids.length })}`;
+    o.selected = r === run;
+    return o;
+  }));
+  if (!has) { ctxHits = []; return; }
+  const byId = new Map(cryo.map((d) => [d.id, d]));
+  const token = ++ctxToken;
+  const hits = await drawContext($('ctx-canvas'), run, S.img, byId, S.jd, S.hl);
+  if (token !== ctxToken || !hits) return;
+  ctxHits = hits;
+  $('ctx-note').textContent = contextNote(run, S.img, run.ids.map((id) => byId.get(id)).filter(Boolean));
+}
+
+function initContext() {
+  $('ctx-ch').addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    S.img = b.dataset.value;
+    writeURL();
+    renderContext();
+  });
+  $('ctx-run').addEventListener('change', (e) => { S.run = { key: e.target.value, hl: S.hl }; renderContext(); });
+  $('ctx-canvas').addEventListener('click', (e) => {
+    const r = e.target.getBoundingClientRect();
+    const d = hitTest(ctxHits, e.clientX - r.left, e.clientY - r.top);
+    if (!d) return;
+    S.hl = d.id;
+    S.jd = (d.j0 + d.j1) / 2;
+    update();
+  });
+  new ResizeObserver(() => renderContext()).observe($('ctx-wrap'));
+}
+
 function renderObservers() {
   const sel = $('obs');
   sel.replaceChildren(...OBSERVERS.map((k) => {
@@ -711,6 +769,7 @@ async function update() {
   renderSites();
   renderCryo();
   renderPoint();
+  renderContext();
 }
 
 function toast(msg) {
@@ -800,6 +859,7 @@ async function main() {
   cryo = (ground?.datasets ?? []).map((d) => ({ ...d, j0: jdOf(d.t0), j1: jdOf(d.t1) }));
   buildLayers();
   initGestures();
+  initContext();
   $('dt').addEventListener('change', (e) => {
     const t = Date.parse(`${e.target.value}Z`);
     if (!Number.isNaN(t)) { S.jd = t / 864e5 + 2440587.5; update(); }

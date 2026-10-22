@@ -132,6 +132,8 @@ methods.html             methods, validation and known limits
 js/skyproj.js            plane-of-sky projection, ground sites, Sun altitude
 data/ground/cryonirsp.json  DKIST Cryo-NIRSP footprints
 scripts/fetch_ground.py  builds it from the Cryo-NIRSP viewer inventory
+scripts/fetch_context.py  SDO/AIA and HMI cutouts -> data/ground/context/
+js/context.js            Cryo-NIRSP footprints over those cutouts
 scripts/stamp_assets.py  content-hashed asset URLs for index.html
 js/i18n.js               language choice and translation
 i18n/<lang>.json         Hindi and Spanish interface text
@@ -167,7 +169,7 @@ A second page, [Earth's view](https://sr-dash.github.io/heliofleet/sky.html), dr
 - the Sun's altitude and daylight window at Haleakalā (DKIST) and Mauna Loa (MLSO);
 - Earth and the spacecraft, placed where the observer sees them in perspective, with an edge marker for those behind the observer.
 
-Clicking the plane of the sky marks a point and lists, under **Who sees this point**, every instrument whose field contains it, with its distance from Sun centre and position angle in that instrument's own view, and whether the Sun hides it (`pt=x,y` in the link). The MLSO and DKIST fields are traced from Earth in the same way, so from another observer they show where Earth's lines of sight cross that observer's plane of the sky. The page saves PNG and PDF snapshots of the current view.
+Clicking the plane of the sky marks a point and lists, under **Who sees this point**, every instrument whose field contains it, with its distance from Sun centre and position angle in that instrument's own view, and whether the Sun hides it (`pt=x,y` in the link). Below the plane of the sky, **Cryo-NIRSP on SDO images** draws the footprints of each observing run over SDO/AIA 171 Å, AIA 193 Å or HMI line-of-sight magnetogram cutouts from the [Helioviewer API](https://api.helioviewer.org/docs/v2/) as a full-disk view with a zoomed inset of the run (`img=aia193` or `img=hmi` in the link); `scripts/fetch_context.py` fetches cutouts for new runs each month and fits the limb in each image to correct frames whose recorded pointing is wrong (near-real-time AIA data and SDO calibration manoeuvres). The MLSO and DKIST fields are traced from Earth in the same way, so from another observer they show where Earth's lines of sight cross that observer's plane of the sky. The page saves PNG and PDF snapshots of the current view.
 
 Heliospheric imagers are modelled as fields of their published size (HI-1 a 20° square, HI-2 a 70° circle, SoloHI a 40° circle, WISPR-I 40° and WISPR-O 58° squares tilted 10° south), so their outlines on this page are approximate.
 

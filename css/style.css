@@ -650,6 +650,12 @@ tbody tr:hover td { background: var(--surface); }
 .cryo-nav { display: flex; gap: 6px; margin-top: 10px; }
 .cryo-nav .btn-ghost { flex: 1; }
 .chip.cryo-active { box-shadow: inset 2px 0 0 var(--accent); background: var(--surface-2); }
+.ctx-panel { margin-top: 18px; }
+.ctx-controls { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: end; margin-bottom: 8px; }
+.ctx-controls .seg { min-width: min(100%, 380px); }
+.ctx-controls .field { margin: 0; min-width: 220px; }
+.ctx-wrap { width: 100%; max-width: 1100px; }
+#ctx-canvas { display: block; width: 100%; aspect-ratio: 1.7; cursor: pointer; }
 .chip-links { display: flex; gap: 8px; margin-top: 2px; }
 .chip-links a { font-size: 12px; }
 @media (max-width: 860px) {

@@ -492,5 +492,19 @@
  "in its field": "en su campo",
  "outside its field ({range})": "fuera de su campo ({range})",
  "outside its footprint": "fuera de su huella",
- "{r} R☉ from Sun centre": "a {r} R☉ del centro del Sol"
+ "{r} R☉ from Sun centre": "a {r} R☉ del centro del Sol",
+ "AIA 171 Å": "AIA 171 Å",
+ "AIA 193 Å": "AIA 193 Å",
+ "HMI magnetogram": "Magnetograma HMI",
+ "Image": "Imagen",
+ "Observing run": "Sesión de observación",
+ "Cryo-NIRSP on SDO images": "Cryo-NIRSP sobre imágenes de SDO",
+ "Cryo-NIRSP footprints over an SDO image": "Campos de Cryo-NIRSP sobre una imagen de SDO",
+ "Footprints use the pointing recorded with each dataset. Click one to jump to it.": "Los campos usan el apuntado registrado con cada conjunto de datos. Haga clic en uno para ir a él.",
+ "No SDO images for Cryo-NIRSP observations within 12 hours. Use the buttons in the Cryo-NIRSP panel to find the nearest observations.": "No hay imágenes de SDO para observaciones de Cryo-NIRSP en 12 horas. Use los botones del panel de Cryo-NIRSP para encontrar las observaciones más cercanas.",
+ "No image for this channel": "No hay imagen para este canal",
+ "The SDO images could not be loaded.": "No se pudieron cargar las imágenes de SDO.",
+ "{channel} image taken at {time} UT, from Helioviewer.": "Imagen de {channel} tomada a las {time} UT, de Helioviewer.",
+ "{n} Cryo-NIRSP datasets observed {a}–{b} UT on {date}.": "{n} conjuntos de datos de Cryo-NIRSP observados de {a} a {b} UT el {date}.",
+ "{n} datasets": "{n} conjuntos de datos"
 }
