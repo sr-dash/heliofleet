@@ -28,9 +28,10 @@ HelioFleet places SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, IMAP, SWFO-L1, Carrut
 
 ### Research tools
 
-Below the map, four tabs work on the same geometry as the map:
+Below the map, six tabs work on the same geometry as the map:
 
 - **Coordinates:** the table for the current moment, downloadable as CSV or JSON, plus a SunPy script that reproduces it independently from JPL Horizons.
+- **Viewing geometry:** for every observer, what co-aligning and time-aligning its images with Earth's needs: distance, light-time offset from Earth (negative when it sees solar events earlier), apparent solar radius, disk-centre B0, Stonyhurst longitude and L0 (matching the FITS keywords RSUN_OBS, HGLT_OBS, HGLN_OBS and CRLN_OBS, with L0 from the observer's own light time), the size of one arcsecond at disk centre, and how much larger features look than from Earth. CSV, JSON and a SunPy cross-check script are included.
 - **Find alignments:** searches a date range for radial alignments of two spacecraft, quadratures with Earth, or magnetic connections (Parker-spiral footpoints within a tolerance). Each window lists its start, end and closest moment, with a button to jump there and a CSV of all windows.
 - **Who sees this spot:** enter a Carrington or Stonyhurst location, such as an active region or flare site. Every observer gets its angle from disk centre, μ, and whether the spot is on disk, near the limb or behind it. The spot can be marked on the map and shared with `spot=c,LON,LAT` (Carrington) or `spot=s,LON,LAT` (Stonyhurst) in the URL.
 - **Export data:** a time series for chosen bodies, dates and cadence (1 hour to 1 week) as CSV or JSON. Column definitions are written at the top of each file.

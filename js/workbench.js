@@ -6,6 +6,7 @@ import { tr } from './i18n.js';
 import { BODIES, SPACECRAFT } from './catalog.js';
 import {
   sceneRows, toCSV, toJSON, timeSeries, sunpyCode, ALIGN_KINDS, findAlignments,
+  geometryRows, geometrySunpy, GEOMETRY_COLUMNS,
   windowsCSV, visibility, citationText, CITATION, ALL_KEYS,
 } from './tools.js';
 import { recordAnimation, videoSupport, LIMITS } from './animate.js';
@@ -116,6 +117,45 @@ export function initWorkbench(ctx) {
     openSheet(tr('SunPy code'),
       tr('Reproduces this table independently with SunPy and JPL Horizons. HelioFleet agrees with SunPy to better than 0.01°; small differences come from interpolating daily samples.'),
       [{ text: sunpyCode(S.jd, keys), file: { name: `heliofleet_${stamp(S.jd)}UT.py`, type: 'text/x-python' } }]);
+  });
+
+  // ---------- viewing geometry ----------
+  const geomRows = () => geometryRows(ctx.scene(), S.hidden);
+  const sgn = (v, d) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(d)}`;
+  // Light-time offsets in seconds up to two minutes, then minutes
+  const lag = (s) => (Math.abs(s) < 0.05 ? '0 s' : Math.abs(s) < 120 ? `${sgn(s, 1)} s` : `${sgn(s / 60, 2)} min`);
+  function renderGeometry() {
+    const body = $('geom-table').querySelector('tbody');
+    const sc = ctx.scene();
+    if (!sc) { body.replaceChildren(); return; }
+    body.innerHTML = geomRows().map((g) => {
+      const flag = g.status === 'lost' ? `<span class="flag">${tr('contact lost · predicted')}</span>` : g.status === 'approx' ? `<span class="flag">${tr('GEO · shown at Earth')}</span>` : '';
+      const isEarth = g.body === 'earth';
+      return `<tr><td><span class="dot" style="--c:var(--c-${g.body})"></span>${BODIES[g.body].short}${flag}</td>
+        <td>${g.r_au.toFixed(g.r_au < 0.2 ? 4 : 3)}</td>
+        <td>${isEarth ? tr('{s} from the Sun', { s: `${(g.light_time_s / 60).toFixed(2)} min` }) : lag(g.offset_vs_earth_s)}</td>
+        <td>${g.rsun_arcsec.toFixed(1)}″</td>
+        <td>${sgn(g.b0_deg, 2)}°</td>
+        <td>${sgn(g.hgs_lon_deg, 2)}°</td>
+        <td>${g.l0_deg.toFixed(2)}°</td>
+        <td>${g.km_per_arcsec.toFixed(1)}</td>
+        <td>${g.scale_vs_earth.toFixed(3)}</td></tr>`;
+    }).join('');
+  }
+  $('geom-csv').addEventListener('click', () => {
+    if (!ctx.scene()) return;
+    save(toCSV(geomRows(), S, GEOMETRY_COLUMNS), `heliofleet_geometry_${stamp(S.jd)}UT.csv`, 'text/csv');
+  });
+  $('geom-json').addEventListener('click', () => {
+    if (!ctx.scene()) return;
+    save(toJSON(geomRows(), S, GEOMETRY_COLUMNS), `heliofleet_geometry_${stamp(S.jd)}UT.json`, 'application/json');
+  });
+  $('geom-sunpy').addEventListener('click', () => {
+    const sc = ctx.scene();
+    if (!sc) return;
+    openSheet(tr('SunPy code'),
+      tr('Reproduces the viewing-geometry table independently with SunPy and JPL Horizons.'),
+      [{ text: geometrySunpy(S.jd, geomRows().map((g) => g.body)), file: { name: `heliofleet_geometry_${stamp(S.jd)}UT.py`, type: 'text/x-python' } }]);
   });
 
   // ---------- alignment search ----------
@@ -380,7 +420,7 @@ export function initWorkbench(ctx) {
   });
 
   return {
-    refresh() { renderVis(); },
+    refresh() { renderVis(); renderGeometry(); },
     isOpen: () => sheet.open,
     openSheet,
     // From a spacecraft's card: open the tools with that body chosen

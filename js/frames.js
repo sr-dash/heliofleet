@@ -43,7 +43,9 @@ function primeMeridian(jdUT) {
 }
 
 // Heliographic coordinates of position r (au) at time jd, with Earth at e.
-export function heliographic(r, e, jd) {
+// Carrington longitudes are as seen from Earth unless `light` (au) gives
+// another observer's distance from the Sun (its own disk-centre L0).
+export function heliographic(r, e, jd, light = norm(e)) {
   const dist = norm(r);
   const ru = scale(r, 1 / dist);
   const x = unit(sub(e, scale(POLE, dot(e, POLE))));
@@ -52,7 +54,7 @@ export function heliographic(r, e, jd) {
   const lon = Math.atan2(dot(ru, y), dot(ru, x)) / D;
   // Carrington longitude as seen from Earth: the Sun is observed one
   // Sun-Earth light time in the past.
-  const [m, my] = primeMeridian(jd - (norm(e) * AU_KM) / C_KM_S / 86400);
+  const [m, my] = primeMeridian(jd - (light * AU_KM) / C_KM_S / 86400);
   const carr = wrap360(Math.atan2(dot(ru, my), dot(ru, m)) / D);
   return { dist, lat, lon: wrap180(lon), carr };
 }

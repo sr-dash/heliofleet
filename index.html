@@ -403,6 +403,7 @@
     <section class="readout workbench" aria-label="Research tools">
       <div class="wb-tabs" role="tablist" aria-label="Research tools">
         <button role="tab" id="tab-coords" aria-controls="panel-coords" aria-selected="true">Coordinates</button>
+        <button role="tab" id="tab-geom" aria-controls="panel-geom" aria-selected="false" tabindex="-1">Viewing geometry</button>
         <button role="tab" id="tab-align" aria-controls="panel-align" aria-selected="false" tabindex="-1">Find alignments</button>
         <button role="tab" id="tab-vis" aria-controls="panel-vis" aria-selected="false" tabindex="-1">Who sees this spot</button>
         <button role="tab" id="tab-series" aria-controls="panel-series" aria-selected="false" tabindex="-1">Export data</button>
@@ -436,6 +437,35 @@
           </table>
         </div>
         <p class="absent" id="absent"></p>
+      </div>
+
+      <div class="wb-panel" role="tabpanel" id="panel-geom" aria-labelledby="tab-geom" hidden>
+        <div class="readout-head">
+          <p class="readout-note">What each observer needs to co-align and time-align its images with Earth's at this moment. The light-time offset is how much later (positive) or earlier (negative) than Earth it sees an event on the Sun. B0, L0 and the solar radius match the FITS keywords HGLT_OBS, CRLN_OBS and RSUN_OBS; L0 uses the observer's own light time.</p>
+          <div class="wb-actions">
+            <button class="btn-ghost" id="geom-csv">CSV</button>
+            <button class="btn-ghost" id="geom-json">JSON</button>
+            <button class="btn-ghost" id="geom-sunpy">SunPy code</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="geom-table">
+            <thead>
+              <tr>
+                <th scope="col">Observer</th>
+                <th scope="col" title="Distance from Sun centre">r <small>au</small></th>
+                <th scope="col" title="Light travel time from the Sun, minus Earth's">Light time <small>vs Earth</small></th>
+                <th scope="col" title="Apparent solar radius">R☉ <small>arcsec</small></th>
+                <th scope="col" title="Heliographic latitude of the disk centre">B0</th>
+                <th scope="col" title="Stonyhurst longitude of the disk centre">HGS lon</th>
+                <th scope="col" title="Carrington longitude of the disk centre, with the observer's own light time">L0</th>
+                <th scope="col" title="Size on the Sun of one arcsecond at disk centre">1″ <small>km</small></th>
+                <th scope="col" title="How much larger a disk-centre feature looks than from Earth">Scale <small>× Earth</small></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
 
       <div class="wb-panel" role="tabpanel" id="panel-align" aria-labelledby="tab-align" hidden>
@@ -571,8 +601,8 @@
   <div class="toast" id="toast" role="status" hidden></div>
 
   <!-- assets:start (written by scripts/stamp_assets.py) -->
-  <script type="importmap">{"imports":{"./js/animate.js":"./js/animate.js?v=0a5fd6979e","./js/app.js":"./js/app.js?v=3ed8d7bcc1","./js/bodyinfo.js":"./js/bodyinfo.js?v=d96ce73256","./js/cards.js":"./js/cards.js?v=df392faa60","./js/catalog.js":"./js/catalog.js?v=9540bfaa0e","./js/context.js":"./js/context.js?v=bc078cfdac","./js/coverage.js":"./js/coverage.js?v=7c8038c9ce","./js/ephem.js":"./js/ephem.js?v=56c0c10b78","./js/events.js":"./js/events.js?v=f9807e6265","./js/export.js":"./js/export.js?v=33f03c2b63","./js/frames.js":"./js/frames.js?v=c3a2e0d167","./js/helioviewer.js":"./js/helioviewer.js?v=14248f1791","./js/i18n.js":"./js/i18n.js?v=b27b772be8","./js/instruments.js":"./js/instruments.js?v=250c964e38","./js/observations.js":"./js/observations.js?v=b367cc656e","./js/render.js":"./js/render.js?v=df21f05af0","./js/ribbon.js":"./js/ribbon.js?v=196bebb9a4","./js/scene.js":"./js/scene.js?v=160dc4fcb3","./js/sky.js":"./js/sky.js?v=384b0f9a13","./js/skyproj.js":"./js/skyproj.js?v=d546a24ec4","./js/tools.js":"./js/tools.js?v=260d7d2daf","./js/workbench.js":"./js/workbench.js?v=ce39857ea7"}}</script>
+  <script type="importmap">{"imports":{"./js/animate.js":"./js/animate.js?v=0a5fd6979e","./js/app.js":"./js/app.js?v=a1502e3357","./js/bodyinfo.js":"./js/bodyinfo.js?v=d96ce73256","./js/cards.js":"./js/cards.js?v=df392faa60","./js/catalog.js":"./js/catalog.js?v=9540bfaa0e","./js/context.js":"./js/context.js?v=bc078cfdac","./js/coverage.js":"./js/coverage.js?v=7c8038c9ce","./js/ephem.js":"./js/ephem.js?v=56c0c10b78","./js/events.js":"./js/events.js?v=f9807e6265","./js/export.js":"./js/export.js?v=33f03c2b63","./js/frames.js":"./js/frames.js?v=7d2a271908","./js/helioviewer.js":"./js/helioviewer.js?v=14248f1791","./js/i18n.js":"./js/i18n.js?v=b27b772be8","./js/instruments.js":"./js/instruments.js?v=250c964e38","./js/observations.js":"./js/observations.js?v=b367cc656e","./js/render.js":"./js/render.js?v=df21f05af0","./js/ribbon.js":"./js/ribbon.js?v=196bebb9a4","./js/scene.js":"./js/scene.js?v=160dc4fcb3","./js/sky.js":"./js/sky.js?v=384b0f9a13","./js/skyproj.js":"./js/skyproj.js?v=d546a24ec4","./js/tools.js":"./js/tools.js?v=b72d59f964","./js/workbench.js":"./js/workbench.js?v=80c74e481a"}}</script>
   <!-- assets:end -->
-  <script type="module" src="js/app.js?v=3ed8d7bcc1"></script>
+  <script type="module" src="js/app.js?v=a1502e3357"></script>
 </body>
 </html>

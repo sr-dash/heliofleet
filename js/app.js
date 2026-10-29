@@ -677,6 +677,7 @@ function buildLegend() {
       writeURL();
       paint();
       renderTable();
+      bench?.refresh();
     });
     li.appendChild(b);
     ul.appendChild(li);

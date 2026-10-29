@@ -107,6 +107,8 @@
         <dd>Heliographic latitude from the Sun's rotation axis; longitude measured from the central meridian as seen from Earth (the projection of the Sun–Earth line on the solar equator).</dd>
         <dt>Carrington</dt>
         <dd>Heliographic longitude fixed to the rotating Sun, from the IAU rotation model: pole at right ascension 286.13° and declination 63.87°, prime meridian W = 84.176° + 14.1844° per day since J2000 (TT). As in SunPy, the Sun is taken as seen from Earth one Sun–Earth light time in the past.</dd>
+        <dt>Viewing geometry</dt>
+        <dd>For an observer at distance <i>r</i> from Sun centre: light time <i>r</i>/<i>c</i>, and its offset from Earth's (<i>r</i> − <i>r</i><sub>⊕</sub>)/<i>c</i>, which is negative when the observer sees a solar event earlier; apparent solar radius arcsin(R<sub>☉</sub>/<i>r</i>), with R<sub>☉</sub> = 695 700 km; B0 and the Stonyhurst longitude are the observer's own heliographic latitude and longitude. The disk-centre Carrington longitude L0 is computed with the observer's own light time, as CRLN_OBS in its FITS headers and SunPy's Carrington frame with that observer, so it differs from the Earth-based Carrington longitude in the Coordinates table by about 0.01° (14.18° per day) for each minute of light-time difference, 0.08° for Parker near perihelion. One arcsecond at disk centre spans (<i>r</i> − R<sub>☉</sub>) tan 1″ on the Sun, and features there look (<i>r</i><sub>⊕</sub> − R<sub>☉</sub>)/(<i>r</i> − R<sub>☉</sub>) times larger than from Earth.</dd>
       </dl>
       <p>These are the definitions used by <a href="https://sunpy.org/">SunPy</a>, against which the page is checked (see <a href="#validation">Validation</a>).</p>
     </section>

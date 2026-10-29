@@ -63,27 +63,27 @@ function header(lines) {
   return lines.map((l) => `# ${l}`).join('\n') + '\n';
 }
 
-export function toCSV(rows, meta) {
+export function toCSV(rows, meta, cols = COLUMNS) {
   const head = header([
     'HelioFleet export',
     `Source: ${SITE}`,
     'Ephemerides: JPL Horizons (https://ssd.jpl.nasa.gov/horizons/), interpolated',
-    `Parker-spiral footpoints for a solar-wind speed of ${meta.wind} km/s`,
+    ...(cols === COLUMNS ? [`Parker-spiral footpoints for a solar-wind speed of ${meta.wind} km/s`] : []),
     `Generated: ${new Date().toISOString().slice(0, 19)}Z`,
-    ...COLUMNS.map(([k, d]) => `${k}: ${d}`),
+    ...cols.map(([k, d]) => `${k}: ${d}`),
   ]);
-  const keys = COLUMNS.map(([k]) => k);
+  const keys = cols.map(([k]) => k);
   const esc = (v) => (typeof v === 'string' && /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
   return head + keys.join(',') + '\n' + rows.map((o) => keys.map((k) => esc(o[k])).join(',')).join('\n') + '\n';
 }
 
-export function toJSON(rows, meta) {
+export function toJSON(rows, meta, cols = COLUMNS) {
   return JSON.stringify({
     source: SITE,
     ephemerides: 'JPL Horizons, interpolated',
-    solar_wind_km_s: meta.wind,
+    ...(cols === COLUMNS ? { solar_wind_km_s: meta.wind } : {}),
     generated: new Date().toISOString().slice(0, 19) + 'Z',
-    columns: Object.fromEntries(COLUMNS),
+    columns: Object.fromEntries(cols),
     rows,
   }, null, 1);
 }
@@ -142,6 +142,93 @@ def show(name, coord):
           f"Carrington lon={hgc.lon.to_value(u.deg):8.3f}")
 
 show("Earth", get_body_heliographic_stonyhurst("earth", t))
+for name, hid in horizons_ids.items():
+    show(name, get_horizons_coord(hid, t))
+`;
+}
+
+// ---------- viewing geometry ----------
+// What each observer needs to co-align and time-align its images with Earth's:
+// light time, apparent solar radius, disk-centre B0 and L0, and image scale.
+
+const C_KM_S = 299792.458;
+const AU_KM = 149597870.7;
+const R_SUN_KM = 695700;
+const ARCSEC = Math.PI / 648000;
+
+export const GEOMETRY_COLUMNS = [
+  ['time_utc', 'UTC moment at the observer'],
+  ['body', 'observer key'],
+  ['name', 'observer name'],
+  ['r_au', 'distance from Sun centre (au)'],
+  ['light_time_s', 'light travel time from Sun centre to the observer (s)'],
+  ['offset_vs_earth_s', 'light time minus Earth\'s (s); negative means it sees solar events earlier than Earth'],
+  ['rsun_arcsec', 'apparent solar radius (arcsec), as RSUN_OBS'],
+  ['b0_deg', 'heliographic latitude of the disk centre, B0, as HGLT_OBS (deg)'],
+  ['hgs_lon_deg', 'Stonyhurst longitude of the disk centre, as HGLN_OBS (deg)'],
+  ['l0_deg', 'Carrington longitude of the disk centre with the observer\'s own light time, as CRLN_OBS (deg)'],
+  ['km_per_arcsec', 'size on the Sun of one arcsecond at disk centre (km)'],
+  ['scale_vs_earth', 'how much larger a disk-centre feature looks than from Earth'],
+  ['status', 'ok, lost (prediction after loss of contact) or approx (shown at Earth)'],
+];
+
+export function geometryRows(scene, hidden) {
+  const e = scene.earth;
+  const dE = norm(e);
+  return scene.bodies
+    .filter((b) => !hidden.has(b.key) && (b.key === 'earth' || BODIES[b.key].kind === 'sc'))
+    .map((b) => {
+      const g = heliographic(b.p, e, scene.jd, norm(b.p));
+      const km = g.dist * AU_KM;
+      return {
+        time_utc: iso(scene.jd),
+        body: b.key,
+        name: BODIES[b.key].name,
+        r_au: r(g.dist, 6),
+        light_time_s: r(km / C_KM_S, 2),
+        offset_vs_earth_s: r((g.dist - dE) * AU_KM / C_KM_S, 2),
+        rsun_arcsec: r(Math.asin(R_SUN_KM / km) / ARCSEC, 2),
+        b0_deg: r(g.lat, 4),
+        hgs_lon_deg: r(g.lon, 4),
+        l0_deg: r(g.carr, 4),
+        km_per_arcsec: r((km - R_SUN_KM) * Math.tan(ARCSEC), 2),
+        scale_vs_earth: r((dE * AU_KM - R_SUN_KM) / (km - R_SUN_KM), 4),
+        status: b.st ?? 'ok',
+      };
+    });
+}
+
+export function geometrySunpy(jd, keys) {
+  const t = iso(jd).replace('Z', '');
+  const sc = keys.filter((k) => BODIES[k].kind === 'sc');
+  const width = Math.max(...sc.map((k) => BODIES[k].name.length), 5) + 2;
+  const lines = sc.map((k) => `    ${JSON.stringify(BODIES[k].name).padEnd(width + 2)}: "${BODIES[k].hid}",`);
+  return `# Reproduce the HelioFleet viewing-geometry table with SunPy.
+# Moment: ${t} UTC   (${SITE}?t=${t.slice(0, 16)}Z)
+# pip install sunpy astroquery
+import numpy as np
+import astropy.units as u
+import astropy.constants as const
+from astropy.time import Time
+from sunpy.coordinates import frames, get_body_heliographic_stonyhurst, get_horizons_coord
+
+t = Time("${t}", scale="utc")
+horizons_ids = {
+${lines.join('\n')}
+}
+earth = get_body_heliographic_stonyhurst("earth", t)
+
+def show(name, coord):
+    hgs = coord.transform_to(frames.HeliographicStonyhurst(obstime=t))
+    # The observer's own disk-centre Carrington longitude (CRLN_OBS)
+    hgc = hgs.transform_to(frames.HeliographicCarrington(obstime=t, observer=hgs))
+    d = hgs.radius
+    rsun = np.arcsin(const.R_sun / d).to(u.arcsec)
+    lag = ((d - earth.radius) / const.c).to(u.s)
+    print(f"{name:${width}s} r={d.to_value(u.AU):9.5f} au  light-time offset={lag.value:+8.1f} s  "
+          f"RSUN={rsun.value:8.2f}\"  B0={hgs.lat.to_value(u.deg):+8.3f}  L0={hgc.lon.to_value(u.deg):8.3f}")
+
+show("Earth", earth)
 for name, hid in horizons_ids.items():
     show(name, get_horizons_coord(hid, t))
 `;
