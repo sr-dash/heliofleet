@@ -20,6 +20,9 @@ identifiers:
   - type: doi
     value: 10.5281/zenodo.23330591
     description: "Version 1.1.0"
+  - type: doi
+    value: 10.5281/zenodo.23752828
+    description: "Version 1.1.1"
 url: "https://sr-dash.github.io/heliofleet/"
 repository-code: "https://github.com/sr-dash/heliofleet"
 license: MIT
