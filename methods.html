@@ -66,6 +66,18 @@
       <h1 class="wordmark">Methods</h1>
       <p class="tagline">How HelioFleet computes what it shows, how that is checked, and where its limits are.</p>
     </div>
+    <div class="switches">
+      <div class="theme-switch" role="radiogroup" aria-label="Colour theme">
+        <button role="radio" data-theme-pick="night" title="Night">
+          <span class="sw" style="--a:#0B1026;--b:#FFB23F"></span><span class="sw-name">Night</span></button>
+        <button role="radio" data-theme-pick="eclipse" title="Totality">
+          <span class="sw" style="--a:#030304;--b:#EDE8DA"></span><span class="sw-name">Totality</span></button>
+        <button role="radio" data-theme-pick="halpha" title="H-alpha">
+          <span class="sw" style="--a:#1A0606;--b:#FF4433"></span><span class="sw-name">H-alpha</span></button>
+        <button role="radio" data-theme-pick="plate" title="Plate">
+          <span class="sw" style="--a:#E6ECF1;--b:#1F2A4A"></span><span class="sw-name">Plate</span></button>
+      </div>
+    </div>
   </header>
   <nav class="sitenav" aria-label="HelioFleet pages">
     <a href="./">Map</a>
@@ -234,5 +246,21 @@
   <footer class="colophon">
     <p>Made by <a href="https://sr-dash.github.io/" rel="author">Dr. Soumyaranjan Dash</a> · <a href="./">HelioFleet map</a> · <a href="sky.html">Sky view</a> · <a href="help.html">How to use</a> · <a href="https://github.com/sr-dash/heliofleet">Source on GitHub</a> · <a href="https://doi.org/10.5281/zenodo.23328187">Cite (DOI 10.5281/zenodo.23328187)</a></p>
   </footer>
+  <script>
+    // Theme picker: the same choice, stored the same way, as on the map and the sky view
+    (() => {
+      const set = (name, keep) => {
+        document.documentElement.dataset.theme = name;
+        document.querySelectorAll('[data-theme-pick]').forEach((b) => b.setAttribute('aria-checked', b.dataset.themePick === name ? 'true' : 'false'));
+        if (keep) { try { localStorage.setItem('heliofleet-theme', name); } catch (e) {} }
+      };
+      set(document.documentElement.dataset.theme, false);
+      document.querySelectorAll('[data-theme-pick]').forEach((b) => b.addEventListener('click', () => {
+        set(b.dataset.themePick, true);
+        const q = new URLSearchParams(location.search);
+        if (q.has('theme')) { q.delete('theme'); history.replaceState(null, '', `${q.toString() ? `?${q}` : location.pathname}${location.hash}`); }
+      }));
+    })();
+  </script>
 </body>
 </html>

@@ -1134,6 +1134,24 @@ function toast(msg) {
   toast.timer = setTimeout(() => { t.hidden = true; }, 2600);
 }
 
+// ---------- theme ----------
+function setTheme(name, keep = true) {
+  document.documentElement.dataset.theme = name;
+  document.querySelectorAll('[data-theme-pick]').forEach((b) => b.setAttribute('aria-checked', b.dataset.themePick === name ? 'true' : 'false'));
+  if (keep) { try { localStorage.setItem('heliofleet-theme', name); } catch (e) { /* storage unavailable */ } }
+  theme = readTheme();
+  paint();
+}
+function initThemeSwitch() {
+  setTheme(document.documentElement.dataset.theme, false);
+  document.querySelectorAll('[data-theme-pick]').forEach((b) => b.addEventListener('click', () => {
+    setTheme(b.dataset.themePick);
+    // A picked theme replaces one that came in on the link
+    const q = new URLSearchParams(location.search);
+    if (q.has('theme')) { q.delete('theme'); history.replaceState(null, '', `?${q}${location.hash}`); }
+  }));
+}
+
 function buildLangSwitch() {
   const box = $('lang-switch');
   for (const [code, name] of Object.entries(LANGUAGES)) {
@@ -1204,7 +1222,7 @@ async function main() {
   translatePage();
   buildLangSwitch();
   readURL();
-  theme = readTheme();
+  initThemeSwitch();
   const [manifest, ground] = await Promise.all([
     loadManifest(),
     fetch('data/ground/cryonirsp.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
