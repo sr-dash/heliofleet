@@ -11,6 +11,7 @@ import { makeSky, fovGrid, fovFrame, inField, viewOf, hpcDirection, SKY_SHAPES, 
 import { norm, angleBetween, R_SUN_AU } from './frames.js';
 import { downloadPNG, downloadPDF } from './export.js';
 import { CHANNELS, loadContext, contextRuns, drawContext, contextNote, hitTest } from './context.js';
+import { OBS_INST, observationsNear, earthShape, earthRsun, liveRun } from './observations.js';
 import { LANGUAGES, detectLang, loadLang, lang, saveLang, tr, translatePage } from './i18n.js';
 
 const $ = (id) => document.getElementById(id);
@@ -41,7 +42,7 @@ const S = {
   obs: 'earth',
   pt: null, // marked point on the plane of the sky, [x, y] in solar radii
   img: 'aia171', // SDO image under the Cryo-NIRSP footprints
-  run: null, // observing run chosen in that panel, { key, hl }
+  oi: new Set(Object.keys(OBS_INST)), // instruments shown in that panel
 };
 const SCENE = { frame: 'hee', view: 'top', trailDays: 0, planets: false, labels: true, spirals: false, wind: 400, hidden: new Set(), cmes: false, fov: new Set() };
 let theme;
@@ -67,6 +68,7 @@ function readURL() {
   const pt = (q.get('pt') || '').split(',').map(Number);
   if (pt.length === 2 && pt.every(Number.isFinite)) S.pt = pt;
   if (CHANNELS[q.get('img')]) S.img = q.get('img');
+  if (q.has('oi')) S.oi = new Set(q.get('oi').split(',').filter((k) => OBS_INST[k]));
 }
 let urlTimer;
 function writeURL() {
@@ -82,6 +84,7 @@ function writeURL() {
     if (S.obs !== 'earth') q.set('obs', S.obs);
     if (S.pt) q.set('pt', S.pt.map((v) => v.toFixed(2)).join(','));
     if (S.img !== 'aia171') q.set('img', S.img);
+    if (S.oi.size !== Object.keys(OBS_INST).length) q.set('oi', [...S.oi].join(','));
     const cur = new URLSearchParams(location.search);
     for (const k of ['lang', 'theme']) if (cur.has(k)) q.set(k, cur.get(k));
     history.replaceState(null, '', `?${q}`);
@@ -678,37 +681,110 @@ function renderCryo() {
   $('cryo-next').disabled = !cryo.some((d) => d.j0 > S.jd + 0.5);
 }
 
-// ---------- Cryo-NIRSP on SDO images ----------
+// ---------- observations on SDO images ----------
 let ctxHits = [];
 let ctxToken = 0;
+const instName = (k) => OBS_INST[k].name;
+const midIso = (d) => isoMinute((d.j0 + d.j1) / 2);
+
+// Every footprint within 12 hours, in Earth's view, with its colour and label
+async function nearbyObservations() {
+  const near = (await observationsNear(S.jd, 0.5)) ?? [];
+  const cry = cryoInWindow().map((d) => ({ ...d, i: 'cryonirsp', f: 'E', n: `${d.wave} · ${tr(MODES[d.mode] ?? d.mode)} · ${d.pid}`, u: `https://sr-dash.github.io/cryonirsp-viewer/?dataset=${d.id}` }));
+  return [...cry, ...near.map(earthShape)]
+    .map((d) => ({ ...d, color: OBS_INST[d.i]?.color ?? '#fff' }))
+    .sort((a, b) => a.j0 - b.j0);
+}
+
 async function renderContext() {
-  const sets = await loadContext();
+  const [sets, all] = await Promise.all([loadContext(), nearbyObservations()]);
+  const shown = all.filter((d) => S.oi.has(d.i));
+  // The selected observation (kept as the frame even while its instrument is hidden), or the
+  // archived Cryo-NIRSP run, or the observation nearest in time
+  const sel = all.find((d) => d.id === S.hl);
   const { runs, pick } = contextRuns(cryoInWindow(), S.jd, S.hl);
-  // A run picked from the list holds until another dataset is highlighted
-  const run = (S.run?.hl === S.hl && runs.find((r) => r.key === S.run.key)) || pick;
+  let run;
+  if (sel?.i === 'cryonirsp' || (!sel && pick && S.oi.has('cryonirsp'))) run = runs.find((r) => sel && r.ids.includes(sel.id)) ?? pick;
+  const near = sel ?? shown.slice().sort((a, b) => Math.abs((a.j0 + a.j1) / 2 - S.jd) - Math.abs((b.j0 + b.j1) / 2 - S.jd))[0];
+  if (!run && near) run = liveRun(near);
+  renderInstruments(all);
+  renderObsList(shown, sel);
   const has = !!run;
   $('ctx-wrap').hidden = !has;
   $('ctx-note').hidden = !has;
-  $('ctx-run-field').hidden = runs.length < 2;
-  $('ctx-summary').textContent = !sets.length ? tr('The SDO images could not be loaded.')
-    : has ? '' : tr('No SDO images for Cryo-NIRSP observations within 12 hours. Use the buttons in the Cryo-NIRSP panel to find the nearest observations.');
+  $('ctx-sel').hidden = !sel;
   $('ctx-summary').hidden = has;
+  $('ctx-summary').textContent = has ? '' : tr('No observations from the chosen instruments within 12 hours.');
   document.querySelectorAll('#ctx-ch button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.value === S.img ? 'true' : 'false'));
-  const sel = $('ctx-run');
-  sel.replaceChildren(...runs.map((r) => {
-    const o = document.createElement('option');
-    o.value = r.key;
-    o.textContent = `${r.t.slice(0, 10)} ${r.t.slice(11, 16)} UT · ${tr('{n} datasets', { n: r.ids.length })}`;
-    o.selected = r === run;
-    return o;
-  }));
+  if (sel) {
+    const link = safeURL(sel.u) ? ` <a href="${safeURL(sel.u)}" target="_blank" rel="noopener">${tr('Data')} ↗</a>` : '';
+    $('ctx-sel').innerHTML = `<i style="background:${sel.color}"></i> <b>${instName(sel.i)}</b> · ${hhmm(sel.j0)}–${hhmm(sel.j1)} UT · <code>${escapeHTML(sel.id)}</code>${sel.n ? ` · ${escapeHTML(sel.n)}` : ''}${link}`;
+  }
   if (!has) { ctxHits = []; return; }
-  const byId = new Map(cryo.map((d) => [d.id, d]));
+  // Footprints overlapping the run, an hour either side
+  const own = run.live ? [near] : all.filter((d) => run.ids.includes(d.id));
+  const a = Math.min(...own.map((d) => d.j0)) - 1 / 24;
+  const b = Math.max(...own.map((d) => d.j1)) + 1 / 24;
+  const items = shown.filter((d) => d.j1 >= a && d.j0 <= b)
+    .map((d) => ({ ...d, label: d.id === S.hl ? `${OBS_INST[d.i].short} ${d.id}` : (d.i === 'cryonirsp' ? d.id : OBS_INST[d.i].short) }));
+  const rsun = own.find((d) => d.rsun)?.rsun ?? earthRsun(run.jd);
+  $('ctx-note').textContent = contextNote(run, S.img, items, Object.fromEntries(Object.keys(OBS_INST).map((k) => [k, OBS_INST[k].short])));
   const token = ++ctxToken;
-  const hits = await drawContext($('ctx-canvas'), run, S.img, byId, S.jd, S.hl);
+  const hits = await drawContext($('ctx-canvas'), run, S.img, items, S.jd, S.hl, rsun);
   if (token !== ctxToken || !hits) return;
   ctxHits = hits;
-  $('ctx-note').textContent = contextNote(run, S.img, run.ids.map((id) => byId.get(id)).filter(Boolean));
+}
+
+// Links from the data files: only http(s), escaped
+const safeURL = (u) => (/^https?:\/\//.test(u ?? '') ? escapeHTML(u) : null);
+
+function escapeHTML(t) {
+  return String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+
+function renderInstruments(all) {
+  const count = {};
+  for (const d of all) count[d.i] = (count[d.i] ?? 0) + 1;
+  const box = $('ctx-inst');
+  // Update the toggles in place, so focus and the page position stay where they are
+  if (box.children.length) {
+    for (const label of box.children) {
+      const k = label.querySelector('input').value;
+      label.classList.toggle('empty', !count[k]);
+      label.querySelector('input').checked = S.oi.has(k);
+      label.querySelector('small').textContent = count[k] ?? 0;
+    }
+    return;
+  }
+  box.innerHTML = Object.entries(OBS_INST).map(([k, m]) => `<label class="${count[k] ? '' : 'empty'}"><input type="checkbox" value="${k}"${S.oi.has(k) ? ' checked' : ''}><i style="background:${m.color}"></i>${m.short} <small>${count[k] ?? 0}</small></label>`).join('');
+}
+
+function renderObsList(shown, sel) {
+  const list = $('ctx-list');
+  list.replaceChildren(...shown.map((d) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'ctx-row';
+    b.dataset.id = d.id;
+    b.title = `${OBS_INST[d.i].name} · ${escapeHTML(d.id)}`;
+    if (d === sel) b.setAttribute('aria-current', 'true');
+    b.innerHTML = `<i style="background:${d.color}"></i><span class="t">${isoMinute(d.j0).slice(5, 10)} ${hhmm(d.j0)}</span><span>${OBS_INST[d.i].short}</span><span class="n">${escapeHTML(d.n || d.id)}</span>${safeURL(d.u) ? `<a href="${safeURL(d.u)}" target="_blank" rel="noopener">${tr('Data')} ↗</a>` : '<span></span>'}`;
+    return b;
+  }));
+  $('ctx-list').hidden = !shown.length;
+  $('ctx-list-title').hidden = !shown.length;
+  // Bring the selected row into view inside the list only; scrollIntoView would move the page too
+  const cur = list.querySelector('[aria-current="true"]');
+  if (cur) {
+    const top = cur.offsetTop;
+    if (top < list.scrollTop || top + cur.offsetHeight > list.scrollTop + list.clientHeight) list.scrollTop = top - list.clientHeight / 2 + cur.offsetHeight / 2;
+  }
+}
+
+function selectObservation(d) {
+  S.hl = d.id;
+  S.jd = (d.j0 + d.j1) / 2;
+  update();
 }
 
 function initContext() {
@@ -719,14 +795,22 @@ function initContext() {
     writeURL();
     renderContext();
   });
-  $('ctx-run').addEventListener('change', (e) => { S.run = { key: e.target.value, hl: S.hl }; renderContext(); });
+  $('ctx-inst').addEventListener('change', (e) => {
+    if (e.target.checked) S.oi.add(e.target.value); else S.oi.delete(e.target.value);
+    writeURL();
+    renderContext();
+  });
+  $('ctx-list').addEventListener('click', async (e) => {
+    if (e.target.closest('a')) return;
+    const row = e.target.closest('.ctx-row');
+    if (!row) return;
+    const d = (await nearbyObservations()).find((x) => x.id === row.dataset.id);
+    if (d) selectObservation(d);
+  });
   $('ctx-canvas').addEventListener('click', (e) => {
     const r = e.target.getBoundingClientRect();
     const d = hitTest(ctxHits, e.clientX - r.left, e.clientY - r.top);
-    if (!d) return;
-    S.hl = d.id;
-    S.jd = (d.j0 + d.j1) / 2;
-    update();
+    if (d) selectObservation(d);
   });
   new ResizeObserver(() => renderContext()).observe($('ctx-wrap'));
 }

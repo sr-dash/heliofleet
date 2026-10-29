@@ -1,5 +1,6 @@
-// DKIST Cryo-NIRSP footprints over SDO/AIA and HMI cutouts of the same run,
-// from data/ground/context/ (built by scripts/fetch_context.py).
+// Observation footprints over SDO/AIA and HMI images: archived cutouts for
+// DKIST Cryo-NIRSP runs (data/ground/context/, built by scripts/fetch_context.py)
+// and live Helioviewer cutouts around any other observation.
 
 import { tr } from './i18n.js';
 
@@ -24,7 +25,7 @@ function image(file) {
       const im = new Image();
       im.onload = () => ok(im);
       im.onerror = () => ok(null);
-      im.src = BASE + file;
+      im.src = file.startsWith('http') ? file : BASE + file;
     }));
   }
   return images.get(file);
@@ -78,21 +79,31 @@ function panel(ctx, box, view, im, ds, jd, hl, opts) {
     }
   }
 
-  // Limb at the radius the datasets record
-  const rsun = ds[0]?.rsun ?? 960;
+  // Limb at the radius the run records
+  const rsun = opts.rsun;
   ctx.strokeStyle = 'rgba(255,255,255,0.45)';
   ctx.setLineDash([4, 4]);
   ctx.beginPath(); ctx.arc(px(0), py(0), rsun / view.scale * k, 0, 2 * Math.PI); ctx.stroke();
   ctx.setLineDash([]);
 
-  // Footprints: the highlighted or current one solid, the rest dashed
+  // Footprints in their instrument's colour; the highlighted one in cyan and thicker,
+  // fields hidden behind the limb from Earth dashed. IRIS slit-jaw fields are drawn faintly.
   const hits = [];
   const sorted = ds.slice().sort((a, b) => (a.id === hl) - (b.id === hl));
   for (const d of sorted) {
-    const on = d.id === hl || (jd >= d.j0 && jd <= d.j1);
-    ctx.strokeStyle = on ? HL : 'rgba(255,255,255,0.8)';
-    ctx.lineWidth = (on ? 2.4 : 1.3) * (opts.labels ? 1 : 0.8);
-    ctx.setLineDash(on || !opts.labels ? [] : [5, 3]);
+    if (d.sx && opts.labels) {
+      ctx.strokeStyle = d.color;
+      ctx.globalAlpha = 0.45;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      d.sx.forEach((x, i) => (i ? ctx.lineTo(px(x), py(d.sy[i])) : ctx.moveTo(px(x), py(d.sy[i]))));
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+    const on = d.id === hl;
+    ctx.strokeStyle = on ? HL : (d.color ?? '#fff');
+    ctx.lineWidth = (on ? 2.6 : 1.4) * (opts.labels ? 1 : 0.8);
+    ctx.setLineDash(d.hidden ? [3, 3] : []);
     ctx.beginPath();
     d.x.forEach((x, i) => (i ? ctx.lineTo(px(x), py(d.y[i])) : ctx.moveTo(px(x), py(d.y[i]))));
     ctx.stroke();
@@ -107,16 +118,16 @@ function panel(ctx, box, view, im, ds, jd, hl, opts) {
     const lh = 13 * f;
     for (const { d, pts } of hits.slice().reverse()) {
       const top = pts.reduce((a, p) => (p[1] < a[1] ? p : a));
-      const w = ctx.measureText(d.id).width;
+      const text = d.label ?? d.id;
+      const w = ctx.measureText(text).width;
       const x = Math.min(bx + side - w - 2, top[0] + 3);
       // Same pointing as a labelled footprint: leave it; otherwise step down until clear
       if (seen.some((r) => Math.hypot(r.ax - top[0], r.ay - top[1]) < 4)) continue;
       let y = top[1] - 2;
       for (let n = 0; n < 6 && seen.some((r) => x < r.x + r.w && r.x < x + w && Math.abs(r.y - y) < lh); n++) y += lh;
       seen.push({ x, y, w, ax: top[0], ay: top[1] });
-      const on = d.id === hl || (jd >= d.j0 && jd <= d.j1);
-      ctx.fillStyle = on ? HL : '#fff';
-      ctx.fillText(d.id, x, y);
+      ctx.fillStyle = d.id === hl ? HL : (d.color ?? '#fff');
+      ctx.fillText(text, x, y);
     }
   }
   if (opts.stamp) {
@@ -184,36 +195,38 @@ function inView(cv, anim) {
 // Full disk on the left with the footprints, and a zoomed inset at top right
 // joined to the area it enlarges. A new run grows the inset out of its box on
 // the disk; a new channel fades over the old one. Returns the hit areas.
-export async function drawContext(cv, run, ch, byId, jd, hl) {
+export async function drawContext(cv, run, ch, ds, jd, hl, rsun) {
   const dpr = window.devicePixelRatio || 1;
   const W = cv.clientWidth;
   const H = cv.clientHeight;
   if (W < 50 || H < 50) return [];
   const f = Math.min(1.3, Math.max(0.85, H / 560));
-  const ds = run.ids.map((id) => byId.get(id)).filter(Boolean);
   const v = run.v ?? 1;
+  const src = (im) => im.url ?? `${im.file}?v=${v}`;
   // The full-disk image is centred on the Sun
   const disk = { x0: 0, y0: 0, scale: 5.2, size: 512, img: {}, ...run.disk };
   const anim = ++shown.anim;
   const [imDisk, imZoom] = await Promise.all([
-    disk.img[ch] ? image(`${disk.img[ch].file}?v=${v}`) : null,
-    run.img[ch] ? image(`${run.img[ch].file}?v=${v}`) : null,
+    disk.img[ch] ? image(src(disk.img[ch])) : null,
+    run.img[ch] ? image(src(run.img[ch])) : null,
   ]);
   if (anim !== shown.anim) return null; // a newer drawing has started
   // The other channels of this run, ready for a quick switch
   for (const c of Object.keys(CHANNELS)) {
-    if (disk.img[c]) image(`${disk.img[c].file}?v=${v}`);
-    if (run.img[c]) image(`${run.img[c].file}?v=${v}`);
+    if (disk.img[c]) image(src(disk.img[c]));
+    if (run.img[c]) image(src(run.img[c]));
   }
+  // Live cutouts are the image nearest the run's time, which Helioviewer does not report
   const when = (disk.img[ch] ?? run.img[ch])?.date;
-  const stamp = when ? `${CHANNELS[ch]}  ${when.slice(0, 10)} ${when.slice(11, 19)} UT` : CHANNELS[ch];
+  const stamp = when ? `${CHANNELS[ch]}  ${when.slice(0, 10)} ${when.slice(11, 19)} UT`
+    : run.live ? `${CHANNELS[ch]}  ${tr('nearest to')} ${run.t.slice(0, 10)} ${run.t.slice(11, 16)} UT` : CHANNELS[ch];
   const zs = Math.min(0.64 * H, W - H - 24);
   const zBox = { x: W - zs, y: 0, s: zs };
 
   const [base, gb] = layer(W, H, dpr);
-  const a = panel(gb, { x: 0, y: 0, s: H }, disk, imDisk, ds, jd, hl, { f, stamp });
+  const a = panel(gb, { x: 0, y: 0, s: H }, disk, imDisk, ds, jd, hl, { f, stamp, rsun });
   const [inset, gi] = layer(zs, zs, dpr);
-  const b = panel(gi, { x: 0, y: 0, s: zs }, run, imZoom, ds, jd, hl, { f: f * 0.9, grid: true, labels: true });
+  const b = panel(gi, { x: 0, y: 0, s: zs }, run, imZoom, ds, jd, hl, { f: f * 0.9, grid: true, labels: true, rsun });
   for (const h of b.hits) h.pts = h.pts.map(([x, y]) => [x + zBox.x, y]);
   const half = run.size * run.scale / 2;
   const r = [a.px(run.x0 - half), a.py(run.y0 + half), a.px(run.x0 + half), a.py(run.y0 - half)];
@@ -275,13 +288,16 @@ export async function drawContext(cv, run, ch, byId, jd, hl) {
   return [...a.hits, ...b.hits];
 }
 
-export function contextNote(run, ch, ds) {
-  const t0 = ds.map((d) => d.t0).sort()[0];
-  const t1 = ds.map((d) => d.t1).sort().at(-1);
+export function contextNote(run, ch, ds, names) {
   const img = run.img[ch];
-  const parts = [tr('{n} Cryo-NIRSP datasets observed {a}–{b} UT on {date}.', { n: ds.length, a: hhmm(t0), b: hhmm(t1), date: t0.slice(0, 10) })];
-  if (img) parts.push(tr('{channel} image taken at {time} UT, from Helioviewer.', { channel: CHANNELS[ch], time: hhmm(img.date) }));
-  parts.push(tr('Footprints use the pointing recorded with each dataset. Click one to jump to it.'));
+  const parts = [];
+  if (run.live) parts.push(tr('{channel} images loaded live from Helioviewer, nearest to {time} UT; their pointing is as recorded and not checked.', { channel: CHANNELS[ch], time: hhmm(run.t) }));
+  else if (img) parts.push(tr('{channel} image taken at {time} UT, from Helioviewer.', { channel: CHANNELS[ch], time: hhmm(img.date) }));
+  const count = {};
+  for (const d of ds) count[d.i] = (count[d.i] ?? 0) + 1;
+  parts.push(tr('Footprints of {n} observations within an hour of this run: {list}.', { n: ds.length, list: Object.entries(count).map(([k, n]) => `${names[k]} ${n}`).join(', ') }));
+  if (ds.some((d) => d.f === 'S')) parts.push(tr('Solar Orbiter fields are carried to Earth\'s view through the solar surface, dashed where that part lies beyond Earth\'s limb.'));
+  parts.push(tr('Footprints use the pointing recorded with each observation. Click one to select it.'));
   return parts.join(' ');
 }
 

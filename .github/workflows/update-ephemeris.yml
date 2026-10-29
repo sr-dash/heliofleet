@@ -76,6 +76,11 @@ jobs:
           pip install --quiet pillow numpy
           python scripts/fetch_context.py
 
+      # IRIS, Hinode/EIS, DKIST and Solar Orbiter footprints of the last twelve months
+      - name: Fetch observation footprints
+        continue-on-error: true
+        run: python scripts/fetch_observations.py
+
       - name: Build the calendar of upcoming events
         run: python scripts/build_calendar.py
 
