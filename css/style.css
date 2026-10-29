@@ -748,8 +748,20 @@ tbody tr:hover td { background: var(--surface); }
   .sitenav::after { content: ""; flex: none; width: 40px; }
 }
 .help li { margin: 6px 0; }
-.methods { max-width: 78ch; padding: 8px 28px 24px; line-height: 1.6; }
+.methods { padding: 8px 28px 32px; line-height: 1.65; font-size: 15.5px; overflow-wrap: break-word; }
 .methods-toc { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 4px 0 8px; font: 500 13px "IBM Plex Mono", monospace; }
+/* Wide screens: the page contents in a sidebar that stays in view, the text filling the rest */
+@media (min-width: 1000px) {
+  .methods { display: grid; grid-template-columns: 200px minmax(0, 1200px); column-gap: 48px; justify-content: start; }
+  .methods > * { grid-column: 2; }
+  .methods > .methods-toc { grid-column: 1; grid-row: 1 / span 40; align-self: start; position: sticky; top: 16px; flex-direction: column; flex-wrap: nowrap; gap: 0; margin: 18px 0 0; padding-left: 12px; border-left: 1px solid var(--line); }
+  .methods > .methods-toc a { padding: 5px 0; text-decoration: none; }
+  .methods > .methods-toc a:hover { text-decoration: underline; }
+  .methods > section:first-of-type { margin-top: 18px; }
+}
+/* Very wide screens: centre the page so the spare space is shared on both sides */
+@media (min-width: 1700px) { .methods { justify-content: center; } }
+@media (max-width: 860px) { .methods { padding: 8px 16px 28px; font-size: 15px; } }
 .methods-toc a, .methods a { color: var(--accent); }
 .methods section { padding-top: 14px; border-top: 1px solid var(--line); margin-top: 18px; }
 .methods h2 { font: 700 22px "Big Shoulders Display", sans-serif; letter-spacing: 0.02em; text-transform: uppercase; margin: 0 0 8px; }
