@@ -668,7 +668,6 @@ tbody tr:hover td { background: var(--surface); }
 .ctx-find-row { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: end; margin: 8px 0; }
 .ctx-find-row > label:not(.field) { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px; cursor: pointer; }
 .ctx-find-row .field { margin: 0; min-width: 150px; }
-.find-row { grid-template-columns: 132px 70px minmax(0, 1fr) auto; }
 .ctx-sub { font-size: 13px; font-weight: 600; margin: 14px 0 6px; }
 .ctx-list { position: relative; max-height: 300px; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px; }
 .ctx-row { display: grid; grid-template-columns: 12px 92px 120px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; width: 100%; padding: 6px 10px; border: 0; border-bottom: 1px solid var(--line); background: none; color: var(--ink); font: inherit; font-size: 13px; text-align: left; cursor: pointer; }
@@ -679,6 +678,15 @@ tbody tr:hover td { background: var(--surface); }
 .ctx-row .t { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--muted); }
 .ctx-row .n { color: var(--muted); }
 @media (max-width: 640px) { .ctx-row { grid-template-columns: 12px 80px minmax(0, 1fr); } .ctx-row .n, .ctx-row a { display: none; } }
+/* Finder rows: start, duration, instruments, position; the last two wrap rather than clip */
+.ctx-row.find-row { grid-template-columns: 9.5em 4.5em minmax(0, 1fr) minmax(0, 13em); align-items: start; }
+.ctx-row.find-row span { white-space: normal; overflow-wrap: anywhere; }
+.ctx-row.find-row .t { white-space: nowrap; }
+@media (max-width: 640px) {
+  .ctx-row.find-row { grid-template-columns: 9.5em minmax(0, 1fr); row-gap: 2px; }
+  .ctx-row.find-row .n { display: block; grid-column: 1 / -1; }
+  .ctx-row.find-row .t:last-child { grid-column: 1 / -1; }
+}
 .chip-links { display: flex; gap: 8px; margin-top: 2px; }
 .chip-links a { font-size: 12px; }
 @media (max-width: 860px) {
