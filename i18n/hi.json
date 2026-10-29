@@ -558,6 +558,8 @@
  "Map": "मानचित्र",
  "Methods": "विधियाँ",
  "Sky view": "आकाश दृश्य",
- "In the print dialog, choose Save as PDF": "प्रिंट डायलॉग में Save as PDF चुनें",
- "Opens the print dialog; choose Save as PDF": "प्रिंट डायलॉग खोलता है; Save as PDF चुनें"
+ "Draws these footprints over AIA or HMI FITS from JSOC and saves a PDF": "इन क्षेत्रों को JSOC की AIA या HMI FITS छवियों पर बनाकर PDF सहेजता है",
+ "Every footprint drawn: instrument, times and outline": "बनाया गया हर क्षेत्र: उपकरण, समय और रूपरेखा",
+ "Footprints (CSV)": "क्षेत्र (CSV)",
+ "SunPy script": "SunPy स्क्रिप्ट"
 }

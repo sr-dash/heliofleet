@@ -116,7 +116,8 @@ export function earthShape(r) {
   }
   x.push(x[0]);
   y.push(y[0]);
-  const out = { ...r, x, y, hidden: hid > 0.5 * (x.length - 1) };
+  // ox, oy keep the field as recorded from Solar Orbiter, for the footprint export
+  const out = { ...r, ox: r.x, oy: r.y, x, y, hidden: hid > 0.5 * (x.length - 1) };
   shapes.set(r, out);
   return out;
 }

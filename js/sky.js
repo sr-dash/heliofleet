@@ -10,7 +10,7 @@ import { INSTRUMENTS, INSTRUMENT, flyingAt, insColor, insLabel, insShort } from 
 import { makeSky, fovGrid, fovFrame, inField, viewOf, hpcDirection, SKY_SHAPES, GROUND, SITES, sunAltitude, observingWindow } from './skyproj.js';
 import { norm, angleBetween, R_SUN_AU } from './frames.js';
 import { downloadPNG, downloadPDF } from './export.js';
-import { CHANNELS, loadContext, contextRuns, drawContext, contextNote, hitTest, contextPNG, contextReport } from './context.js';
+import { CHANNELS, loadContext, contextRuns, drawContext, contextNote, hitTest, contextPNG, contextView } from './context.js';
 import { OBS_INST, observationsNear, earthShape, earthRsun, liveRun } from './observations.js';
 import { LANGUAGES, detectLang, loadLang, lang, saveLang, tr, translatePage } from './i18n.js';
 
@@ -760,16 +760,14 @@ async function renderContext() {
   const counts = {};
   for (const d of items) counts[d.i] = (counts[d.i] ?? 0) + 1;
   $('ctx-png').hidden = !!run.live;
-  ctxRows = items.slice().sort((a, b) => a.j0 - b.j0).map((d) => {
-    const xs = d.x.slice(0, -1);
-    const ys = d.y.slice(0, -1);
-    return {
-      color: d.color, name: OBS_INST[d.i].name, id: d.id,
-      t0: isoMinute(d.j0).replace('T', ' '), t1: isoMinute(d.j1).replace('T', ' '),
-      x: Math.round((Math.max(...xs) + Math.min(...xs)) / 2), y: Math.round((Math.max(...ys) + Math.min(...ys)) / 2),
-      note: d.n ?? '', url: d.u,
-    };
-  });
+  // Outlines as recorded: Solar Orbiter's in its own frame, with its position
+  ctxRows = items.slice().sort((a, b) => a.j0 - b.j0).map((d) => ({
+    color: d.color, name: OBS_INST[d.i].name, id: d.id,
+    t0: isoMinute(d.j0).replace('T', ' '), t1: isoMinute(d.j1).replace('T', ' '),
+    frame: d.f === 'S' ? 'solo' : 'earth', obs: d.f === 'S' ? d.o : null,
+    px: d.f === 'S' ? d.ox : d.x, py: d.f === 'S' ? d.oy : d.y,
+    note: d.n ?? '', url: d.u,
+  }));
   const img = run.img[S.img];
   ctxCaption = [
     `HelioFleet · observation footprints on SDO images · ${isoMinute(S.jd).replace('T', ' ')} UT`,
@@ -917,36 +915,112 @@ function initFinder() {
 
 // ---------- downloads of the observations panel ----------
 let ctxCaption = [];
-let ctxRows = []; // the footprints drawn, for the PDF's table
+let ctxRows = []; // the footprints drawn, for the CSV and the SunPy script
 
-// The PDF is printed by the browser from a hidden page, because live Helioviewer images
-// may be shown and printed but not read back by this site
-async function printReport() {
-  writeURL();
-  await new Promise((r) => setTimeout(r, 260));
-  const html = contextReport({
-    title: `HelioFleet · observation footprints on SDO images · ${isoMinute(S.jd).replace('T', ' ')} UT`,
-    lines: ctxCaption.slice(1), rows: ctxRows, link: location.href,
-  });
-  if (!html) return;
-  document.getElementById('report-frame')?.remove();
-  const frame = document.createElement('iframe');
-  frame.id = 'report-frame';
-  frame.title = 'Printable report';
-  frame.style.cssText = 'position:fixed;right:0;bottom:0;width:1px;height:1px;border:0;opacity:0;pointer-events:none';
-  frame.srcdoc = html;
-  document.body.appendChild(frame);
-  await new Promise((r) => frame.addEventListener('load', r, { once: true }));
-  const doc = frame.contentDocument;
-  // Wait for the images (at most 15 s) before opening the print dialog
-  await Promise.race([
-    Promise.all([...doc.querySelectorAll('image')].map((im) => new Promise((ok) => { im.addEventListener('load', ok, { once: true }); im.addEventListener('error', ok, { once: true }); }))),
-    new Promise((r) => setTimeout(r, 15000)),
-  ]);
-  toast(tr('In the print dialog, choose Save as PDF'));
-  frame.contentWindow.focus();
-  frame.contentWindow.print();
+const csvCell = (v) => (typeof v === 'string' && /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v ?? '');
+function footprintsCSV() {
+  const cols = [
+    ['instrument', 'instrument'], ['id', 'observation identifier'], ['start_utc', 'start (UTC)'], ['end_utc', 'end (UTC)'],
+    ['frame', 'earth: helioprojective as seen from Earth; solo: as seen from Solar Orbiter at the observer position given'],
+    ['observer_hgs_lon_deg', 'Solar Orbiter Stonyhurst longitude (deg)'], ['observer_hgs_lat_deg', 'Solar Orbiter Stonyhurst latitude (deg)'],
+    ['observer_dist_au', 'Solar Orbiter distance from the Sun (au)'],
+    ['x_arcsec', 'outline helioprojective longitudes, closed polygon, separated by ;'], ['y_arcsec', 'outline helioprojective latitudes, separated by ;'],
+    ['description', 'study, programme or proposal'], ['data_url', 'link to the data or its quick look'],
+  ];
+  const head = ['HelioFleet observation footprints', `View: ${location.href}`, `Generated: ${new Date().toISOString().slice(0, 19)}Z`,
+    'Sources: DKIST Data Center, LMSAL Heliophysics Coverage Registry (IRIS), Hinode/EIS as-run catalogue, Solar Orbiter Archive',
+    ...cols.map(([k, d]) => `${k}: ${d}`)].map((l) => `# ${l}`).join('\n');
+  const rows = ctxRows.map((r) => [r.name, r.id, r.t0, r.t1, r.frame, ...(r.obs ?? ['', '', '']), r.px.join(';'), r.py.join(';'), r.note, r.url ?? ''].map(csvCell).join(','));
+  return `${head}\n${cols.map(([k]) => k).join(',')}\n${rows.join('\n')}\n`;
 }
+
+// A script that draws the same footprints over AIA or HMI FITS from JSOC, and saves the figure as PDF
+function footprintsSunpy() {
+  const v = contextView();
+  const t = `${isoMinute(S.jd)}:00`;
+  const list = (a) => `[${a.join(', ')}]`;
+  const fps = ctxRows.map((r) => `    (${JSON.stringify(r.name)}, ${JSON.stringify(r.id)}, "${r.t0.replace(' ', 'T')}", "${r.color}", ${r.obs ? `(${r.obs.join(', ')})` : 'None'},\n     ${list(r.px)},\n     ${list(r.py)}),`).join('\n');
+  return `# HelioFleet: observation footprints over SDO/AIA or HMI images, from JSOC FITS files.
+# View online: ${location.href}
+# pip install "sunpy[net,map]" matplotlib
+# Earth-view footprints are drawn as recorded. Solar Orbiter fields (observer given) are
+# carried into the map's view by SunPy: through the solar surface on the disk, and on a
+# sphere around Solar Orbiter at the Sun's distance off the disk.
+import astropy.units as u
+import matplotlib.pyplot as plt
+import numpy as np
+import sunpy.map
+from astropy.coordinates import SkyCoord
+from astropy.time import Time
+from matplotlib.lines import Line2D
+from sunpy.coordinates import frames
+from sunpy.net import Fido, attrs as a
+
+T = Time("${t}")
+CHANNEL = "${S.img}"  # aia171, aia193 or hmi
+ZOOM_X = (${Math.round(v?.x[0] ?? -300)}, ${Math.round(v?.x[1] ?? 300)})  # arcsec, the zoomed panel of the page
+ZOOM_Y = (${Math.round(v?.y[0] ?? -300)}, ${Math.round(v?.y[1] ?? 300)})
+
+# name, id, start (UTC), colour, Solar Orbiter (Stonyhurst lon deg, lat deg, distance au) or None, x, y (arcsec)
+FOOTPRINTS = [
+${fps}
+]
+
+
+def fetch(channel, t):
+    """The AIA or HMI image nearest t, from JSOC through Fido."""
+    window = a.Time(t - 10 * u.min, t + 10 * u.min)
+    if channel == "hmi":
+        res = Fido.search(window, a.Instrument.hmi, a.Physobs.los_magnetic_field)
+    else:
+        res = Fido.search(window, a.Instrument.aia, a.Wavelength(int(channel[3:]) * u.angstrom))
+    starts = Time(res[0]["Start Time"])
+    i = int(np.argmin(np.abs((starts - t).to_value(u.s))))
+    return sunpy.map.Map(Fido.fetch(res[0, i])).rotate(order=3)
+
+
+def outline(fp, m):
+    name, _id, start, colour, solo, x, y = fp
+    if solo is None:
+        return SkyCoord(x * u.arcsec, y * u.arcsec, frame=m.coordinate_frame)
+    observer = SkyCoord(solo[0] * u.deg, solo[1] * u.deg, solo[2] * u.AU,
+                        frame=frames.HeliographicStonyhurst, obstime=Time(start))
+    seen = SkyCoord(x * u.arcsec, y * u.arcsec, frame=frames.Helioprojective(observer=observer, obstime=Time(start)))
+    # Off-disk points placed on a sphere around Solar Orbiter at the Sun's distance
+    with frames.Helioprojective.assume_spherical_screen(observer, only_off_disk=True):
+        return seen.transform_to(m.coordinate_frame)
+
+
+def show(m, ax):
+    if CHANNEL == "hmi":
+        m.plot(axes=ax, vmin=-300, vmax=300, cmap="gray")
+    else:
+        m.plot(axes=ax, clip_interval=(1, 99.8) * u.percent)
+    ax.set_autoscale_on(False)  # outlines reaching past the image do not widen the axes
+    for fp in FOOTPRINTS:
+        ax.plot_coord(outline(fp, m), color=fp[3], lw=1.2)
+
+
+m = fetch(CHANNEL, T)
+fig = plt.figure(figsize=(15, 7.5))
+ax1 = fig.add_subplot(1, 2, 1, projection=m)
+show(m, ax1)
+box = SkyCoord(ZOOM_X * u.arcsec, ZOOM_Y * u.arcsec, frame=m.coordinate_frame)
+m.draw_quadrangle(box, axes=ax1, edgecolor="cyan", lw=1)
+sub = m.submap(box[0], top_right=box[1])
+ax2 = fig.add_subplot(1, 2, 2, projection=sub)
+show(sub, ax2)
+seen = {}
+for fp in FOOTPRINTS:
+    seen.setdefault(fp[0], fp[3])
+ax2.legend([Line2D([], [], color=c) for c in seen.values()], list(seen), loc="lower left", fontsize=8)
+fig.suptitle(f"Observation footprints, {T.isot[:16]} UTC (HelioFleet)")
+name = f"heliofleet_footprints_{T.strftime('%Y%m%d_%H%M')}.pdf"
+fig.savefig(name, bbox_inches="tight")
+print("saved", name)
+`;
+}
+
 function saveBlob(blob, name) {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -963,7 +1037,8 @@ function initDownloads() {
     const blob = await contextPNG([...ctxCaption, location.href]);
     if (blob) saveBlob(blob, `heliofleet_observations_${fileStamp()}UT.png`);
   });
-  $('ctx-pdf').addEventListener('click', () => printReport());
+  $('ctx-csv').addEventListener('click', () => saveBlob(new Blob([footprintsCSV()], { type: 'text/csv' }), `heliofleet_footprints_${fileStamp()}UT.csv`));
+  $('ctx-sunpy').addEventListener('click', () => saveBlob(new Blob([footprintsSunpy()], { type: 'text/x-python' }), `heliofleet_footprints_${fileStamp()}UT.py`));
   $('sky-link-copy').addEventListener('click', () => copyLink());
 }
 

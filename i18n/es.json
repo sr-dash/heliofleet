@@ -558,6 +558,8 @@
  "Map": "Mapa",
  "Methods": "Métodos",
  "Sky view": "Vista del cielo",
- "In the print dialog, choose Save as PDF": "En el diálogo de impresión, elija Guardar como PDF",
- "Opens the print dialog; choose Save as PDF": "Abre el diálogo de impresión; elija Guardar como PDF"
+ "Draws these footprints over AIA or HMI FITS from JSOC and saves a PDF": "Dibuja estos campos sobre FITS de AIA o HMI de JSOC y guarda un PDF",
+ "Every footprint drawn: instrument, times and outline": "Cada campo dibujado: instrumento, horas y contorno",
+ "Footprints (CSV)": "Campos (CSV)",
+ "SunPy script": "Script de SunPy"
 }

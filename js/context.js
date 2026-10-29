@@ -161,7 +161,6 @@ function layer(w, h, dpr) {
 }
 
 let last = null; // the latest drawing, for the downloads
-const absolute = (u) => (u.startsWith('http') ? u : new URL(BASE + u, location.href).href);
 const ease = (t) => 1 - (1 - t) ** 3;
 const lerp = (a, b, t) => a + (b - a) * t;
 const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -259,9 +258,7 @@ export async function drawContext(cv, run, ch, ds, jd, hl, rsun) {
 
   // Kept for the PNG and SVG downloads
   last = {
-    W, H, zs, zBox, r, compose, run, ch, ds, hl, rsun, disk, stamp, f,
-    // Absolute addresses, so a saved SVG still finds its images
-    urls: { disk: disk.img[ch] && absolute(src(disk.img[ch])), zoom: run.img[ch] && absolute(src(run.img[ch])) },
+    W, H, compose, run,
   };
   cv.width = Math.round(W * dpr);
   cv.height = Math.round(H * dpr);
@@ -297,7 +294,6 @@ export async function drawContext(cv, run, ch, ds, jd, hl, rsun) {
 }
 
 // ---------- downloads ----------
-const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const CAPTION_LH = 16;
 
 // PNG of the panel as drawn, with the caption below. Null when the images are live
@@ -324,106 +320,12 @@ export async function contextPNG(caption) {
   });
 }
 
-// The panel as an SVG figure with the images linked by address and vector footprints,
-// for the printable report: inline in a page, the browser loads and prints the images
-export function contextSVG(caption = []) {
+// The run the panel shows and its inset, for the footprint export
+export function contextView() {
   if (!last) return null;
-  const { W, H, zs, zBox, r, run, ds, hl, rsun, disk, stamp, urls, f } = last;
-  const capH = caption.length ? 14 + caption.length * CAPTION_LH : 0;
-  const mapper = (box, view) => {
-    const k = box.s / view.size;
-    return [(x) => box.x + box.s / 2 + (x - view.x0) / view.scale * k, (y) => box.y + box.s / 2 - (y - view.y0) / view.scale * k, k];
-  };
-  const out = [`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${W} ${H + capH}" font-family="IBM Plex Mono, Menlo, monospace">`,
-    `<rect width="${W}" height="${H + capH}" fill="#05070d"/>`,
-    `<defs><clipPath id="cd"><rect x="0" y="0" width="${H}" height="${H}"/></clipPath><clipPath id="cz"><rect x="${zBox.x}" y="0" width="${zs}" height="${zs}"/></clipPath></defs>`];
-  const poly = (d, px, py, w, dash) => `<polyline points="${d.x.map((x, i) => `${px(x).toFixed(1)},${py(d.y[i]).toFixed(1)}`).join(' ')}" fill="none" stroke="${d.id === hl ? HL : (d.color ?? '#fff')}" stroke-width="${d.id === hl ? w * 1.9 : w}"${dash ? ' stroke-dasharray="3 3"' : ''}/>`;
-  // Full disk
-  {
-    const box = { x: 0, y: 0, s: H };
-    const view = { x0: 0, y0: 0, ...disk };
-    const [px, py, k] = mapper(box, view);
-    out.push('<g clip-path="url(#cd)">', `<rect width="${H}" height="${H}" fill="#000"/>`);
-    if (urls.disk) out.push(`<image href="${esc(urls.disk)}" xlink:href="${esc(urls.disk)}" x="0" y="0" width="${H}" height="${H}"/>`);
-    out.push(`<circle cx="${px(0)}" cy="${py(0)}" r="${rsun / view.scale * k}" fill="none" stroke="rgba(255,255,255,0.45)" stroke-dasharray="4 4"/>`);
-    for (const d of ds) out.push(poly(d, px, py, 1.1, d.hidden));
-    out.push(`<rect x="${6 * f}" y="${6 * f}" width="${stamp.length * 7.3 * f + 10}" height="${20 * f}" fill="rgba(0,0,0,0.6)"/>`,
-      `<text x="${11 * f}" y="${16 * f}" fill="#fff" font-size="${12 * f}" dominant-baseline="middle">${esc(stamp)}</text>`, '</g>');
-  }
-  // Box on the disk and the lines to the inset
-  out.push(`<rect x="${r[0]}" y="${r[1]}" width="${r[2] - r[0]}" height="${r[3] - r[1]}" fill="none" stroke="${HL}" stroke-width="1.2"/>`,
-    `<path d="M${r[2]},${r[1]}L${zBox.x},0M${r[2]},${r[3]}L${zBox.x},${zs}" stroke="${HL}" stroke-opacity="0.7" fill="none"/>`);
-  // Inset
-  {
-    const view = run;
-    const [px, py, k] = mapper(zBox, view);
-    out.push('<g clip-path="url(#cz)">', `<rect x="${zBox.x}" y="0" width="${zs}" height="${zs}" fill="#000"/>`);
-    if (urls.zoom) out.push(`<image href="${esc(urls.zoom)}" xlink:href="${esc(urls.zoom)}" x="${zBox.x}" y="0" width="${zs}" height="${zs}"/>`);
-    const half = view.size * view.scale / 2;
-    const step = niceStep(2 * half);
-    const fs = 11 * f * 0.9;
-    for (let x = Math.ceil((view.x0 - half) / step) * step; x <= view.x0 + half; x += step) {
-      out.push(`<line x1="${px(x)}" y1="0" x2="${px(x)}" y2="${zs}" stroke="rgba(255,255,255,0.18)"/>`);
-      if (px(x) > zBox.x + 44 * f) out.push(`<text x="${px(x)}" y="${zs - 6}" fill="rgba(255,255,255,0.75)" font-size="${fs}" text-anchor="middle">${x}″</text>`);
-    }
-    for (let y = Math.ceil((view.y0 - half) / step) * step; y <= view.y0 + half; y += step) {
-      out.push(`<line x1="${zBox.x}" y1="${py(y)}" x2="${zBox.x + zs}" y2="${py(y)}" stroke="rgba(255,255,255,0.18)"/>`);
-      if (py(y) < zs - 24 * f) out.push(`<text x="${zBox.x + 4}" y="${py(y)}" fill="rgba(255,255,255,0.75)" font-size="${fs}" dominant-baseline="middle">${y}″</text>`);
-    }
-    out.push(`<circle cx="${px(0)}" cy="${py(0)}" r="${rsun / view.scale * k}" fill="none" stroke="rgba(255,255,255,0.45)" stroke-dasharray="4 4"/>`);
-    const seen = [];
-    for (const d of ds) {
-      if (d.sx) out.push(`<polyline points="${d.sx.map((x, i) => `${px(x).toFixed(1)},${py(d.sy[i]).toFixed(1)}`).join(' ')}" fill="none" stroke="${d.color}" stroke-opacity="0.45"/>`);
-      out.push(poly(d, px, py, 1.4, d.hidden));
-    }
-    for (const d of ds.slice().reverse()) {
-      const pts = d.x.map((x, i) => [px(x), py(d.y[i])]);
-      const top = pts.reduce((a, p) => (p[1] < a[1] ? p : a));
-      if (seen.some((q) => Math.hypot(q[0] - top[0], q[1] - top[1]) < 4)) continue;
-      seen.push(top);
-      out.push(`<text x="${Math.min(zBox.x + zs - 60, top[0] + 3)}" y="${top[1] - 3}" fill="${d.id === hl ? HL : (d.color ?? '#fff')}" font-size="${fs}">${esc(d.label ?? d.id)}</text>`);
-    }
-    out.push('</g>', `<rect x="${zBox.x + 0.75}" y="0.75" width="${zs - 1.5}" height="${zs - 1.5}" fill="none" stroke="${HL}" stroke-width="1.5"/>`);
-  }
-  caption.forEach((line, i) => out.push(`<text x="8" y="${H + 20 + i * CAPTION_LH}" fill="#e8ecf4" font-size="12">${esc(line)}</text>`));
-  out.push('</svg>');
-  return out.join('\n');
-}
-
-// A printable report: the figure, then a table of every footprint, for the browser's
-// "Save as PDF". Rows are { color, name, id, t0, t1, x, y, note, url } in UTC and arcsec.
-export function contextReport({ title, lines, rows, link }) {
-  const svg = contextSVG();
-  if (!svg) return null;
-  const safe = (u) => (/^https?:\/\//.test(u ?? '') ? esc(u) : '');
-  const body = rows.map((r) => `<tr><td><span class="sw" style="background:${esc(r.color)}"></span>${esc(r.name)}</td><td><code>${esc(r.id)}</code></td><td>${esc(r.t0)}<br>${esc(r.t1)}</td><td>${esc(r.x)}″, ${esc(r.y)}″</td><td>${esc(r.note || '')}</td><td>${safe(r.url) ? `<a href="${safe(r.url)}">data</a>` : ''}</td></tr>`).join('');
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${esc(title)}</title>
-<style>
-@page { size: A4 landscape; margin: 11mm; }
-* { box-sizing: border-box; }
-body { margin: 0; font: 10.5px/1.4 "Instrument Sans", Helvetica, Arial, sans-serif; color: #111; }
-h1 { font-size: 15px; margin: 0 0 2px; }
-.meta { margin: 0 0 8px; color: #333; }
-.fig { margin: 0 0 8px; text-align: center; }
-/* Small enough that the table starts on the first page */
-.fig svg { display: inline-block; height: 112mm; width: auto; max-width: 100%; background: #05070d; }
-table { border-collapse: collapse; width: 100%; }
-th, td { text-align: left; vertical-align: top; padding: 3px 6px; border-bottom: 0.5px solid #bbb; }
-th { font-weight: 600; background: #f0f0f0; }
-thead { display: table-header-group; }
-tr { break-inside: avoid; }
-code { font: 9.5px "IBM Plex Mono", Menlo, monospace; }
-.sw { display: inline-block; width: 9px; height: 9px; margin-right: 5px; border: 0.5px solid #555; vertical-align: -1px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-.fig, th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-.foot { margin-top: 8px; color: #333; }
-.foot a, td a { color: #0645ad; }
-</style></head><body>
-<h1>${esc(title)}</h1>
-<p class="meta">${lines.map(esc).join('<br>')}</p>
-<div class="fig">${svg}</div>
-<table><thead><tr><th>Instrument</th><th>Observation</th><th>Start – end (UTC)</th><th>Centre (Earth view)</th><th>Description</th><th></th></tr></thead><tbody>${body}</tbody></table>
-<p class="foot">Footprints use the pointing recorded with each observation, in helioprojective arcseconds as seen from Earth; Solar Orbiter fields are carried into Earth's view through the solar surface, dashed where they lie beyond Earth's limb. Sources: DKIST Data Center, LMSAL Heliophysics Coverage Registry (IRIS), Hinode/EIS as-run catalogue, Solar Orbiter Archive; SDO/AIA and HMI images via Helioviewer.<br>View this online: <a href="${safe(link)}">${esc(link)}</a></p>
-</body></html>`;
+  const { run } = last;
+  const half = run.size * run.scale / 2;
+  return { live: !!run.live, t: run.t, x: [run.x0 - half, run.x0 + half], y: [run.y0 - half, run.y0 + half] };
 }
 
 export function contextNote(run, ch, ds, names) {
