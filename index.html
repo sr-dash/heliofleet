@@ -13,7 +13,7 @@
     gtag('config', 'G-8X5BSNF3VV');
   </script>
 
-  <meta name="description" content="Interactive map of SDO, SOHO, Aditya-L1, Solar Orbiter, Parker Solar Probe, STEREO, BepiColombo and more around the Sun and Earth on any date since 2010. Eclipse presets, alignment search, spot visibility, coordinate export and PNG/PDF snapshots from JPL Horizons ephemerides.">
+  <meta name="description" content="Interactive map of SDO, SOHO, Aditya-L1, Solar Orbiter, Parker Solar Probe, STEREO, BepiColombo and more around the Sun and Earth on any date since 2010: coordinates, viewing geometry, alignment search, solar coverage over HMI magnetograms, and IRIS, Hinode/EIS, DKIST and Solar Orbiter observation footprints, from JPL Horizons ephemerides.">
   <meta name="keywords" content="HelioFleet, spacecraft positions, where is STEREO, Parker Solar Probe location, Solar Orbiter location, Aditya-L1, SDO, heliophysics, solar eclipse, Stonyhurst coordinates, Carrington longitude, Parker spiral, JPL Horizons, heliospheric orbit map">
   <meta name="author" content="Soumyaranjan Dash">
   <meta name="robots" content="index, follow, max-image-preview:large">
@@ -47,7 +47,7 @@
   <meta property="og:locale:alternate" content="hi_IN">
   <meta property="og:locale:alternate" content="es_ES">
   <meta property="og:title" content="HelioFleet: where the Sun-watching spacecraft are">
-  <meta property="og:description" content="SDO, SOHO, Aditya-L1, Solar Orbiter, Parker, STEREO, BepiColombo and more around the Sun and Earth on any date since 2010, with eclipse presets and alignment search.">
+  <meta property="og:description" content="SDO, SOHO, Aditya-L1, Solar Orbiter, Parker, STEREO, BepiColombo and more around the Sun and Earth on any date since 2010, with viewing geometry, alignment search and coordinated IRIS, Hinode/EIS, DKIST and Solar Orbiter observations.">
   <meta property="og:url" content="https://sr-dash.github.io/heliofleet/">
   <meta property="og:image" content="https://sr-dash.github.io/heliofleet/assets/og-image.png">
   <meta property="og:image:secure_url" content="https://sr-dash.github.io/heliofleet/assets/og-image.png">
@@ -60,7 +60,7 @@
   <meta name="twitter:site" content="@soumyatheory">
   <meta name="twitter:creator" content="@soumyatheory">
   <meta name="twitter:title" content="HelioFleet: where the Sun-watching spacecraft are">
-  <meta name="twitter:description" content="SDO, SOHO, Aditya-L1, Solar Orbiter, Parker, STEREO, BepiColombo and more around the Sun and Earth on any date since 2010.">
+  <meta name="twitter:description" content="SDO, SOHO, Aditya-L1, Solar Orbiter, Parker, STEREO, BepiColombo and more around the Sun and Earth on any date since 2010, with viewing geometry and coordinated-observation search.">
   <meta name="twitter:image" content="https://sr-dash.github.io/heliofleet/assets/og-image.png">
   <meta name="twitter:image:alt" content="HelioFleet map of spacecraft around the Sun during the 8 April 2024 total solar eclipse">
 
@@ -103,7 +103,7 @@
         "name": "HelioFleet",
         "alternateName": "HelioFleet spacecraft position map",
         "url": "https://sr-dash.github.io/heliofleet/",
-        "description": "Interactive map of SDO, SOHO, Aditya-L1, Solar Orbiter, Parker Solar Probe, STEREO, BepiColombo and more around the Sun and Earth on any date since 2010. Eclipse presets, alignment search, spot visibility, coordinate export and PNG/PDF snapshots from JPL Horizons ephemerides.",
+        "description": "Interactive map of SDO, SOHO, Aditya-L1, Solar Orbiter, Parker Solar Probe, STEREO, BepiColombo and more around the Sun and Earth on any date since 2010: coordinates, viewing geometry, alignment search, solar coverage over HMI magnetograms, and IRIS, Hinode/EIS, DKIST and Solar Orbiter observation footprints, from JPL Horizons ephemerides.",
         "applicationCategory": "EducationalApplication",
         "applicationSubCategory": "Heliophysics visualization",
         "operatingSystem": "Any (web browser)",
@@ -114,12 +114,13 @@
         "datePublished": "2026-10-09",
         "image": "https://sr-dash.github.io/heliofleet/assets/og-image.png",
         "screenshot": "https://sr-dash.github.io/heliofleet/assets/og-image.png",
-        "keywords": "spacecraft positions, heliophysics, solar eclipse, multi-spacecraft alignment, quadrature, magnetic connectivity, STEREO, Parker Solar Probe, Solar Orbiter, Aditya-L1, SDO, SOHO, BepiColombo, Carrington longitude, Parker spiral",
+        "keywords": "spacecraft positions, heliophysics, solar eclipse, multi-spacecraft alignment, quadrature, magnetic connectivity, coordinated observations, STEREO, Parker Solar Probe, Solar Orbiter, Aditya-L1, SDO, SOHO, BepiColombo, IRIS, Hinode EIS, DKIST, Carrington longitude, Parker spiral, light-travel time",
         "featureList": [
           "Spacecraft positions for any UTC date since 2010, extended monthly as new ephemerides appear",
           "Earth-fixed (HEE) and inertial ecliptic frames, top and edge-on views",
           "Presets for every total and hybrid solar eclipse since 2010",
           "Stonyhurst and Carrington coordinates with Parker-spiral footpoints",
+          "Viewing geometry per observer: light-time offset from Earth, apparent solar radius, B0, L0 and image scale",
           "Near-Earth inset with the L1 point and the SOHO, Aditya-L1, ACE, Wind, DSCOVR, IMAP, SWFO-L1 and Carruthers orbits",
           "Search for radial alignments, quadratures and magnetic connections between spacecraft",
           "Visibility of any Carrington or Stonyhurst location from every observer",
@@ -129,6 +130,8 @@
           "Coronagraph and heliospheric imager fields of view, and a solar surface map over SDO/HMI synoptic magnetograms showing what each observer sees",
           "Sky view of every field of view projected onto the plane of the sky seen from Earth or a chosen spacecraft",
           "MLSO K-Cor and UCoMP fields and DKIST Cryo-NIRSP observation footprints",
+          "IRIS, Hinode/EIS, DKIST and Solar Orbiter (EUI-HRI, PHI-HRT, SPICE) observation footprints over SDO/AIA and HMI images",
+          "Finder for coordinated observations: times when chosen facilities observed the same place on the Sun together",
           "Helioviewer.org links for the selected moment",
           "Interface in English, Hindi and Spanish",
           "MP4 and GIF animation export",
@@ -159,7 +162,8 @@
           "value": "10.5281/zenodo.23328187",
           "url": "https://doi.org/10.5281/zenodo.23328187"
         },
-        "softwareVersion": "1.1.0",
+        "softwareVersion": "1.1.1",
+        "dateModified": "2026-10-29",
         "license": "https://opensource.org/licenses/MIT",
         "author": { "@id": "https://sr-dash.github.io/#person" },
         "creator": { "@id": "https://sr-dash.github.io/#person" },
@@ -601,7 +605,7 @@
   <div class="toast" id="toast" role="status" hidden></div>
 
   <!-- assets:start (written by scripts/stamp_assets.py) -->
-  <script type="importmap">{"imports":{"./js/animate.js":"./js/animate.js?v=0a5fd6979e","./js/app.js":"./js/app.js?v=a1502e3357","./js/bodyinfo.js":"./js/bodyinfo.js?v=d96ce73256","./js/cards.js":"./js/cards.js?v=df392faa60","./js/catalog.js":"./js/catalog.js?v=9540bfaa0e","./js/context.js":"./js/context.js?v=bc078cfdac","./js/coverage.js":"./js/coverage.js?v=7c8038c9ce","./js/ephem.js":"./js/ephem.js?v=56c0c10b78","./js/events.js":"./js/events.js?v=f9807e6265","./js/export.js":"./js/export.js?v=33f03c2b63","./js/frames.js":"./js/frames.js?v=7d2a271908","./js/helioviewer.js":"./js/helioviewer.js?v=14248f1791","./js/i18n.js":"./js/i18n.js?v=b27b772be8","./js/instruments.js":"./js/instruments.js?v=250c964e38","./js/observations.js":"./js/observations.js?v=b367cc656e","./js/render.js":"./js/render.js?v=df21f05af0","./js/ribbon.js":"./js/ribbon.js?v=196bebb9a4","./js/scene.js":"./js/scene.js?v=160dc4fcb3","./js/sky.js":"./js/sky.js?v=384b0f9a13","./js/skyproj.js":"./js/skyproj.js?v=d546a24ec4","./js/tools.js":"./js/tools.js?v=b72d59f964","./js/workbench.js":"./js/workbench.js?v=80c74e481a"}}</script>
+  <script type="importmap">{"imports":{"./js/animate.js":"./js/animate.js?v=0a5fd6979e","./js/app.js":"./js/app.js?v=a1502e3357","./js/bodyinfo.js":"./js/bodyinfo.js?v=d96ce73256","./js/cards.js":"./js/cards.js?v=df392faa60","./js/catalog.js":"./js/catalog.js?v=9540bfaa0e","./js/context.js":"./js/context.js?v=bc078cfdac","./js/coverage.js":"./js/coverage.js?v=7c8038c9ce","./js/ephem.js":"./js/ephem.js?v=56c0c10b78","./js/events.js":"./js/events.js?v=f9807e6265","./js/export.js":"./js/export.js?v=33f03c2b63","./js/frames.js":"./js/frames.js?v=7d2a271908","./js/helioviewer.js":"./js/helioviewer.js?v=14248f1791","./js/i18n.js":"./js/i18n.js?v=b27b772be8","./js/instruments.js":"./js/instruments.js?v=250c964e38","./js/observations.js":"./js/observations.js?v=b367cc656e","./js/render.js":"./js/render.js?v=df21f05af0","./js/ribbon.js":"./js/ribbon.js?v=196bebb9a4","./js/scene.js":"./js/scene.js?v=160dc4fcb3","./js/sky.js":"./js/sky.js?v=384b0f9a13","./js/skyproj.js":"./js/skyproj.js?v=d546a24ec4","./js/tools.js":"./js/tools.js?v=8cc78efd26","./js/workbench.js":"./js/workbench.js?v=80c74e481a"}}</script>
   <!-- assets:end -->
   <script type="module" src="js/app.js?v=a1502e3357"></script>
 </body>

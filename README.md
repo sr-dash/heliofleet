@@ -208,7 +208,7 @@ Reports of anything that looks wrong, requests for spacecraft and instruments, t
 
 If HelioFleet helps your research, please cite it:
 
-> Dash, S. (2026). *HelioFleet: an interactive map of heliophysics spacecraft positions* (Version 1.1.0) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.23328187
+> Dash, S. (2026). *HelioFleet: an interactive map of heliophysics spacecraft positions* (Version 1.1.1) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.23328187
 
 That DOI always resolves to the latest release. Each release also has its own DOI, listed on the [Zenodo record](https://doi.org/10.5281/zenodo.23328187); [10.5281/zenodo.23330591](https://doi.org/10.5281/zenodo.23330591) is version 1.1.0 and [10.5281/zenodo.23328188](https://doi.org/10.5281/zenodo.23328188) is version 1.0.0. GitHub's **Cite this repository** button (from [CITATION.cff](CITATION.cff)) and the **Cite HelioFleet** button on the page give APA and BibTeX references.
 

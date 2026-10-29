@@ -7,8 +7,8 @@ authors:
     given-names: Soumyaranjan
     orcid: "https://orcid.org/0000-0003-0103-6569"
     affiliation: "National Solar Observatory"
-version: 1.1.0
-date-released: 2026-10-12
+version: 1.1.1
+date-released: 2026-10-29
 doi: 10.5281/zenodo.23328187
 identifiers:
   - type: doi
@@ -33,12 +33,16 @@ abstract: >-
   magnetic connections, checks which observers see a given point on the Sun,
   and exports coordinates and time series. It draws the fields of view of
   coronagraphs and heliospheric imagers, summarises which solar longitudes
-  are imaged, and shows flares, CMEs and geomagnetic storms from NASA DONKI.
-  A sky view projects every instrument's field of view onto the plane of the
-  sky seen from Earth or from a chosen spacecraft, with MLSO K-Cor and UCoMP
-  fields and DKIST Cryo-NIRSP observation footprints. Positions come from
-  JPL Horizons ephemerides, refreshed monthly. The interface is available in
-  English, Hindi and Spanish.
+  are imaged on a solar surface map over SDO/HMI synoptic magnetograms, and
+  shows flares, CMEs and geomagnetic storms from NASA DONKI. A viewing-geometry
+  table gives each observer's light-time offset from Earth, apparent solar
+  radius, B0 and L0. A sky view projects every instrument's field of view onto
+  the plane of the sky seen from Earth or from a chosen spacecraft, with MLSO
+  K-Cor and UCoMP fields, and draws the observation footprints of DKIST, IRIS,
+  Hinode/EIS and Solar Orbiter (EUI-HRI, PHI-HRT, SPICE) over SDO/AIA and HMI
+  images, with a finder for times when chosen facilities observed the same
+  place together. Positions come from JPL Horizons ephemerides, refreshed
+  monthly. The interface is available in English, Hindi and Spanish.
 keywords:
   - heliophysics
   - spacecraft ephemerides
@@ -49,3 +53,7 @@ keywords:
   - JPL Horizons
   - coronagraph
   - DKIST
+  - IRIS
+  - Hinode
+  - Solar Orbiter
+  - coordinated observations
