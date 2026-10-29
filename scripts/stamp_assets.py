@@ -20,7 +20,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 # Each page and its entry module
-PAGES = {"index.html": "app.js", "sky.html": "sky.js", "methods.html": None}  # methods.html: stylesheet only
+PAGES = {"index.html": "app.js", "sky.html": "sky.js", "methods.html": None, "help.html": None}  # methods and help: stylesheet only
 
 
 def digest(path):

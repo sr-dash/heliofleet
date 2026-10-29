@@ -26,6 +26,10 @@ HelioFleet places SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, IMAP, SWFO-L1, Carrut
 - **Four themes:** Night, Totality, H-alpha and Plate (light).
 - **Three languages:** English, हिन्दी (Hindi) and Español (Spanish), chosen from the header, remembered per visitor, picked up from the browser's language, or set in a link with `lang=hi` or `lang=es`.
 
+### Finding your way and sharing a view
+
+A bar under the title links every page and the main tools: the map, solar coverage, viewing geometry, alignment search, the sky view, observations on SDO images, the coordinated-observation finder, the [methods page](https://sr-dash.github.io/heliofleet/methods.html) and the [How to use](https://sr-dash.github.io/heliofleet/help.html) guide, which describes every tool with example links. The address of each page holds everything needed to reproduce it, including the open research tab (`tab=`), an alignment search (`align=`, rerun when the link opens), the finder's facilities, dates and location (`find`, `ffrom`, `fto`, `fwhere`) and the selected observation (`hl=`); a section name after `#` (`#tools`, `#coverage`, `#observations`, `#finder`) opens the page there. **Copy link** buttons on the map, the sky view, the observations panel and the finder copy it. The observations panel downloads as PNG (archived Cryo-NIRSP runs) or SVG (any observation, with the SDO images linked and the footprints as vector outlines), each with a caption.
+
 ### Research tools
 
 Below the map, six tabs work on the same geometry as the map:

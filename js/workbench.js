@@ -45,6 +45,8 @@ export function initWorkbench(ctx) {
       t.tabIndex = on ? 0 : -1;
       $(t.getAttribute('aria-controls')).hidden = !on;
     }
+    S.tab = tab.id.slice(4);
+    ctx.writeURL();
     if (tab.id === 'tab-align') primeAlign();
     if (tab.id === 'tab-series') primeSeries();
     if (tab.id === 'tab-anim') primeAnim();
@@ -205,6 +207,8 @@ export function initWorkbench(ctx) {
     form.classList.add('busy');
     out.innerHTML = `<p class="tool-summary">${tr('Searching…')}</p>`;
     try {
+      S.align = { kind: q.kind, a: q.a, b: q.b, tol: q.tol, from: $('align-from').value, to: $('align-to').value };
+      ctx.writeURL();
       const res = await findAlignments(q);
       lastAlign = { res, q };
       renderAlign(res, q);
@@ -418,6 +422,22 @@ export function initWorkbench(ctx) {
         { heading: 'BibTeX', text: bib, file: { name: 'heliofleet.bib', type: 'application/x-bibtex' } },
       ]);
   });
+
+  // A shared link reopens its tab, and reruns its alignment search
+  if (S.align && ALIGN_KINDS[S.align.kind]) {
+    select($('tab-align'));
+    kindSel.value = S.align.kind;
+    syncKind(false);
+    if ([...$('align-a').options].some((o) => o.value === S.align.a)) $('align-a').value = S.align.a;
+    if ([...$('align-b').options].some((o) => o.value === S.align.b)) $('align-b').value = S.align.b;
+    if (S.align.tol > 0) $('align-tol').value = S.align.tol;
+    $('align-from').value = S.align.from;
+    $('align-to').value = S.align.to;
+    $('align-form').requestSubmit();
+  } else if (S.tab !== 'coords') {
+    const t = $(`tab-${S.tab}`);
+    if (t) select(t);
+  }
 
   return {
     refresh() { renderVis(); renderGeometry(); },

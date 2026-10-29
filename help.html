@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How to Use HelioFleet</title>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-8X5BSNF3VV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-8X5BSNF3VV');
+  </script>
+
+  <meta name="description" content="A guide to every HelioFleet tool: the spacecraft map, solar coverage, coordinates and viewing geometry, alignment and visibility searches, exports, the sky view, observation footprints of DKIST, IRIS, Hinode/EIS and Solar Orbiter on SDO images, the coordinated-observation finder, and links that share an exact view.">
+  <meta name="author" content="Soumyaranjan Dash">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://sr-dash.github.io/heliofleet/help.html">
+  <link rel="author" href="https://sr-dash.github.io/">
+  <meta name="google-site-verification" content="wNt-P7enH5ZTT0cjYYqXEN9GRrj-0_OcbZSER57FIK4">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0B1026" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#E6ECF1" media="(prefers-color-scheme: light)">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Soumyaranjan Dash Portfolio">
+  <meta property="og:title" content="How to use HelioFleet">
+  <meta property="og:description" content="Every HelioFleet tool, what it is for, and how to link to exactly what you are looking at.">
+  <meta property="og:url" content="https://sr-dash.github.io/heliofleet/help.html">
+  <meta property="og:image" content="https://sr-dash.github.io/heliofleet/assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="How to use HelioFleet">
+  <meta name="twitter:description" content="Every HelioFleet tool, what it is for, and how to link to exactly what you are looking at.">
+  <meta name="twitter:site" content="@soumyatheory">
+  <meta name="twitter:creator" content="@soumyatheory">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Fonts load without holding up the first paint; text shows in the fallback font until they arrive -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap"></noscript>
+  <link rel="stylesheet" href="css/style.css?v=b59f62445c">
+  <script>
+    try {
+      const q = new URLSearchParams(location.search);
+      const t = ['night', 'eclipse', 'halpha', 'plate'].includes(q.get('theme')) ? q.get('theme') : localStorage.getItem('heliofleet-theme');
+      if (t) document.documentElement.dataset.theme = t;
+      else if (matchMedia('(prefers-color-scheme: light)').matches) document.documentElement.dataset.theme = 'plate';
+    } catch (e) {}
+  </script>
+</head>
+<body class="methods-page">
+  <header class="masthead">
+    <div class="brand">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="https://sr-dash.github.io/" rel="author">Soumyaranjan Dash</a>
+        <span aria-hidden="true">/</span>
+        <a href="https://sr-dash.github.io/software/">Software</a>
+        <span aria-hidden="true">/</span>
+        <a href="./">HelioFleet</a>
+      </nav>
+      <h1 class="wordmark">How to use</h1>
+      <p class="tagline">Every tool in HelioFleet, what it is for, and how to share exactly what you are looking at.</p>
+    </div>
+  </header>
+  <nav class="sitenav" aria-label="HelioFleet pages">
+    <a href="./">Map</a>
+    <a href="./#coverage">Solar coverage</a>
+    <a href="./?tab=geom#tools">Viewing geometry</a>
+    <a href="./?tab=align#tools">Alignment search</a>
+    <a href="sky.html">Sky view</a>
+    <a href="sky.html#observations">Observations on SDO images</a>
+    <a href="sky.html?find=dkist,iris#finder">Coordinated observations</a>
+    <a href="methods.html">Methods</a>
+    <a class="sitenav-help" href="help.html" aria-current="page">How to use</a>
+  </nav>
+
+  <main class="methods help">
+    <nav class="methods-toc" aria-label="On this page">
+      <a href="#start">Getting started</a>
+      <a href="#the-map">The map</a>
+      <a href="#tools">Research tools</a>
+      <a href="#sky-view">Sky view</a>
+      <a href="#observations">Observations on SDO images</a>
+      <a href="#finder">Coordinated observations</a>
+      <a href="#share">Sharing a view</a>
+      <a href="#recipes">Examples</a>
+      <a href="#data">Data and updates</a>
+    </nav>
+
+    <section id="start">
+      <h2>Getting started</h2>
+      <p>HelioFleet has two working pages. The <a href="./">map</a> shows where the spacecraft are around the Sun and Earth, what each of them can see of the solar surface, and research tools for coordinates, geometry and searches. The <a href="sky.html">sky view</a> shows instrument fields of view on the plane of the sky, and observation footprints of high-resolution instruments over SDO images. Both work for any moment since 2010.</p>
+      <ul>
+        <li><b>Choose a moment</b> with the date box, the step buttons (±1 hour, ±1 day), the timeline under the map, or a preset (eclipses, mission milestones, space-weather events). On the map, the arrow keys step one day, and with Shift one hour.</li>
+        <li><b>Today</b> returns to the present; the HelioFleet title starts over with the default view.</li>
+        <li>The interface is in English, Hindi and Spanish, and has four colour themes; both are remembered.</li>
+        <li>Everything you change is written into the page address, so the address always reproduces what you see (see <a href="#share">Sharing a view</a>).</li>
+      </ul>
+    </section>
+
+    <section id="the-map">
+      <h2>The map</h2>
+      <dl>
+        <dt>Spacecraft and planets</dt>
+        <dd>Click a spacecraft or its name in the legend for its card: distance, heliographic coordinates, light time, the Sun's apparent size, perihelia, and buttons for its view of the Sun and its alignments. Legend buttons hide or show bodies.</dd>
+        <dt>Display</dt>
+        <dd>Earth-fixed or inertial frame, top or edge-on view, trails, planets, Parker spirals at a chosen solar-wind speed, CME fronts, and coronagraph and heliospheric-imager fields of view.</dd>
+        <dt>Solar coverage</dt>
+        <dd>Under the map, a Carrington map of the solar surface over the SDO/HMI synoptic magnetogram, with each observer's near and far side and the spacecraft footpoints. Hover for what each point is seen by; click to mark a point.</dd>
+        <dt>Snapshots, animations and embedding</dt>
+        <dd>PNG and PDF snapshots with a key, MP4 and GIF animations of a date range, a link to the current view, and code to embed the map on another site.</dd>
+      </dl>
+    </section>
+
+    <section id="tools">
+      <h2>Research tools</h2>
+      <p>The tabs under the map share the map's geometry, so every number matches what is drawn. Each tab can be opened directly with <code>tab=</code> in the address.</p>
+      <dl>
+        <dt>Coordinates (<code>tab=coords</code>)</dt>
+        <dd>Distance, Stonyhurst and Carrington coordinates, separation from Earth and Parker-spiral footpoint of every body, as CSV or JSON, with SunPy code that reproduces them.</dd>
+        <dt>Viewing geometry (<code>tab=geom</code>)</dt>
+        <dd>For co-aligning and time-aligning images from different viewpoints: each observer's light-time offset from Earth, apparent solar radius, B0, Stonyhurst longitude and L0 (as RSUN_OBS, HGLT_OBS, HGLN_OBS and CRLN_OBS in its FITS headers), the size of one arcsecond at disk centre, and how much larger features look than from Earth.</dd>
+        <dt>Find alignments (<code>tab=align</code>)</dt>
+        <dd>Searches a date range for radial alignments of two spacecraft, quadratures with Earth, or magnetic connections. The search is kept in the address (<code>align=</code>), so a shared link reruns it.</dd>
+        <dt>Who sees this spot (<code>tab=vis</code>)</dt>
+        <dd>For a Carrington or Stonyhurst location, which observers see it, how close to disk centre, and whether it is near the limb or behind it.</dd>
+        <dt>Export data (<code>tab=series</code>) and Animation (<code>tab=anim</code>)</dt>
+        <dd>Time series of positions and coordinates, and video of a date range.</dd>
+      </dl>
+    </section>
+
+    <section id="sky-view">
+      <h2>Sky view</h2>
+      <dl>
+        <dt>Plane of the sky</dt>
+        <dd>Instrument fields of view projected onto the plane of the sky seen from Earth or from a chosen spacecraft ("View from"), with MLSO K-Cor and UCoMP fields and Cryo-NIRSP footprints. Zoom with the buttons or the mouse wheel, drag to pan, double-click to centre. Layers turn each field on or off.</dd>
+        <dt>Who sees this point</dt>
+        <dd>Click the plane of the sky to mark a point; the panel lists every instrument whose field contains it, with distance from Sun centre and position angle in that instrument's own view.</dd>
+        <dt>Ground observatories and Cryo-NIRSP</dt>
+        <dd>Daylight windows at Haleakalā and Mauna Loa, and the DKIST Cryo-NIRSP datasets near the moment, with buttons to step to earlier or later observations.</dd>
+        <dt>Snapshot</dt>
+        <dd>PNG or PDF of the plane of the sky with a key of every layer, and a link to the current view.</dd>
+      </dl>
+    </section>
+
+    <section id="observations">
+      <h2>Observations on SDO images</h2>
+      <p>Below the plane of the sky, the fields of DKIST (Cryo-NIRSP, VBI, ViSP, DL-NIRSP, VTF), IRIS, Hinode/EIS and Solar Orbiter (EUI-HRI, PHI-HRT, SPICE) observations within 12 hours of the moment are drawn over SDO/AIA 171 Å, AIA 193 Å or HMI magnetogram images: a full-disk view on the left and a zoomed inset of the chosen observation.</p>
+      <ul>
+        <li>Instrument toggles show or hide each instrument (<code>oi=</code> in the address); the image buttons switch channel (<code>img=aia193</code>, <code>img=hmi</code>).</li>
+        <li>The list gives every observation with its description and a link to its data. Choosing one, from the list or the image, centres the images on it (<code>hl=</code> in the address).</li>
+        <li>Solar Orbiter fields are carried into Earth's view through the solar surface; parts beyond Earth's limb are dashed.</li>
+        <li><b>Download PNG</b> saves the panel with a caption. For archived Cryo-NIRSP runs the images are included; for other observations the images load live from Helioviewer, which does not let other sites save them as PNG, so use <b>Download SVG</b>: it keeps the images linked and the footprints as vector outlines, ready for figures.</li>
+      </ul>
+    </section>
+
+    <section id="finder">
+      <h2>Coordinated observations</h2>
+      <p>"Find coordinated observations", under the observations panel, lists every time the chosen facilities (DKIST, IRIS, Hinode/EIS, Solar Orbiter) observed the same place on the Sun together: their observations overlap in time and their fields overlap in Earth's view. Narrow it by date and to the disk or the limb. Each result opens with all its footprints drawn. The search is kept in the address (<code>find</code>, <code>ffrom</code>, <code>fto</code>, <code>fwhere</code>), and <b>Copy link to this search</b> gives a link that opens it.</p>
+    </section>
+
+    <section id="share">
+      <h2>Sharing a view</h2>
+      <p>The address of each page holds everything needed to reproduce it, and <b>Copy link</b> buttons on the map, the sky view, the observations panel and the finder copy it. Adding a section name after <code>#</code> opens the page at that section.</p>
+      <table>
+        <thead><tr><th>Page</th><th>Address parameters</th><th>Sections</th></tr></thead>
+        <tbody>
+          <tr><td>Map</td><td><code>t</code> moment (UTC), <code>frame</code>, <code>view</code>, <code>zoom</code>, <code>trail</code>, <code>planets</code>, <code>spirals</code>, <code>wind</code>, <code>hide</code>, <code>cme</code>, <code>fov</code>, <code>spot</code>, <code>tab</code>, <code>align</code>, <code>lang</code>, <code>theme</code>, <code>embed</code></td><td><code>#map</code>, <code>#coverage</code>, <code>#tools</code></td></tr>
+          <tr><td>Sky view</td><td><code>t</code>, <code>obs</code> observer, <code>zoom</code>, <code>fov</code>, <code>ground</code>, <code>hide</code>, <code>pt</code> marked point, <code>hl</code> highlighted observation, <code>img</code> SDO channel, <code>oi</code> instruments, <code>find</code>, <code>ffrom</code>, <code>fto</code>, <code>fwhere</code>, <code>lang</code>, <code>theme</code></td><td><code>#observations</code>, <code>#finder</code>, <code>#point</code>, <code>#cryo</code>, <code>#sites</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="recipes">
+      <h2>Examples</h2>
+      <ul>
+        <li><a href="sky.html?find=dkist,iris,eis,solo&amp;ffrom=2024-01-01&amp;fto=2024-12-31&amp;fwhere=disk#finder">Times in 2024 when DKIST, IRIS, Hinode/EIS and Solar Orbiter observed the same place on the disk</a></li>
+        <li><a href="sky.html?t=2025-10-05T22:51Z&amp;zoom=1.6&amp;hl=97338-20251005T1947#observations">A coordinated prominence campaign at the west limb, 5 October 2025, over AIA 171 Å</a></li>
+        <li><a href="sky.html?t=2024-03-23T14:56Z&amp;zoom=1.6&amp;hl=20240323_141928_3620109443&amp;img=hmi#observations">IRIS, EIS and Solar Orbiter SPICE at the north pole, 23 March 2024, over the HMI magnetogram</a></li>
+        <li><a href="sky.html?t=2025-03-22T22:25Z&amp;zoom=10&amp;fov=c2,metis,wispri&amp;ground=kcor,cryo">Parker's perihelion of 22 March 2025 seen from Earth, with LASCO C2, Metis, WISPR-I and K-Cor fields</a></li>
+        <li><a href="./?t=2025-03-22T22:25Z&amp;tab=geom#tools">The viewing geometry of every observer at that perihelion</a></li>
+        <li><a href="./?t=2025-06-01T00:00Z&amp;tab=align&amp;align=radial,solo,psp,5,2025-01-01,2025-12-31#tools">Radial alignments of Solar Orbiter and Parker in 2025</a></li>
+        <li><a href="./?t=2024-04-08T18:18Z#coverage">The solar surface seen by each observer during the total eclipse of 8 April 2024</a></li>
+      </ul>
+    </section>
+
+    <section id="data">
+      <h2>Data and updates</h2>
+      <p>Positions come from JPL Horizons. Observation lists come from the DKIST Data Center, the LMSAL Heliophysics Coverage Registry (IRIS), the Hinode/EIS as-run catalogue and the Solar Orbiter Archive; SDO images from Helioviewer; synoptic magnetograms from JSOC; space-weather events from NASA DONKI. All of them are refreshed on the first of each month. How the numbers are computed and checked is on the <a href="methods.html">methods page</a>; problems and requests are welcome on <a href="https://github.com/sr-dash/heliofleet/issues/new/choose">GitHub</a>.</p>
+    </section>
+  </main>
+
+  <footer class="colophon">
+    <p>Made by <a href="https://sr-dash.github.io/" rel="author">Dr. Soumyaranjan Dash</a> · <a href="./">HelioFleet map</a> · <a href="sky.html">Sky view</a> · <a href="methods.html">Methods and accuracy</a> · <a href="https://github.com/sr-dash/heliofleet">Source on GitHub</a> · <a href="https://doi.org/10.5281/zenodo.23328187">Cite (DOI 10.5281/zenodo.23328187)</a></p>
+  </footer>
+</body>
+</html>

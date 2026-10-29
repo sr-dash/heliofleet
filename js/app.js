@@ -45,7 +45,11 @@ const S = {
   cmes: true,
   covsys: 'stonyhurst',
   fov: new Set(),
+  tab: 'coords', // research tool open below the map
+  align: null, // last alignment search, { kind, a, b, tol, from, to }, so a link can rerun it
 };
+// Section a link can open at: index.html#tools, #coverage, #map
+const SECTIONS = { tools: 'tools', coverage: 'coverage-panel', map: 'map-wrap' };
 let cards;
 let covHighlight = null;
 let covGeom = null;
@@ -92,6 +96,23 @@ function readURL() {
       S.spotOnMap = sp[3] !== '0';
     }
   }
+  if (['coords', 'geom', 'align', 'vis', 'series', 'anim'].includes(q.get('tab'))) S.tab = q.get('tab');
+  // align=kind,a,b,tolerance,from,to (dates as YYYY-MM-DD)
+  const al = (q.get('align') || '').split(',');
+  if (al.length === 6 && /^\d{4}-\d\d-\d\d$/.test(al[4]) && /^\d{4}-\d\d-\d\d$/.test(al[5])) {
+    S.align = { kind: al[0], a: al[1], b: al[2], tol: parseFloat(al[3]), from: al[4], to: al[5] };
+    S.tab = 'align';
+  }
+}
+
+// Page links in the navigation bar carry the moment and language
+function syncNav(t, lang) {
+  for (const a of document.querySelectorAll('.sitenav a[data-nav]')) {
+    const u = new URL(a.dataset.nav, location.href);
+    u.searchParams.set('t', t);
+    if (lang) u.searchParams.set('lang', lang);
+    a.href = `${u.pathname.split('/').pop() || './'}${u.search}${u.hash}`;
+  }
 }
 
 let urlTimer;
@@ -114,11 +135,14 @@ function writeURL() {
     const cur = new URLSearchParams(location.search);
     for (const k of ['theme', 'embed', 'lang']) if (cur.has(k)) q.set(k, cur.get(k));
     if (S.spot) q.set('spot', [S.spot.sys[0], S.spot.lon, S.spot.lat, ...(S.spotOnMap ? [] : [0])].join(','));
-    history.replaceState(null, '', `?${q}`);
+    if (S.tab !== 'coords') q.set('tab', S.tab);
+    if (S.align && S.tab === 'align') q.set('align', [S.align.kind, S.align.a, S.align.b, S.align.tol, S.align.from, S.align.to].join(','));
+    history.replaceState(null, '', `?${q}${location.hash}`);
     // The sky view keeps its own layers; only the moment and language carry over
     const sky = new URLSearchParams({ t: q.get('t') });
     if (q.has('lang')) sky.set('lang', q.get('lang'));
     $('sky-link').href = `sky.html?${sky}`;
+    syncNav(q.get('t'), q.get('lang'));
     if (EMBED) {
       const full = new URLSearchParams(q);
       full.delete('embed');
@@ -1004,6 +1028,7 @@ async function main() {
     toast,
     scene: () => scene,
     range: () => RANGE,
+    writeURL: () => writeURL(),
     jump: (jd) => { stopPlay(); S.jd = jd; update(); },
     redraw: () => update(),
     theme: () => theme,
@@ -1084,6 +1109,15 @@ async function main() {
   matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => { theme = readTheme(); paint(); });
 
   await update();
+  // A link to a section opens there once the page has drawn, and again once the
+  // content above it has settled, unless the reader has scrolled meanwhile
+  const target = $(SECTIONS[location.hash.slice(1)] ?? '');
+  if (target) {
+    let moved = false;
+    for (const ev of ['wheel', 'touchstart', 'keydown', 'mousedown']) addEventListener(ev, () => { moved = true; }, { once: true, passive: true });
+    target.scrollIntoView({ block: 'start' });
+    for (const ms of [800, 2000]) setTimeout(() => { if (!moved) target.scrollIntoView({ block: 'start' }); }, ms);
+  }
 }
 
 main();

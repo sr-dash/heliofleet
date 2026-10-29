@@ -43,7 +43,7 @@
   <!-- Fonts load without holding up the first paint; text shows in the fallback font until they arrive -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap"></noscript>
-  <link rel="stylesheet" href="css/style.css?v=2dc4f22873">
+  <link rel="stylesheet" href="css/style.css?v=b59f62445c">
   <script>
     try {
       const q = new URLSearchParams(location.search);
@@ -67,6 +67,17 @@
       <p class="tagline">How HelioFleet computes what it shows, how that is checked, and where its limits are.</p>
     </div>
   </header>
+  <nav class="sitenav" aria-label="HelioFleet pages">
+    <a href="./">Map</a>
+    <a href="./#coverage">Solar coverage</a>
+    <a href="./?tab=geom#tools">Viewing geometry</a>
+    <a href="./?tab=align#tools">Alignment search</a>
+    <a href="sky.html">Sky view</a>
+    <a href="sky.html#observations">Observations on SDO images</a>
+    <a href="sky.html?find=dkist,iris#finder">Coordinated observations</a>
+    <a href="methods.html" aria-current="page">Methods</a>
+    <a class="sitenav-help" href="help.html">How to use</a>
+  </nav>
 
   <main class="methods">
     <nav class="methods-toc" aria-label="On this page">
@@ -221,7 +232,7 @@
   </main>
 
   <footer class="colophon">
-    <p>Made by <a href="https://sr-dash.github.io/" rel="author">Dr. Soumyaranjan Dash</a> · <a href="./">HelioFleet map</a> · <a href="sky.html">Sky view</a> · <a href="https://github.com/sr-dash/heliofleet">Source on GitHub</a> · <a href="https://doi.org/10.5281/zenodo.23328187">Cite (DOI 10.5281/zenodo.23328187)</a></p>
+    <p>Made by <a href="https://sr-dash.github.io/" rel="author">Dr. Soumyaranjan Dash</a> · <a href="./">HelioFleet map</a> · <a href="sky.html">Sky view</a> · <a href="help.html">How to use</a> · <a href="https://github.com/sr-dash/heliofleet">Source on GitHub</a> · <a href="https://doi.org/10.5281/zenodo.23328187">Cite (DOI 10.5281/zenodo.23328187)</a></p>
   </footer>
 </body>
 </html>

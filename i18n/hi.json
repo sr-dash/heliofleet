@@ -70,7 +70,6 @@
  "Copied": "कॉपी हो गया",
  "Copy": "कॉपी करें",
  "Copy feed link": "फ़ीड लिंक कॉपी करें",
- "Copy link to this moment": "इस क्षण का लिंक कॉपी करें",
  "Copy the address bar to share this moment": "इस क्षण को साझा करने के लिए पता-पट्टी कॉपी करें",
  "Cosine of that angle": "उस कोण का कोज्या (cos)",
  "DKIST Cryo-NIRSP": "DKIST Cryo-NIRSP",
@@ -547,5 +546,18 @@
  "km": "km",
  "vs Earth": "पृथ्वी के सापेक्ष",
  "{s} from the Sun": "सूर्य से {s}",
- "× Earth": "× पृथ्वी"
+ "× Earth": "× पृथ्वी",
+ "Alignment search": "संरेखण खोज",
+ "Coordinated observations": "समन्वित प्रेक्षण",
+ "Copy link": "लिंक कॉपी करें",
+ "Copy link to this search": "इस खोज का लिंक कॉपी करें",
+ "Copy link to this view": "इस दृश्य का लिंक कॉपी करें",
+ "Copy the address bar to share this view": "यह दृश्य साझा करने के लिए एड्रेस बार कॉपी करें",
+ "Download SVG": "SVG डाउनलोड करें",
+ "HelioFleet pages": "HelioFleet के पृष्ठ",
+ "Helioviewer does not let other sites save its live images as PNG; Download SVG keeps them.": "Helioviewer अन्य साइटों को अपनी लाइव छवियाँ PNG के रूप में सहेजने नहीं देता; SVG डाउनलोड करने पर वे शामिल रहती हैं।",
+ "How to use": "उपयोग कैसे करें",
+ "Map": "मानचित्र",
+ "Methods": "विधियाँ",
+ "Sky view": "आकाश दृश्य"
 }

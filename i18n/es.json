@@ -70,7 +70,6 @@
  "Copied": "Copiado",
  "Copy": "Copiar",
  "Copy feed link": "Copiar enlace del calendario",
- "Copy link to this moment": "Copiar enlace a este momento",
  "Copy the address bar to share this moment": "Copia la barra de direcciones para compartir este momento",
  "Cosine of that angle": "Coseno de ese ángulo",
  "DKIST Cryo-NIRSP": "DKIST Cryo-NIRSP",
@@ -547,5 +546,18 @@
  "km": "km",
  "vs Earth": "respecto a la Tierra",
  "{s} from the Sun": "{s} desde el Sol",
- "× Earth": "× Tierra"
+ "× Earth": "× Tierra",
+ "Alignment search": "Búsqueda de alineaciones",
+ "Coordinated observations": "Observaciones coordinadas",
+ "Copy link": "Copiar enlace",
+ "Copy link to this search": "Copiar enlace a esta búsqueda",
+ "Copy link to this view": "Copiar enlace a esta vista",
+ "Copy the address bar to share this view": "Copie la barra de direcciones para compartir esta vista",
+ "Download SVG": "Descargar SVG",
+ "HelioFleet pages": "Páginas de HelioFleet",
+ "Helioviewer does not let other sites save its live images as PNG; Download SVG keeps them.": "Helioviewer no permite a otros sitios guardar sus imágenes en directo como PNG; Descargar SVG las conserva.",
+ "How to use": "Cómo usarlo",
+ "Map": "Mapa",
+ "Methods": "Métodos",
+ "Sky view": "Vista del cielo"
 }

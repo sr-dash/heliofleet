@@ -10,7 +10,7 @@ import { INSTRUMENTS, INSTRUMENT, flyingAt, insColor, insLabel, insShort } from 
 import { makeSky, fovGrid, fovFrame, inField, viewOf, hpcDirection, SKY_SHAPES, GROUND, SITES, sunAltitude, observingWindow } from './skyproj.js';
 import { norm, angleBetween, R_SUN_AU } from './frames.js';
 import { downloadPNG, downloadPDF } from './export.js';
-import { CHANNELS, loadContext, contextRuns, drawContext, contextNote, hitTest } from './context.js';
+import { CHANNELS, loadContext, contextRuns, drawContext, contextNote, hitTest, contextPNG, contextSVG } from './context.js';
 import { OBS_INST, observationsNear, earthShape, earthRsun, liveRun } from './observations.js';
 import { LANGUAGES, detectLang, loadLang, lang, saveLang, tr, translatePage } from './i18n.js';
 
@@ -43,6 +43,7 @@ const S = {
   pt: null, // marked point on the plane of the sky, [x, y] in solar radii
   img: 'aia171', // SDO image under the Cryo-NIRSP footprints
   oi: new Set(Object.keys(OBS_INST)), // instruments shown in that panel
+  find: null, // coordinated-observation search, { g: [facilities], from, to, where }, while the finder is open
 };
 const SCENE = { frame: 'hee', view: 'top', trailDays: 0, planets: false, labels: true, spirals: false, wind: 400, hidden: new Set(), cmes: false, fov: new Set() };
 let theme;
@@ -69,7 +70,26 @@ function readURL() {
   if (pt.length === 2 && pt.every(Number.isFinite)) S.pt = pt;
   if (CHANNELS[q.get('img')]) S.img = q.get('img');
   if (q.has('oi')) S.oi = new Set(q.get('oi').split(',').filter((k) => OBS_INST[k]));
+  // find=dkist,iris&ffrom=2024-01-01&fto=2024-12-31&fwhere=disk opens the finder with that search
+  if (q.has('find')) {
+    const day = (v) => (/^\d{4}-\d\d-\d\d$/.test(v ?? '') ? v : '');
+    S.find = {
+      g: q.get('find').split(',').filter((g) => ['dkist', 'iris', 'eis', 'solo'].includes(g)),
+      from: day(q.get('ffrom')), to: day(q.get('fto')),
+      where: ['any', 'disk', 'limb'].includes(q.get('fwhere')) ? q.get('fwhere') : 'any',
+    };
+  }
 }
+// Page links in the navigation bar carry the moment and language
+function syncNav(t, lang) {
+  for (const a of document.querySelectorAll('.sitenav a[data-nav]')) {
+    const u = new URL(a.dataset.nav, location.href);
+    u.searchParams.set('t', t);
+    if (lang) u.searchParams.set('lang', lang);
+    a.href = `${u.pathname.split('/').pop() || './'}${u.search}${u.hash}`;
+  }
+}
+
 let urlTimer;
 function writeURL() {
   clearTimeout(urlTimer);
@@ -85,14 +105,21 @@ function writeURL() {
     if (S.pt) q.set('pt', S.pt.map((v) => v.toFixed(2)).join(','));
     if (S.img !== 'aia171') q.set('img', S.img);
     if (S.oi.size !== Object.keys(OBS_INST).length) q.set('oi', [...S.oi].join(','));
+    if (S.find) {
+      q.set('find', S.find.g.join(','));
+      if (S.find.from) q.set('ffrom', S.find.from);
+      if (S.find.to) q.set('fto', S.find.to);
+      if (S.find.where !== 'any') q.set('fwhere', S.find.where);
+    }
     const cur = new URLSearchParams(location.search);
     for (const k of ['lang', 'theme']) if (cur.has(k)) q.set(k, cur.get(k));
-    history.replaceState(null, '', `?${q}`);
+    history.replaceState(null, '', `?${q}${location.hash}`);
     // The map keeps its own layers; only the moment and language carry over
     const map = new URLSearchParams({ t: `${isoMinute(S.jd)}Z` });
     if (cur.has('lang')) map.set('lang', cur.get('lang'));
     $('map-back').href = `./?${map}`;
     $('map-link').href = `./?${map}`;
+    syncNav(q.get('t'), cur.get('lang'));
   }, 200);
 }
 
@@ -729,6 +756,17 @@ async function renderContext() {
     .map((d) => ({ ...d, label: d.id === S.hl ? `${OBS_INST[d.i].short} ${d.id}` : (d.i === 'cryonirsp' ? d.id : OBS_INST[d.i].short) }));
   const rsun = own.find((d) => d.rsun)?.rsun ?? earthRsun(run.jd);
   $('ctx-note').textContent = contextNote(run, S.img, items, Object.fromEntries(Object.keys(OBS_INST).map((k) => [k, OBS_INST[k].short])));
+  // Caption of the downloads, in English like the data files
+  const counts = {};
+  for (const d of items) counts[d.i] = (counts[d.i] ?? 0) + 1;
+  const img = run.img[S.img];
+  ctxCaption = [
+    `HelioFleet · observation footprints on SDO images · ${isoMinute(S.jd).replace('T', ' ')} UT`,
+    `${CHANNELS[S.img]} ${img?.date ? `image at ${img.date.slice(0, 19).replace('T', ' ')} UT` : `image nearest to ${run.t.slice(0, 16).replace('T', ' ')} UT`}, from Helioviewer${run.live ? ' (pointing as recorded)' : ''}`,
+    `Footprints within an hour: ${Object.entries(counts).map(([k, n]) => `${OBS_INST[k].name} ${n}`).join(', ')}`,
+    ...(sel ? [`Selected: ${OBS_INST[sel.i].name} ${sel.id}, ${isoMinute(sel.j0).replace('T', ' ')} to ${isoMinute(sel.j1).slice(11)} UT${sel.n ? ` · ${sel.n}`.slice(0, 110) : ''}`] : []),
+    'Sources: DKIST Data Center, LMSAL HCR (IRIS), Hinode/EIS catalogue, Solar Orbiter Archive; SDO/AIA and HMI via Helioviewer',
+  ];
   const token = ++ctxToken;
   const hits = await drawContext($('ctx-canvas'), run, S.img, items, S.jd, S.hl, rsun);
   if (token !== ctxToken || !hits) return;
@@ -839,10 +877,73 @@ async function renderFinder() {
   }
 }
 
-function initFinder() {
-  $('ctx-find').addEventListener('toggle', () => { if ($('ctx-find').open) renderFinder(); });
-  for (const id of ['find-groups', 'find-from', 'find-to', 'find-where']) $(id).addEventListener('change', () => renderFinder());
+function finderState() {
+  return {
+    g: [...document.querySelectorAll('#find-groups input:checked')].map((i) => i.value),
+    from: $('find-from').value, to: $('find-to').value, where: $('find-where').value,
+  };
 }
+
+function initFinder() {
+  // A shared search opens with its choices
+  if (S.find) {
+    document.querySelectorAll('#find-groups input').forEach((i) => { i.checked = S.find.g.includes(i.value); });
+    $('find-from').value = S.find.from;
+    $('find-to').value = S.find.to;
+    $('find-where').value = S.find.where;
+    $('ctx-find').open = true;
+  }
+  $('ctx-find').addEventListener('toggle', () => {
+    S.find = $('ctx-find').open ? finderState() : null;
+    writeURL();
+    if ($('ctx-find').open) renderFinder();
+  });
+  for (const id of ['find-groups', 'find-from', 'find-to', 'find-where']) {
+    $(id).addEventListener('change', () => { S.find = finderState(); writeURL(); renderFinder(); });
+  }
+  $('find-link').addEventListener('click', () => copyLink('finder'));
+}
+
+// ---------- downloads of the observations panel ----------
+let ctxCaption = [];
+function saveBlob(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+const fileStamp = () => isoMinute(S.jd).replace(/[-:]/g, '').replace('T', '_');
+function initDownloads() {
+  $('ctx-link').addEventListener('click', () => copyLink('observations'));
+  $('ctx-png').addEventListener('click', async () => {
+    const blob = await contextPNG([...ctxCaption, location.href]);
+    if (blob) saveBlob(blob, `heliofleet_observations_${fileStamp()}UT.png`);
+    else toast(tr('Helioviewer does not let other sites save its live images as PNG; Download SVG keeps them.'));
+  });
+  $('ctx-svg').addEventListener('click', () => {
+    const svg = contextSVG([...ctxCaption, location.href]);
+    if (svg) saveBlob(new Blob([svg], { type: 'image/svg+xml' }), `heliofleet_observations_${fileStamp()}UT.svg`);
+  });
+  $('sky-link-copy').addEventListener('click', () => copyLink());
+}
+
+// Copies a link to the current view, opening at a section (#observations, #finder)
+async function copyLink(section = '') {
+  history.replaceState(null, '', `${location.search}${section ? `#${section}` : ''}`);
+  writeURL();
+  await new Promise((r) => setTimeout(r, 260));
+  try {
+    await navigator.clipboard.writeText(location.href);
+    toast(tr('Link copied'));
+  } catch {
+    toast(tr('Copy the address bar to share this view'));
+  }
+}
+// Sections a link can open at
+const SECTIONS = { observations: 'ctx', finder: 'ctx-find', point: 'pt-list', cryo: 'cryo-list', sites: 'sites' };
 
 function initContext() {
   $('ctx-ch').addEventListener('click', (e) => {
@@ -1002,6 +1103,7 @@ async function main() {
   initGestures();
   initContext();
   initFinder();
+  initDownloads();
   $('dt').addEventListener('change', (e) => {
     const t = Date.parse(`${e.target.value}Z`);
     if (!Number.isNaN(t)) { S.jd = t / 864e5 + 2440587.5; update(); }
@@ -1032,6 +1134,16 @@ async function main() {
   $('dl-pdf').addEventListener('click', () => saveSnapshot('pdf'));
   new ResizeObserver(() => paint()).observe($('sky-wrap'));
   await update();
+  // A link to a section opens there once the page has drawn, and again once the
+  // images and lists above it have loaded, unless the reader has scrolled meanwhile
+  const target = $(SECTIONS[location.hash.slice(1)] ?? '');
+  if (target) {
+    if (target.tagName === 'DETAILS') target.open = true;
+    let moved = false;
+    for (const ev of ['wheel', 'touchstart', 'keydown', 'mousedown']) addEventListener(ev, () => { moved = true; }, { once: true, passive: true });
+    target.scrollIntoView({ block: 'start' });
+    for (const ms of [800, 2000, 4000]) setTimeout(() => { if (!moved) target.scrollIntoView({ block: 'start' }); }, ms);
+  }
 }
 
 main();

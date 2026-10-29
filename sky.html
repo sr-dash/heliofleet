@@ -43,7 +43,7 @@
   <!-- Fonts load without holding up the first paint; text shows in the fallback font until they arrive -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap"></noscript>
-  <link rel="stylesheet" href="css/style.css?v=2dc4f22873">
+  <link rel="stylesheet" href="css/style.css?v=b59f62445c">
   <script>
     try {
       const q = new URLSearchParams(location.search);
@@ -74,6 +74,17 @@
       <div class="lang-switch" id="lang-switch" role="group" aria-label="Language"></div>
     </div>
   </header>
+  <nav class="sitenav" aria-label="HelioFleet pages">
+    <a href="./" data-nav="./">Map</a>
+    <a href="./#coverage" data-nav="./#coverage">Solar coverage</a>
+    <a href="./?tab=geom#tools" data-nav="./?tab=geom#tools">Viewing geometry</a>
+    <a href="./?tab=align#tools" data-nav="./?tab=align#tools">Alignment search</a>
+    <a href="sky.html" data-nav="sky.html" aria-current="page">Sky view</a>
+    <a href="sky.html#observations" data-nav="sky.html#observations">Observations on SDO images</a>
+    <a href="sky.html?find=dkist,iris#finder" data-nav="sky.html?find=dkist,iris#finder">Coordinated observations</a>
+    <a href="methods.html" data-nav="methods.html">Methods</a>
+    <a class="sitenav-help" href="help.html">How to use</a>
+  </nav>
 
   <section class="sky-controls" aria-label="Observer, date and zoom">
     <label class="field"><span class="field-label">View from</span>
@@ -108,7 +119,14 @@
       <p class="coverage-note" id="obs-note" hidden></p>
       <p class="coverage-note" id="sky-note">Lines of sight from each instrument are followed to where they cross the plane through Sun centre perpendicular to the line from the Sun to the chosen observer. Earth and the spacecraft appear where that observer sees them. MLSO and DKIST fields are traced from Earth in the same way. Fields are drawn from the published elongation ranges; heliospheric imagers use the published field sizes.</p>
       <section class="panel ctx-panel" id="ctx" aria-labelledby="ctx-title">
-        <h2 class="panel-title" id="ctx-title">Observations on SDO images</h2>
+        <div class="ctx-head">
+          <h2 class="panel-title" id="ctx-title">Observations on SDO images</h2>
+          <div class="ctx-actions">
+            <button class="btn-ghost" id="ctx-link">Copy link</button>
+            <button class="btn-ghost" id="ctx-png">Download PNG</button>
+            <button class="btn-ghost" id="ctx-svg">Download SVG</button>
+          </div>
+        </div>
         <div class="ctx-controls">
           <div class="seg" id="ctx-ch" role="group" aria-label="Image">
             <button data-value="aia171">AIA 171 Å</button>
@@ -142,6 +160,7 @@
                 <option value="limb">At or beyond the limb</option>
               </select></label>
           </div>
+          <div class="ctx-find-row"><button class="btn-ghost" id="find-link">Copy link to this search</button></div>
           <p class="tool-help" id="find-summary" aria-live="polite"></p>
           <div class="ctx-list" id="find-list"></div>
         </details>
@@ -166,6 +185,7 @@
           <button id="dl-png" class="btn-primary">Download PNG</button>
           <button id="dl-pdf" class="btn-primary">Download PDF</button>
         </div>
+        <button class="btn-ghost wide" id="sky-link-copy">Copy link to this view</button>
       </section>
       <section class="panel">
         <h2 class="panel-title">Ground observatories</h2>
@@ -190,8 +210,8 @@
 
   <div class="toast" id="toast" role="status" hidden></div>
   <!-- assets:start (written by scripts/stamp_assets.py) -->
-  <script type="importmap">{"imports":{"./js/animate.js":"./js/animate.js?v=0a5fd6979e","./js/app.js":"./js/app.js?v=a1502e3357","./js/bodyinfo.js":"./js/bodyinfo.js?v=d96ce73256","./js/cards.js":"./js/cards.js?v=df392faa60","./js/catalog.js":"./js/catalog.js?v=9540bfaa0e","./js/context.js":"./js/context.js?v=bc078cfdac","./js/coverage.js":"./js/coverage.js?v=7c8038c9ce","./js/ephem.js":"./js/ephem.js?v=56c0c10b78","./js/events.js":"./js/events.js?v=f9807e6265","./js/export.js":"./js/export.js?v=33f03c2b63","./js/frames.js":"./js/frames.js?v=7d2a271908","./js/helioviewer.js":"./js/helioviewer.js?v=14248f1791","./js/i18n.js":"./js/i18n.js?v=b27b772be8","./js/instruments.js":"./js/instruments.js?v=250c964e38","./js/observations.js":"./js/observations.js?v=b367cc656e","./js/render.js":"./js/render.js?v=df21f05af0","./js/ribbon.js":"./js/ribbon.js?v=196bebb9a4","./js/scene.js":"./js/scene.js?v=160dc4fcb3","./js/sky.js":"./js/sky.js?v=384b0f9a13","./js/skyproj.js":"./js/skyproj.js?v=d546a24ec4","./js/tools.js":"./js/tools.js?v=2965d6c348","./js/workbench.js":"./js/workbench.js?v=80c74e481a"}}</script>
+  <script type="importmap">{"imports":{"./js/animate.js":"./js/animate.js?v=0a5fd6979e","./js/app.js":"./js/app.js?v=0a699675d6","./js/bodyinfo.js":"./js/bodyinfo.js?v=d96ce73256","./js/cards.js":"./js/cards.js?v=df392faa60","./js/catalog.js":"./js/catalog.js?v=9540bfaa0e","./js/context.js":"./js/context.js?v=f44d588cac","./js/coverage.js":"./js/coverage.js?v=7c8038c9ce","./js/ephem.js":"./js/ephem.js?v=56c0c10b78","./js/events.js":"./js/events.js?v=f9807e6265","./js/export.js":"./js/export.js?v=33f03c2b63","./js/frames.js":"./js/frames.js?v=7d2a271908","./js/helioviewer.js":"./js/helioviewer.js?v=14248f1791","./js/i18n.js":"./js/i18n.js?v=b27b772be8","./js/instruments.js":"./js/instruments.js?v=250c964e38","./js/observations.js":"./js/observations.js?v=b367cc656e","./js/render.js":"./js/render.js?v=df21f05af0","./js/ribbon.js":"./js/ribbon.js?v=196bebb9a4","./js/scene.js":"./js/scene.js?v=160dc4fcb3","./js/sky.js":"./js/sky.js?v=50bb4a2f01","./js/skyproj.js":"./js/skyproj.js?v=d546a24ec4","./js/tools.js":"./js/tools.js?v=2965d6c348","./js/workbench.js":"./js/workbench.js?v=ce9451af7d"}}</script>
   <!-- assets:end -->
-  <script type="module" src="js/sky.js?v=384b0f9a13"></script>
+  <script type="module" src="js/sky.js?v=50bb4a2f01"></script>
 </body>
 </html>

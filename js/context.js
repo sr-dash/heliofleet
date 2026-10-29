@@ -160,6 +160,8 @@ function layer(w, h, dpr) {
   return [c, g];
 }
 
+let last = null; // the latest drawing, for the downloads
+const absolute = (u) => (u.startsWith('http') ? u : new URL(BASE + u, location.href).href);
 const ease = (t) => 1 - (1 - t) ** 3;
 const lerp = (a, b, t) => a + (b - a) * t;
 const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -255,6 +257,12 @@ export async function drawContext(cv, run, ch, ds, jd, hl, rsun) {
     }
   };
 
+  // Kept for the PNG and SVG downloads
+  last = {
+    W, H, zs, zBox, r, compose, run, ch, ds, hl, rsun, disk, stamp, f,
+    // Absolute addresses, so a saved SVG still finds its images
+    urls: { disk: disk.img[ch] && absolute(src(disk.img[ch])), zoom: run.img[ch] && absolute(src(run.img[ch])) },
+  };
   cv.width = Math.round(W * dpr);
   cv.height = Math.round(H * dpr);
   const ctx = cv.getContext('2d');
@@ -286,6 +294,99 @@ export async function drawContext(cv, run, ch, ds, jd, hl, rsun) {
   }
   // The inset lies on top, so it is searched first
   return [...a.hits, ...b.hits];
+}
+
+// ---------- downloads ----------
+const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const CAPTION_LH = 16;
+
+// PNG of the panel as drawn, with the caption below. Null when the images are live
+// Helioviewer cutouts, whose pixels a page from another site may not read.
+export async function contextPNG(caption) {
+  if (!last) return null;
+  const { W, H, compose } = last;
+  const capH = 14 + caption.length * CAPTION_LH;
+  const k = 2;
+  const c = document.createElement('canvas');
+  c.width = W * k;
+  c.height = (H + capH) * k;
+  const g = c.getContext('2d');
+  g.scale(k, k);
+  g.fillStyle = '#05070d';
+  g.fillRect(0, 0, W, H + capH);
+  compose(g, 1);
+  g.fillStyle = '#e8ecf4';
+  g.font = '12px "IBM Plex Mono", ui-monospace, monospace';
+  g.textBaseline = 'top';
+  caption.forEach((line, i) => g.fillText(line, 8, H + 8 + i * CAPTION_LH));
+  return new Promise((ok) => {
+    try { c.toBlob((b) => ok(b), 'image/png'); } catch { ok(null); }
+  });
+}
+
+// SVG with the images linked (so live Helioviewer cutouts stay in) and vector footprints
+export function contextSVG(caption) {
+  if (!last) return null;
+  const { W, H, zs, zBox, r, run, ds, hl, rsun, disk, stamp, urls, f } = last;
+  const capH = 14 + caption.length * CAPTION_LH;
+  const mapper = (box, view) => {
+    const k = box.s / view.size;
+    return [(x) => box.x + box.s / 2 + (x - view.x0) / view.scale * k, (y) => box.y + box.s / 2 - (y - view.y0) / view.scale * k, k];
+  };
+  const out = [`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${W}" height="${H + capH}" viewBox="0 0 ${W} ${H + capH}" font-family="IBM Plex Mono, Menlo, monospace">`,
+    `<rect width="${W}" height="${H + capH}" fill="#05070d"/>`,
+    `<defs><clipPath id="cd"><rect x="0" y="0" width="${H}" height="${H}"/></clipPath><clipPath id="cz"><rect x="${zBox.x}" y="0" width="${zs}" height="${zs}"/></clipPath></defs>`];
+  const poly = (d, px, py, w, dash) => `<polyline points="${d.x.map((x, i) => `${px(x).toFixed(1)},${py(d.y[i]).toFixed(1)}`).join(' ')}" fill="none" stroke="${d.id === hl ? HL : (d.color ?? '#fff')}" stroke-width="${d.id === hl ? w * 1.9 : w}"${dash ? ' stroke-dasharray="3 3"' : ''}/>`;
+  // Full disk
+  {
+    const box = { x: 0, y: 0, s: H };
+    const view = { x0: 0, y0: 0, ...disk };
+    const [px, py, k] = mapper(box, view);
+    out.push('<g clip-path="url(#cd)">', `<rect width="${H}" height="${H}" fill="#000"/>`);
+    if (urls.disk) out.push(`<image href="${esc(urls.disk)}" xlink:href="${esc(urls.disk)}" x="0" y="0" width="${H}" height="${H}"/>`);
+    out.push(`<circle cx="${px(0)}" cy="${py(0)}" r="${rsun / view.scale * k}" fill="none" stroke="rgba(255,255,255,0.45)" stroke-dasharray="4 4"/>`);
+    for (const d of ds) out.push(poly(d, px, py, 1.1, d.hidden));
+    out.push(`<rect x="${6 * f}" y="${6 * f}" width="${stamp.length * 7.3 * f + 10}" height="${20 * f}" fill="rgba(0,0,0,0.6)"/>`,
+      `<text x="${11 * f}" y="${16 * f}" fill="#fff" font-size="${12 * f}" dominant-baseline="middle">${esc(stamp)}</text>`, '</g>');
+  }
+  // Box on the disk and the lines to the inset
+  out.push(`<rect x="${r[0]}" y="${r[1]}" width="${r[2] - r[0]}" height="${r[3] - r[1]}" fill="none" stroke="${HL}" stroke-width="1.2"/>`,
+    `<path d="M${r[2]},${r[1]}L${zBox.x},0M${r[2]},${r[3]}L${zBox.x},${zs}" stroke="${HL}" stroke-opacity="0.7" fill="none"/>`);
+  // Inset
+  {
+    const view = run;
+    const [px, py, k] = mapper(zBox, view);
+    out.push('<g clip-path="url(#cz)">', `<rect x="${zBox.x}" y="0" width="${zs}" height="${zs}" fill="#000"/>`);
+    if (urls.zoom) out.push(`<image href="${esc(urls.zoom)}" xlink:href="${esc(urls.zoom)}" x="${zBox.x}" y="0" width="${zs}" height="${zs}"/>`);
+    const half = view.size * view.scale / 2;
+    const step = niceStep(2 * half);
+    const fs = 11 * f * 0.9;
+    for (let x = Math.ceil((view.x0 - half) / step) * step; x <= view.x0 + half; x += step) {
+      out.push(`<line x1="${px(x)}" y1="0" x2="${px(x)}" y2="${zs}" stroke="rgba(255,255,255,0.18)"/>`);
+      if (px(x) > zBox.x + 44 * f) out.push(`<text x="${px(x)}" y="${zs - 6}" fill="rgba(255,255,255,0.75)" font-size="${fs}" text-anchor="middle">${x}″</text>`);
+    }
+    for (let y = Math.ceil((view.y0 - half) / step) * step; y <= view.y0 + half; y += step) {
+      out.push(`<line x1="${zBox.x}" y1="${py(y)}" x2="${zBox.x + zs}" y2="${py(y)}" stroke="rgba(255,255,255,0.18)"/>`);
+      if (py(y) < zs - 24 * f) out.push(`<text x="${zBox.x + 4}" y="${py(y)}" fill="rgba(255,255,255,0.75)" font-size="${fs}" dominant-baseline="middle">${y}″</text>`);
+    }
+    out.push(`<circle cx="${px(0)}" cy="${py(0)}" r="${rsun / view.scale * k}" fill="none" stroke="rgba(255,255,255,0.45)" stroke-dasharray="4 4"/>`);
+    const seen = [];
+    for (const d of ds) {
+      if (d.sx) out.push(`<polyline points="${d.sx.map((x, i) => `${px(x).toFixed(1)},${py(d.sy[i]).toFixed(1)}`).join(' ')}" fill="none" stroke="${d.color}" stroke-opacity="0.45"/>`);
+      out.push(poly(d, px, py, 1.4, d.hidden));
+    }
+    for (const d of ds.slice().reverse()) {
+      const pts = d.x.map((x, i) => [px(x), py(d.y[i])]);
+      const top = pts.reduce((a, p) => (p[1] < a[1] ? p : a));
+      if (seen.some((q) => Math.hypot(q[0] - top[0], q[1] - top[1]) < 4)) continue;
+      seen.push(top);
+      out.push(`<text x="${Math.min(zBox.x + zs - 60, top[0] + 3)}" y="${top[1] - 3}" fill="${d.id === hl ? HL : (d.color ?? '#fff')}" font-size="${fs}">${esc(d.label ?? d.id)}</text>`);
+    }
+    out.push('</g>', `<rect x="${zBox.x + 0.75}" y="0.75" width="${zs - 1.5}" height="${zs - 1.5}" fill="none" stroke="${HL}" stroke-width="1.5"/>`);
+  }
+  caption.forEach((line, i) => out.push(`<text x="8" y="${H + 20 + i * CAPTION_LH}" fill="#e8ecf4" font-size="12">${esc(line)}</text>`));
+  out.push('</svg>');
+  return out.join('\n');
 }
 
 export function contextNote(run, ch, ds, names) {
