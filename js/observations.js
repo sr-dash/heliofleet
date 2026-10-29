@@ -34,7 +34,12 @@ async function loadIndex() {
 function loadMonth(key) {
   if (!months.has(key)) {
     months.set(key, fetch(`${BASE}${key}.json`).then((r) => (r.ok ? r.json() : { rows: [] }))
-      .then((d) => d.rows.map((r) => ({ ...r, j0: jdOf(r.t0), j1: jdOf(r.t1) }))).catch(() => []));
+      .then((d) => d.rows.map((r) => {
+        // Durations over a day come from faulty catalogue entries; cut them to a day
+        const j0 = jdOf(r.t0);
+        const j1 = Math.min(jdOf(r.t1) || j0, j0 + 1);
+        return { ...r, j0, j1 };
+      }).filter((r) => Number.isFinite(r.j0))).catch(() => []));
   }
   return months.get(key);
 }

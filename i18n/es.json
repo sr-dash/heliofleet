@@ -510,5 +510,22 @@
  "Solar Orbiter fields are carried to Earth's view through the solar surface, dashed where that part lies beyond Earth's limb.": "Los campos de Solar Orbiter se trasladan a la vista de la Tierra a través de la superficie solar, a trazos donde quedan más allá del limbo visto desde la Tierra.",
  "nearest to": "más cercana a",
  "{channel} images loaded live from Helioviewer, nearest to {time} UT; their pointing is as recorded and not checked.": "Imágenes de {channel} cargadas en directo de Helioviewer, las más cercanas a las {time} UT; su apuntado es el registrado y no se ha comprobado.",
- "html:ctx-credits": "Listas de observaciones del <a href=\"https://www.lmsal.com/hek/hcr\">LMSAL Heliophysics Coverage Registry</a> (IRIS), el catálogo de ejecución de <a href=\"https://eis.nrl.navy.mil/\">Hinode/EIS</a>, el <a href=\"https://dkist.data.nso.edu/\">DKIST Data Center</a> y el <a href=\"https://soar.esac.esa.int/\">Solar Orbiter Archive</a>; imágenes de SDO de <a href=\"https://helioviewer.org/\">Helioviewer</a>."
+ "html:ctx-credits": "Listas de observaciones del <a href=\"https://www.lmsal.com/hek/hcr\">LMSAL Heliophysics Coverage Registry</a> (IRIS), el catálogo de ejecución de <a href=\"https://eis.nrl.navy.mil/\">Hinode/EIS</a>, el <a href=\"https://dkist.data.nso.edu/\">DKIST Data Center</a> y el <a href=\"https://soar.esac.esa.int/\">Solar Orbiter Archive</a>; imágenes de SDO de <a href=\"https://helioviewer.org/\">Helioviewer</a>.",
+ "Anywhere": "En cualquier lugar",
+ "At or beyond the limb": "En el limbo o más allá",
+ "Choose at least two facilities.": "Elija al menos dos instalaciones.",
+ "DKIST": "DKIST",
+ "Facilities that must take part": "Instalaciones que deben participar",
+ "Find coordinated observations": "Buscar observaciones coordinadas",
+ "Hinode/EIS": "Hinode/EIS",
+ "IRIS": "IRIS",
+ "No coordinated observations of these facilities in this range.": "No hay observaciones coordinadas de estas instalaciones en este intervalo.",
+ "On the disk": "En el disco",
+ "Solar Orbiter": "Solar Orbiter",
+ "The list of coordinated observations could not be loaded.": "No se pudo cargar la lista de observaciones coordinadas.",
+ "Times when every chosen facility observed the same place on the Sun, overlapping in time, with fields compared in Earth's view.": "Momentos en que todas las instalaciones elegidas observaron el mismo lugar del Sol a la vez, con los campos comparados en la vista desde la Tierra.",
+ "and {n} more; narrow the dates to see them": "y {n} más; acote las fechas para verlas",
+ "disk, ({x}″, {y}″)": "disco, ({x}″, {y}″)",
+ "limb, ({x}″, {y}″)": "limbo, ({x}″, {y}″)",
+ "{n} times found, newest first. Click one to open it.": "{n} momentos encontrados, los más recientes primero. Haga clic en uno para abrirlo."
 }

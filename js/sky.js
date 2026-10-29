@@ -787,6 +787,63 @@ function selectObservation(d) {
   update();
 }
 
+// ---------- coordinated-dataset finder ----------
+const FACILITY = { dkist: 'DKIST', iris: 'IRIS', eis: 'Hinode/EIS', solo: 'Solar Orbiter' };
+let coordinated = null;
+async function loadCoordinated() {
+  coordinated ??= fetch('data/obs/coordinated.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  return coordinated;
+}
+
+async function renderFinder() {
+  const data = await loadCoordinated();
+  const list = $('find-list');
+  if (!data) { $('find-summary').textContent = tr('The list of coordinated observations could not be loaded.'); list.replaceChildren(); return; }
+  const need = [...document.querySelectorAll('#find-groups input:checked')].map((i) => i.value);
+  const from = $('find-from').value || '2010-01-01';
+  const to = $('find-to').value || '2100-01-01';
+  const where = $('find-where').value;
+  const hits = need.length < 2 ? [] : data.rows.filter((r) => {
+    const has = r[5].split('+');
+    if (!need.every((g) => has.includes(g))) return false;
+    if (r[0].slice(0, 10) < from || r[0].slice(0, 10) > to) return false;
+    return where === 'any' || (where === 'disk' ? r[4] < 0.95 : r[4] >= 0.95);
+  }).reverse();
+  $('find-summary').textContent = need.length < 2 ? tr('Choose at least two facilities.')
+    : hits.length ? tr('{n} times found, newest first. Click one to open it.', { n: hits.length })
+      : tr('No coordinated observations of these facilities in this range.');
+  const shown = hits.slice(0, 300);
+  list.replaceChildren(...shown.map((r) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'ctx-row find-row';
+    const counts = Object.entries(r[6]).map(([k, n]) => `${OBS_INST[k]?.short ?? k} ${n}`).join(' · ');
+    const loc = r[4] < 0.95 ? tr('disk, ({x}″, {y}″)', { x: r[2], y: r[3] }) : tr('limb, ({x}″, {y}″)', { x: r[2], y: r[3] });
+    b.innerHTML = `<span class="t">${r[0].slice(0, 10)} ${r[0].slice(11, 16)}</span><span class="t">${r[1] < 1 ? `${Math.round(r[1] * 60)} min` : `${r[1].toFixed(1)} h`}</span><span class="n">${escapeHTML(counts)}</span><span class="t">${escapeHTML(loc)}</span>`;
+    b.title = r[5].split('+').map((g) => FACILITY[g]).join(' + ');
+    b.addEventListener('click', () => {
+      // Show every instrument of the group, then open its least common facility's first observation
+      for (const k of Object.keys(r[6])) S.oi.add(k);
+      S.hl = r[7];
+      S.jd = jdOf(r[8].replace('Z', ':00Z'));
+      update();
+      $('ctx-wrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+    return b;
+  }));
+  if (hits.length > shown.length) {
+    const more = document.createElement('p');
+    more.className = 'tool-help';
+    more.textContent = tr('and {n} more; narrow the dates to see them', { n: hits.length - shown.length });
+    list.appendChild(more);
+  }
+}
+
+function initFinder() {
+  $('ctx-find').addEventListener('toggle', () => { if ($('ctx-find').open) renderFinder(); });
+  for (const id of ['find-groups', 'find-from', 'find-to', 'find-where']) $(id).addEventListener('change', () => renderFinder());
+}
+
 function initContext() {
   $('ctx-ch').addEventListener('click', (e) => {
     const b = e.target.closest('button');
@@ -944,6 +1001,7 @@ async function main() {
   buildLayers();
   initGestures();
   initContext();
+  initFinder();
   $('dt').addEventListener('change', (e) => {
     const t = Date.parse(`${e.target.value}Z`);
     if (!Number.isNaN(t)) { S.jd = t / 864e5 + 2440587.5; update(); }

@@ -663,6 +663,12 @@ tbody tr:hover td { background: var(--surface); }
 .ctx-inst small { color: var(--muted); font-family: "IBM Plex Mono", monospace; }
 .ctx-sel { margin: 10px 0 4px; font-size: 14px; }
 .ctx-sel a { margin-left: 6px; }
+.ctx-find { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 10px; }
+.ctx-find summary { cursor: pointer; font-size: 14px; font-weight: 600; }
+.ctx-find-row { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: end; margin: 8px 0; }
+.ctx-find-row > label:not(.field) { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px; cursor: pointer; }
+.ctx-find-row .field { margin: 0; min-width: 150px; }
+.find-row { grid-template-columns: 132px 70px minmax(0, 1fr) auto; }
 .ctx-sub { font-size: 13px; font-weight: 600; margin: 14px 0 6px; }
 .ctx-list { position: relative; max-height: 300px; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px; }
 .ctx-row { display: grid; grid-template-columns: 12px 92px 120px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; width: 100%; padding: 6px 10px; border: 0; border-bottom: 1px solid var(--line); background: none; color: var(--ink); font: inherit; font-size: 13px; text-align: left; cursor: pointer; }

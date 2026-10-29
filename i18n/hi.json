@@ -510,5 +510,22 @@
  "Solar Orbiter fields are carried to Earth's view through the solar surface, dashed where that part lies beyond Earth's limb.": "Solar Orbiter के क्षेत्र सौर सतह के माध्यम से पृथ्वी के दृश्य में लाए गए हैं; जो भाग पृथ्वी से दिखने वाले लिंब के पार है, वह डैश रेखा में है।",
  "nearest to": "निकटतम",
  "{channel} images loaded live from Helioviewer, nearest to {time} UT; their pointing is as recorded and not checked.": "{channel} छवियाँ Helioviewer से सीधे लोड की गईं, {time} UT के निकटतम; उनकी पॉइंटिंग दर्ज मान है और जाँची नहीं गई।",
- "html:ctx-credits": "प्रेक्षण-सूचियाँ <a href=\"https://www.lmsal.com/hek/hcr\">LMSAL Heliophysics Coverage Registry</a> (IRIS), <a href=\"https://eis.nrl.navy.mil/\">Hinode/EIS</a> के as-run कैटलॉग, <a href=\"https://dkist.data.nso.edu/\">DKIST Data Center</a> और <a href=\"https://soar.esac.esa.int/\">Solar Orbiter Archive</a> से; SDO छवियाँ <a href=\"https://helioviewer.org/\">Helioviewer</a> से।"
+ "html:ctx-credits": "प्रेक्षण-सूचियाँ <a href=\"https://www.lmsal.com/hek/hcr\">LMSAL Heliophysics Coverage Registry</a> (IRIS), <a href=\"https://eis.nrl.navy.mil/\">Hinode/EIS</a> के as-run कैटलॉग, <a href=\"https://dkist.data.nso.edu/\">DKIST Data Center</a> और <a href=\"https://soar.esac.esa.int/\">Solar Orbiter Archive</a> से; SDO छवियाँ <a href=\"https://helioviewer.org/\">Helioviewer</a> से।",
+ "Anywhere": "कहीं भी",
+ "At or beyond the limb": "लिंब पर या उसके पार",
+ "Choose at least two facilities.": "कम से कम दो वेधशालाएँ/मिशन चुनें।",
+ "DKIST": "DKIST",
+ "Facilities that must take part": "जिन वेधशालाओं/मिशनों का शामिल होना ज़रूरी है",
+ "Find coordinated observations": "समन्वित प्रेक्षण खोजें",
+ "Hinode/EIS": "Hinode/EIS",
+ "IRIS": "IRIS",
+ "No coordinated observations of these facilities in this range.": "इस अवधि में इन वेधशालाओं/मिशनों के कोई समन्वित प्रेक्षण नहीं हैं।",
+ "On the disk": "डिस्क पर",
+ "Solar Orbiter": "Solar Orbiter",
+ "The list of coordinated observations could not be loaded.": "समन्वित प्रेक्षणों की सूची लोड नहीं हो सकी।",
+ "Times when every chosen facility observed the same place on the Sun, overlapping in time, with fields compared in Earth's view.": "वे समय जब हर चुनी गई वेधशाला/मिशन ने एक ही समय में सूर्य पर एक ही स्थान का प्रेक्षण किया; क्षेत्रों की तुलना पृथ्वी के दृश्य में की गई है।",
+ "and {n} more; narrow the dates to see them": "और {n}; उन्हें देखने के लिए तिथियाँ सीमित करें",
+ "disk, ({x}″, {y}″)": "डिस्क, ({x}″, {y}″)",
+ "limb, ({x}″, {y}″)": "लिंब, ({x}″, {y}″)",
+ "{n} times found, newest first. Click one to open it.": "{n} समय मिले, नवीनतम पहले। खोलने के लिए किसी पर क्लिक करें।"
 }

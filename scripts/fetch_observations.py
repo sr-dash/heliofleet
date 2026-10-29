@@ -20,7 +20,11 @@ Usage:
   python scripts/fetch_observations.py --all                # everything since 2010
   python scripts/fetch_observations.py --only iris,dkist    # some sources only
   python scripts/fetch_observations.py --threads 8          # parallel Solar Orbiter days (default 4)
-  python scripts/fetch_observations.py --index              # only rebuild data/obs/index.json
+  python scripts/fetch_observations.py --index              # only rebuild the index and coordinated list
+
+Every run also rebuilds data/obs/coordinated.json: groups of observations by
+different facilities (DKIST, IRIS, Hinode/EIS, Solar Orbiter) that overlap in
+time and on the Sun as seen from Earth, for the page's coordinated-dataset finder.
 Standard library only.
 """
 
@@ -329,6 +333,7 @@ def write_index():
         except ValueError:
             continue  # being written by a parallel run; the next index pass counts it
         index[f.stem] = {k: sum(r["i"] == k for r in rows) for k in sorted({r["i"] for r in rows})}
+    coordinated()
     (OUT / "index.json").write_text(json.dumps({
         "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "sources": {"iris": "LMSAL Heliophysics Coverage Registry", "eis": "Hinode/EIS as-run catalogue",
@@ -336,6 +341,140 @@ def write_index():
         "months": index}, indent=1))
     size = sum(f.stat().st_size for f in OUT.glob("*.json")) / 1e6
     print(f"{len(index)} months of observations in {OUT.relative_to(ROOT)} ({size:.1f} MB)")
+
+
+
+# ---------- coordinated observations ----------
+GROUP = {"iris": "iris", "eis": "eis", "euihri": "solo", "euilya": "solo", "phihrt": "solo", "spice": "solo"}
+R_SUN_AU = 695700 / 149597870.7
+ARC = math.pi / 648000
+
+
+def earth_view(jd):
+    """Earth's heliographic latitude (degrees) and distance (au), after Meeus."""
+    T = (jd - 2451545) / 36525
+    M = math.radians(357.52911 + 35999.05029 * T)
+    lon = 280.46646 + 36000.76983 * T + (1.914602 - 0.004817 * T) * math.sin(M) + 0.019993 * math.sin(2 * M)
+    node = 73.6667 + 1.3958333 * (jd - 2396758) / 36525
+    b0 = math.degrees(math.asin(math.sin(math.radians(lon - node)) * math.sin(math.radians(7.25))))
+    return 0.0, b0, 1.000140 - 0.016708 * math.cos(M) - 0.000139 * math.cos(2 * M)
+
+
+def axes(lon, lat, d):
+    lo, la = math.radians(lon), math.radians(lat)
+    o = [d * math.cos(la) * math.cos(lo), d * math.cos(la) * math.sin(lo), d * math.sin(la)]
+    s = [-v / d for v in o]
+    n = [-s[2] * s[0], -s[2] * s[1], 1 - s[2] * s[2]]
+    nn = math.hypot(*n)
+    n = [v / nn for v in n]
+    w = [s[1] * n[2] - s[2] * n[1], s[2] * n[0] - s[0] * n[2], s[0] * n[1] - s[1] * n[0]]
+    return o, s, n, w
+
+
+def carry(tx, ty, frm, to):
+    """The same construction as js/observations.js: through the solar surface, or
+    where the line of sight passes closest to Sun centre."""
+    o, s, n, w = frm
+    a, b = tx * ARC, ty * ARC
+    d = [math.cos(b) * math.cos(a) * s[k] + math.cos(b) * math.sin(a) * w[k] + math.sin(b) * n[k] for k in range(3)]
+    od = sum(o[k] * d[k] for k in range(3))
+    disc = od * od - (sum(v * v for v in o) - R_SUN_AU ** 2)
+    t = -od - math.sqrt(disc) if disc >= 0 else -od
+    p = [o[k] + t * d[k] for k in range(3)]
+    eo, es, en, ew = to
+    v = [p[k] - eo[k] for k in range(3)]
+    r = math.hypot(*v)
+    dot = lambda x, y: sum(x[k] * y[k] for k in range(3))
+    return math.atan2(dot(v, ew), dot(v, es)) / ARC, math.asin(dot(v, en) / r) / ARC
+
+
+def jd_of(iso_):
+    return datetime.fromisoformat(iso_[:19]).replace(tzinfo=timezone.utc).timestamp() / 86400 + 2440587.5
+
+
+def earth_box(r, j):
+    """Bounding box of a footprint in Earth's helioprojective frame."""
+    if r.get("f") != "S":
+        return min(r["x"]), min(r["y"]), max(r["x"]), max(r["y"])
+    frm, to = axes(*r["o"]), axes(*earth_view(j))
+    pts = []
+    for i in range(len(r["x"]) - 1):
+        for u in (0, 0.5):
+            pts.append(carry(r["x"][i] + (r["x"][i + 1] - r["x"][i]) * u, r["y"][i] + (r["y"][i + 1] - r["y"][i]) * u, frm, to))
+    xs, ys = [p[0] for p in pts], [p[1] for p in pts]
+    return min(xs), min(ys), max(xs), max(ys)
+
+
+def coordinated():
+    """Observations by different facilities overlapping in time and in Earth's view,
+    joined into groups (one group per shared target and stretch of time)."""
+    obs = []
+    for f in sorted(OUT.glob("????-??.json")):
+        try:
+            obs += json.loads(f.read_text())["rows"]
+        except ValueError:
+            continue
+    cryo = ROOT / "data" / "ground" / "cryonirsp.json"
+    if cryo.exists():
+        for d in json.loads(cryo.read_text())["datasets"]:
+            obs.append({"i": "cryonirsp", "t0": d["t0"], "t1": d["t1"], "f": "E", "x": d["x"], "y": d["y"], "id": d["id"]})
+    items = []
+    for r in obs:
+        try:
+            j0, j1 = jd_of(r["t0"]), jd_of(r["t1"])
+        except ValueError:
+            continue  # an impossible date in the source record
+        if j1 < j0:
+            continue
+        # Longer than a day comes from faulty catalogue entries (the page cuts these too)
+        j1 = min(j1, j0 + 1)
+        g = GROUP.get(r["i"], "dkist")
+        items.append((j0, j1, g, r["i"], r["id"], earth_box(r, (j0 + j1) / 2)))
+    items.sort()
+    parent = list(range(len(items)))
+    def find(a):
+        while parent[a] != a:
+            parent[a] = parent[parent[a]]
+            a = parent[a]
+        return a
+    active = []
+    for k, (j0, j1, g, *_rest, b) in enumerate(items):
+        active = [m for m in active if items[m][1] >= j0]
+        for m in active:
+            o = items[m]
+            if o[2] != g and o[5][0] <= b[2] and b[0] <= o[5][2] and o[5][1] <= b[3] and b[1] <= o[5][3]:
+                parent[find(k)] = find(m)
+        active.append(k)
+    comps = {}
+    for k in range(len(items)):
+        comps.setdefault(find(k), []).append(k)
+    out = []
+    for ks in comps.values():
+        groups = sorted({items[k][2] for k in ks})
+        if len(groups) < 2:
+            continue
+        j0 = min(items[k][0] for k in ks)
+        j1 = max(items[k][1] for k in ks)
+        cx = sum((items[k][5][0] + items[k][5][2]) / 2 for k in ks) / len(ks)
+        cy = sum((items[k][5][1] + items[k][5][3]) / 2 for k in ks) / len(ks)
+        rsun = 959.63 / earth_view((j0 + j1) / 2)[2]
+        count = {}
+        for k in ks:
+            count[items[k][3]] = count.get(items[k][3], 0) + 1
+        # The member to open: the rarest facility's first observation
+        rare = min(groups, key=lambda g: sum(items[k][2] == g for k in ks))
+        first = min((k for k in ks if items[k][2] == rare), key=lambda k: items[k][0])
+        out.append([
+            (datetime(1970, 1, 1) + timedelta(days=j0 - 2440587.5)).strftime("%Y-%m-%dT%H:%MZ"),
+            round((j1 - j0) * 24, 2), round(cx), round(cy), round(math.hypot(cx, cy) / rsun, 2),
+            "+".join(groups), count, items[first][4],
+            (datetime(1970, 1, 1) + timedelta(days=(items[first][0] + items[first][1]) / 2 - 2440587.5)).strftime("%Y-%m-%dT%H:%MZ")])
+    out.sort()
+    (OUT / "coordinated.json").write_text(json.dumps({
+        "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "columns": ["start", "hours", "x", "y", "r_over_rsun", "facilities", "observations", "open", "open_mid"],
+        "rows": out}, separators=(",", ":")))
+    print(f"{len(out)} coordinated groups in {OUT.relative_to(ROOT)}/coordinated.json")
 
 
 if __name__ == "__main__":

@@ -41,7 +41,7 @@
   <!-- Fonts load without holding up the first paint; text shows in the fallback font until they arrive -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap"></noscript>
-  <link rel="stylesheet" href="css/style.css?v=41d203983c">
+  <link rel="stylesheet" href="css/style.css?v=2964d251e5">
   <script>
     try {
       const q = new URLSearchParams(location.search);
@@ -121,6 +121,28 @@
         <p class="coverage-note" id="ctx-note"></p>
         <h3 class="ctx-sub" id="ctx-list-title">Observations within 12 hours</h3>
         <div class="ctx-list" id="ctx-list"></div>
+        <details class="ctx-find" id="ctx-find">
+          <summary>Find coordinated observations</summary>
+          <p class="tool-help">Times when every chosen facility observed the same place on the Sun, overlapping in time, with fields compared in Earth's view.</p>
+          <div class="ctx-find-row" id="find-groups" role="group" aria-label="Facilities that must take part">
+            <label><input type="checkbox" value="dkist" checked>DKIST</label>
+            <label><input type="checkbox" value="iris" checked>IRIS</label>
+            <label><input type="checkbox" value="eis">Hinode/EIS</label>
+            <label><input type="checkbox" value="solo">Solar Orbiter</label>
+          </div>
+          <div class="ctx-find-row">
+            <label class="field"><span class="field-label">From</span><input type="date" id="find-from" min="2010-01-01"></label>
+            <label class="field"><span class="field-label">To</span><input type="date" id="find-to" min="2010-01-01"></label>
+            <label class="field"><span class="field-label">Where</span>
+              <select id="find-where">
+                <option value="any">Anywhere</option>
+                <option value="disk">On the disk</option>
+                <option value="limb">At or beyond the limb</option>
+              </select></label>
+          </div>
+          <p class="tool-help" id="find-summary" aria-live="polite"></p>
+          <div class="ctx-list" id="find-list"></div>
+        </details>
         <p class="tool-help" data-i18n-html="ctx-credits">Observation lists from the <a href="https://www.lmsal.com/hek/hcr">LMSAL Heliophysics Coverage Registry</a> (IRIS), the <a href="https://eis.nrl.navy.mil/">Hinode/EIS</a> as-run catalogue, the <a href="https://dkist.data.nso.edu/">DKIST Data Center</a> and the <a href="https://soar.esac.esa.int/">Solar Orbiter Archive</a>; SDO images from <a href="https://helioviewer.org/">Helioviewer</a>.</p>
       </section>
     </section>
@@ -166,8 +188,8 @@
 
   <div class="toast" id="toast" role="status" hidden></div>
   <!-- assets:start (written by scripts/stamp_assets.py) -->
-  <script type="importmap">{"imports":{"./js/animate.js":"./js/animate.js?v=0a5fd6979e","./js/app.js":"./js/app.js?v=3ed8d7bcc1","./js/bodyinfo.js":"./js/bodyinfo.js?v=d96ce73256","./js/cards.js":"./js/cards.js?v=df392faa60","./js/catalog.js":"./js/catalog.js?v=9540bfaa0e","./js/context.js":"./js/context.js?v=bc078cfdac","./js/coverage.js":"./js/coverage.js?v=7c8038c9ce","./js/ephem.js":"./js/ephem.js?v=56c0c10b78","./js/events.js":"./js/events.js?v=f9807e6265","./js/export.js":"./js/export.js?v=33f03c2b63","./js/frames.js":"./js/frames.js?v=c3a2e0d167","./js/helioviewer.js":"./js/helioviewer.js?v=14248f1791","./js/i18n.js":"./js/i18n.js?v=b27b772be8","./js/instruments.js":"./js/instruments.js?v=250c964e38","./js/observations.js":"./js/observations.js?v=cbaf4c2206","./js/render.js":"./js/render.js?v=df21f05af0","./js/ribbon.js":"./js/ribbon.js?v=196bebb9a4","./js/scene.js":"./js/scene.js?v=160dc4fcb3","./js/sky.js":"./js/sky.js?v=57dc53f630","./js/skyproj.js":"./js/skyproj.js?v=d546a24ec4","./js/tools.js":"./js/tools.js?v=260d7d2daf","./js/workbench.js":"./js/workbench.js?v=ce39857ea7"}}</script>
+  <script type="importmap">{"imports":{"./js/animate.js":"./js/animate.js?v=0a5fd6979e","./js/app.js":"./js/app.js?v=3ed8d7bcc1","./js/bodyinfo.js":"./js/bodyinfo.js?v=d96ce73256","./js/cards.js":"./js/cards.js?v=df392faa60","./js/catalog.js":"./js/catalog.js?v=9540bfaa0e","./js/context.js":"./js/context.js?v=bc078cfdac","./js/coverage.js":"./js/coverage.js?v=7c8038c9ce","./js/ephem.js":"./js/ephem.js?v=56c0c10b78","./js/events.js":"./js/events.js?v=f9807e6265","./js/export.js":"./js/export.js?v=33f03c2b63","./js/frames.js":"./js/frames.js?v=c3a2e0d167","./js/helioviewer.js":"./js/helioviewer.js?v=14248f1791","./js/i18n.js":"./js/i18n.js?v=b27b772be8","./js/instruments.js":"./js/instruments.js?v=250c964e38","./js/observations.js":"./js/observations.js?v=b367cc656e","./js/render.js":"./js/render.js?v=df21f05af0","./js/ribbon.js":"./js/ribbon.js?v=196bebb9a4","./js/scene.js":"./js/scene.js?v=160dc4fcb3","./js/sky.js":"./js/sky.js?v=384b0f9a13","./js/skyproj.js":"./js/skyproj.js?v=d546a24ec4","./js/tools.js":"./js/tools.js?v=260d7d2daf","./js/workbench.js":"./js/workbench.js?v=ce39857ea7"}}</script>
   <!-- assets:end -->
-  <script type="module" src="js/sky.js?v=57dc53f630"></script>
+  <script type="module" src="js/sky.js?v=384b0f9a13"></script>
 </body>
 </html>
