@@ -748,8 +748,8 @@ tbody tr:hover td { background: var(--surface); }
   .sitenav::after { content: ""; flex: none; width: 40px; }
 }
 .help li { margin: 6px 0; }
-.methods { padding: 8px 28px 32px; line-height: 1.65; font-size: 15.5px; overflow-wrap: break-word; }
-.methods-toc { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 4px 0 8px; font: 500 13px "IBM Plex Mono", monospace; }
+.methods { padding: 8px 28px 32px; line-height: 1.7; font-size: 17px; overflow-wrap: break-word; }
+.methods-toc { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 4px 0 8px; font: 500 14px "IBM Plex Mono", monospace; }
 /* Wide screens: the page contents in a sidebar that stays in view, the text filling the rest */
 @media (min-width: 1000px) {
   .methods { display: grid; grid-template-columns: 200px minmax(0, 1200px); column-gap: 48px; justify-content: start; }
@@ -761,17 +761,17 @@ tbody tr:hover td { background: var(--surface); }
 }
 /* Very wide screens: centre the page so the spare space is shared on both sides */
 @media (min-width: 1700px) { .methods { justify-content: center; } }
-@media (max-width: 860px) { .methods { padding: 8px 16px 28px; font-size: 15px; } }
+@media (max-width: 860px) { .methods { padding: 8px 16px 28px; font-size: 16px; } }
 .methods-toc a, .methods a { color: var(--accent); }
 .methods section { padding-top: 14px; border-top: 1px solid var(--line); margin-top: 18px; }
-.methods h2 { font: 700 22px "Big Shoulders Display", sans-serif; letter-spacing: 0.02em; text-transform: uppercase; margin: 0 0 8px; }
+.methods h2 { font: 700 26px "Big Shoulders Display", sans-serif; letter-spacing: 0.02em; text-transform: uppercase; margin: 0 0 8px; }
 .methods dt { font-weight: 600; margin-top: 10px; }
 .methods dd { margin: 2px 0 0; color: var(--muted); }
 .methods li { margin: 4px 0; }
-.methods table { border-collapse: collapse; width: 100%; font-size: 14px; margin: 10px 0; }
+.methods table { border-collapse: collapse; width: 100%; font-size: 15.5px; margin: 10px 0; }
 .methods th, .methods td { text-align: left; padding: 6px 10px 6px 0; border-bottom: 1px solid var(--line); vertical-align: top; white-space: normal; overflow-wrap: break-word; }
-.methods th { font: 500 12px "IBM Plex Mono", monospace; color: var(--muted); }
-.methods code { font: 13px "IBM Plex Mono", monospace; }
+.methods th { font: 500 13px "IBM Plex Mono", monospace; color: var(--muted); }
+.methods code { font: 14.5px "IBM Plex Mono", monospace; }
 @media (max-width: 860px) { .methods { padding: 8px 16px 20px; } }
 
 @media (prefers-reduced-motion: reduce) {
