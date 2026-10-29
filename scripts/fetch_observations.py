@@ -271,7 +271,7 @@ def merge(rows, tol=30.0, gap=1800):
     for r in out:
         r.pop("_c"), r.pop("_w")
         if "k" in r:
-            r["n"] = " · ".join(v for v in (r["n"], f"{r['k']} files") if v)
+            r["n"] = " · ".join(v for v in (r["n"], f"{r['k']} file{'s' if r['k'] != 1 else ''}") if v)
             del r["k"]
     return out
 

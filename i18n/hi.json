@@ -553,11 +553,11 @@
  "Copy link to this search": "इस खोज का लिंक कॉपी करें",
  "Copy link to this view": "इस दृश्य का लिंक कॉपी करें",
  "Copy the address bar to share this view": "यह दृश्य साझा करने के लिए एड्रेस बार कॉपी करें",
- "Download SVG": "SVG डाउनलोड करें",
  "HelioFleet pages": "HelioFleet के पृष्ठ",
- "Helioviewer does not let other sites save its live images as PNG; Download SVG keeps them.": "Helioviewer अन्य साइटों को अपनी लाइव छवियाँ PNG के रूप में सहेजने नहीं देता; SVG डाउनलोड करने पर वे शामिल रहती हैं।",
  "How to use": "उपयोग कैसे करें",
  "Map": "मानचित्र",
  "Methods": "विधियाँ",
- "Sky view": "आकाश दृश्य"
+ "Sky view": "आकाश दृश्य",
+ "In the print dialog, choose Save as PDF": "प्रिंट डायलॉग में Save as PDF चुनें",
+ "Opens the print dialog; choose Save as PDF": "प्रिंट डायलॉग खोलता है; Save as PDF चुनें"
 }

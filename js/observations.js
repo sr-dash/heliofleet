@@ -38,7 +38,8 @@ function loadMonth(key) {
         // Durations over a day come from faulty catalogue entries; cut them to a day
         const j0 = jdOf(r.t0);
         const j1 = Math.min(jdOf(r.t1) || j0, j0 + 1);
-        return { ...r, j0, j1 };
+        // Older lists say "1 files"
+        return { ...r, j0, j1, n: r.n?.replace(/\b1 files\b/, '1 file') };
       }).filter((r) => Number.isFinite(r.j0))).catch(() => []));
   }
   return months.get(key);

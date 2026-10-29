@@ -553,11 +553,11 @@
  "Copy link to this search": "Copiar enlace a esta búsqueda",
  "Copy link to this view": "Copiar enlace a esta vista",
  "Copy the address bar to share this view": "Copie la barra de direcciones para compartir esta vista",
- "Download SVG": "Descargar SVG",
  "HelioFleet pages": "Páginas de HelioFleet",
- "Helioviewer does not let other sites save its live images as PNG; Download SVG keeps them.": "Helioviewer no permite a otros sitios guardar sus imágenes en directo como PNG; Descargar SVG las conserva.",
  "How to use": "Cómo usarlo",
  "Map": "Mapa",
  "Methods": "Métodos",
- "Sky view": "Vista del cielo"
+ "Sky view": "Vista del cielo",
+ "In the print dialog, choose Save as PDF": "En el diálogo de impresión, elija Guardar como PDF",
+ "Opens the print dialog; choose Save as PDF": "Abre el diálogo de impresión; elija Guardar como PDF"
 }

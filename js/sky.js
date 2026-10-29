@@ -10,7 +10,7 @@ import { INSTRUMENTS, INSTRUMENT, flyingAt, insColor, insLabel, insShort } from 
 import { makeSky, fovGrid, fovFrame, inField, viewOf, hpcDirection, SKY_SHAPES, GROUND, SITES, sunAltitude, observingWindow } from './skyproj.js';
 import { norm, angleBetween, R_SUN_AU } from './frames.js';
 import { downloadPNG, downloadPDF } from './export.js';
-import { CHANNELS, loadContext, contextRuns, drawContext, contextNote, hitTest, contextPNG, contextSVG } from './context.js';
+import { CHANNELS, loadContext, contextRuns, drawContext, contextNote, hitTest, contextPNG, contextReport } from './context.js';
 import { OBS_INST, observationsNear, earthShape, earthRsun, liveRun } from './observations.js';
 import { LANGUAGES, detectLang, loadLang, lang, saveLang, tr, translatePage } from './i18n.js';
 
@@ -759,6 +759,17 @@ async function renderContext() {
   // Caption of the downloads, in English like the data files
   const counts = {};
   for (const d of items) counts[d.i] = (counts[d.i] ?? 0) + 1;
+  $('ctx-png').hidden = !!run.live;
+  ctxRows = items.slice().sort((a, b) => a.j0 - b.j0).map((d) => {
+    const xs = d.x.slice(0, -1);
+    const ys = d.y.slice(0, -1);
+    return {
+      color: d.color, name: OBS_INST[d.i].name, id: d.id,
+      t0: isoMinute(d.j0).replace('T', ' '), t1: isoMinute(d.j1).replace('T', ' '),
+      x: Math.round((Math.max(...xs) + Math.min(...xs)) / 2), y: Math.round((Math.max(...ys) + Math.min(...ys)) / 2),
+      note: d.n ?? '', url: d.u,
+    };
+  });
   const img = run.img[S.img];
   ctxCaption = [
     `HelioFleet · observation footprints on SDO images · ${isoMinute(S.jd).replace('T', ' ')} UT`,
@@ -906,6 +917,36 @@ function initFinder() {
 
 // ---------- downloads of the observations panel ----------
 let ctxCaption = [];
+let ctxRows = []; // the footprints drawn, for the PDF's table
+
+// The PDF is printed by the browser from a hidden page, because live Helioviewer images
+// may be shown and printed but not read back by this site
+async function printReport() {
+  writeURL();
+  await new Promise((r) => setTimeout(r, 260));
+  const html = contextReport({
+    title: `HelioFleet · observation footprints on SDO images · ${isoMinute(S.jd).replace('T', ' ')} UT`,
+    lines: ctxCaption.slice(1), rows: ctxRows, link: location.href,
+  });
+  if (!html) return;
+  document.getElementById('report-frame')?.remove();
+  const frame = document.createElement('iframe');
+  frame.id = 'report-frame';
+  frame.title = 'Printable report';
+  frame.style.cssText = 'position:fixed;right:0;bottom:0;width:1px;height:1px;border:0;opacity:0;pointer-events:none';
+  frame.srcdoc = html;
+  document.body.appendChild(frame);
+  await new Promise((r) => frame.addEventListener('load', r, { once: true }));
+  const doc = frame.contentDocument;
+  // Wait for the images (at most 15 s) before opening the print dialog
+  await Promise.race([
+    Promise.all([...doc.querySelectorAll('image')].map((im) => new Promise((ok) => { im.addEventListener('load', ok, { once: true }); im.addEventListener('error', ok, { once: true }); }))),
+    new Promise((r) => setTimeout(r, 15000)),
+  ]);
+  toast(tr('In the print dialog, choose Save as PDF'));
+  frame.contentWindow.focus();
+  frame.contentWindow.print();
+}
 function saveBlob(blob, name) {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -921,12 +962,8 @@ function initDownloads() {
   $('ctx-png').addEventListener('click', async () => {
     const blob = await contextPNG([...ctxCaption, location.href]);
     if (blob) saveBlob(blob, `heliofleet_observations_${fileStamp()}UT.png`);
-    else toast(tr('Helioviewer does not let other sites save its live images as PNG; Download SVG keeps them.'));
   });
-  $('ctx-svg').addEventListener('click', () => {
-    const svg = contextSVG([...ctxCaption, location.href]);
-    if (svg) saveBlob(new Blob([svg], { type: 'image/svg+xml' }), `heliofleet_observations_${fileStamp()}UT.svg`);
-  });
+  $('ctx-pdf').addEventListener('click', () => printReport());
   $('sky-link-copy').addEventListener('click', () => copyLink());
 }
 

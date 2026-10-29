@@ -324,16 +324,17 @@ export async function contextPNG(caption) {
   });
 }
 
-// SVG with the images linked (so live Helioviewer cutouts stay in) and vector footprints
-export function contextSVG(caption) {
+// The panel as an SVG figure with the images linked by address and vector footprints,
+// for the printable report: inline in a page, the browser loads and prints the images
+export function contextSVG(caption = []) {
   if (!last) return null;
   const { W, H, zs, zBox, r, run, ds, hl, rsun, disk, stamp, urls, f } = last;
-  const capH = 14 + caption.length * CAPTION_LH;
+  const capH = caption.length ? 14 + caption.length * CAPTION_LH : 0;
   const mapper = (box, view) => {
     const k = box.s / view.size;
     return [(x) => box.x + box.s / 2 + (x - view.x0) / view.scale * k, (y) => box.y + box.s / 2 - (y - view.y0) / view.scale * k, k];
   };
-  const out = [`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${W}" height="${H + capH}" viewBox="0 0 ${W} ${H + capH}" font-family="IBM Plex Mono, Menlo, monospace">`,
+  const out = [`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${W} ${H + capH}" font-family="IBM Plex Mono, Menlo, monospace">`,
     `<rect width="${W}" height="${H + capH}" fill="#05070d"/>`,
     `<defs><clipPath id="cd"><rect x="0" y="0" width="${H}" height="${H}"/></clipPath><clipPath id="cz"><rect x="${zBox.x}" y="0" width="${zs}" height="${zs}"/></clipPath></defs>`];
   const poly = (d, px, py, w, dash) => `<polyline points="${d.x.map((x, i) => `${px(x).toFixed(1)},${py(d.y[i]).toFixed(1)}`).join(' ')}" fill="none" stroke="${d.id === hl ? HL : (d.color ?? '#fff')}" stroke-width="${d.id === hl ? w * 1.9 : w}"${dash ? ' stroke-dasharray="3 3"' : ''}/>`;
@@ -387,6 +388,42 @@ export function contextSVG(caption) {
   caption.forEach((line, i) => out.push(`<text x="8" y="${H + 20 + i * CAPTION_LH}" fill="#e8ecf4" font-size="12">${esc(line)}</text>`));
   out.push('</svg>');
   return out.join('\n');
+}
+
+// A printable report: the figure, then a table of every footprint, for the browser's
+// "Save as PDF". Rows are { color, name, id, t0, t1, x, y, note, url } in UTC and arcsec.
+export function contextReport({ title, lines, rows, link }) {
+  const svg = contextSVG();
+  if (!svg) return null;
+  const safe = (u) => (/^https?:\/\//.test(u ?? '') ? esc(u) : '');
+  const body = rows.map((r) => `<tr><td><span class="sw" style="background:${esc(r.color)}"></span>${esc(r.name)}</td><td><code>${esc(r.id)}</code></td><td>${esc(r.t0)}<br>${esc(r.t1)}</td><td>${esc(r.x)}″, ${esc(r.y)}″</td><td>${esc(r.note || '')}</td><td>${safe(r.url) ? `<a href="${safe(r.url)}">data</a>` : ''}</td></tr>`).join('');
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${esc(title)}</title>
+<style>
+@page { size: A4 landscape; margin: 11mm; }
+* { box-sizing: border-box; }
+body { margin: 0; font: 10.5px/1.4 "Instrument Sans", Helvetica, Arial, sans-serif; color: #111; }
+h1 { font-size: 15px; margin: 0 0 2px; }
+.meta { margin: 0 0 8px; color: #333; }
+.fig { margin: 0 0 8px; text-align: center; }
+/* Small enough that the table starts on the first page */
+.fig svg { display: inline-block; height: 112mm; width: auto; max-width: 100%; background: #05070d; }
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; vertical-align: top; padding: 3px 6px; border-bottom: 0.5px solid #bbb; }
+th { font-weight: 600; background: #f0f0f0; }
+thead { display: table-header-group; }
+tr { break-inside: avoid; }
+code { font: 9.5px "IBM Plex Mono", Menlo, monospace; }
+.sw { display: inline-block; width: 9px; height: 9px; margin-right: 5px; border: 0.5px solid #555; vertical-align: -1px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.fig, th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.foot { margin-top: 8px; color: #333; }
+.foot a, td a { color: #0645ad; }
+</style></head><body>
+<h1>${esc(title)}</h1>
+<p class="meta">${lines.map(esc).join('<br>')}</p>
+<div class="fig">${svg}</div>
+<table><thead><tr><th>Instrument</th><th>Observation</th><th>Start – end (UTC)</th><th>Centre (Earth view)</th><th>Description</th><th></th></tr></thead><tbody>${body}</tbody></table>
+<p class="foot">Footprints use the pointing recorded with each observation, in helioprojective arcseconds as seen from Earth; Solar Orbiter fields are carried into Earth's view through the solar surface, dashed where they lie beyond Earth's limb. Sources: DKIST Data Center, LMSAL Heliophysics Coverage Registry (IRIS), Hinode/EIS as-run catalogue, Solar Orbiter Archive; SDO/AIA and HMI images via Helioviewer.<br>View this online: <a href="${safe(link)}">${esc(link)}</a></p>
+</body></html>`;
 }
 
 export function contextNote(run, ch, ds, names) {
