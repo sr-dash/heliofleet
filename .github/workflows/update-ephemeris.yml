@@ -71,6 +71,7 @@ jobs:
 
       # Images for new Cryo-NIRSP runs; a Helioviewer outage only leaves gaps
       - name: Fetch SDO context images for Cryo-NIRSP
+        id: context
         continue-on-error: true
         run: |
           pip install --quiet pillow numpy
@@ -78,6 +79,7 @@ jobs:
 
       # IRIS, Hinode/EIS, DKIST and Solar Orbiter footprints of the last twelve months
       - name: Fetch observation footprints
+        id: observations
         continue-on-error: true
         run: python scripts/fetch_observations.py
 
@@ -117,6 +119,13 @@ jobs:
         run: |
           gh api -X POST "repos/${{ github.repository }}/pages/builds" --silent \
             || echo "::warning::Could not request a Pages build; it will publish on the next push."
+
+      # A failed image or footprint fetch does not stop the update, but is reported
+      - name: Report a partial update
+        if: steps.context.outcome == 'failure' || steps.observations.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/report_failure.sh "Monthly update could not fetch some observation data"
 
       - name: Report a failed update
         if: failure()

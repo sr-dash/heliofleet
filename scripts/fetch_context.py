@@ -163,6 +163,7 @@ def fetch(path, t, layer, source, mode, x0, y0, scale, size):
         info = json.loads(get(f"{API}getClosestImage/?date={t}&sourceId={source}"))
     except Exception as e:
         print(f"  {path.name}: failed ({e})", flush=True)
+        FAILED.append(path.name)
         return None, None
     Image.open(io.BytesIO(png)).convert(mode).save(path, quality=80, optimize=True)
     time.sleep(1)
@@ -210,6 +211,7 @@ def main():
                 shift = limb_offset(screenshot(mid, layer, 0, 0, CHECK[1], CHECK[0]), rsun) or (0.0, 0.0)
             except Exception as e:
                 print(f"  {key} {ch}: pointing check failed ({e})", flush=True)
+                FAILED.append(f"{key} {ch} pointing check")
                 if kept:
                     s["img"][ch], s["disk"]["img"][ch] = had
                 continue
@@ -250,5 +252,10 @@ def main():
     print(f"{len(sets)} runs, {done} of {6 * len(sets)} images ({size:.1f} MB)")
 
 
+FAILED = []  # images that could not be fetched; the run then exits with an error
+
 if __name__ == "__main__":
     main()
+    if FAILED:
+        # The index and every other image are written; the error lets the workflow report the gap
+        sys.exit(f"could not fetch {len(FAILED)} images: {', '.join(FAILED[:10])}")

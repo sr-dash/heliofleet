@@ -96,6 +96,7 @@ def iris(m0, m1):
             events = json.loads(get(f"{HCR}?{q}").decode("utf-8", "replace")).get("Events", [])
         except Exception as e:
             print(f"  IRIS {m:%Y-%m}: failed ({e})", flush=True)
+            FAILED.append(f"IRIS {m:%Y-%m}")
             continue
         for e in events:
             if e.get("xCen") is None or e.get("raster_fovx") is None or not e.get("startTime") or not e.get("stopTime"):
@@ -276,6 +277,7 @@ def merge(rows, tol=30.0, gap=1800):
 
 
 THREADS = 4
+FAILED = []  # sources or months that could not be fetched; the run then exits with an error
 SOURCES = {"iris": iris, "eis": eis, "dkist": dkist, "solo": solo}
 INSTS = {"iris": {"iris"}, "eis": {"eis"}, "dkist": None, "solo": {"euihri", "euilya", "phihrt", "spice"}}
 
@@ -307,6 +309,7 @@ def main():
             fresh[name] = SOURCES[name](a, m1)
         except Exception as e:
             print(f"  {name}: failed ({e}); its earlier rows are kept", flush=True)
+            FAILED.append(name)
     # Replace each refetched source's rows in the refetched months, one file per month
     others = {i for n, ins in INSTS.items() if ins for i in ins}
     def mine(r):
@@ -479,3 +482,6 @@ def coordinated():
 
 if __name__ == "__main__":
     main()
+    if FAILED:
+        # Everything else is written; the error lets the workflow report the gap
+        sys.exit(f"could not fetch: {', '.join(FAILED)}")
