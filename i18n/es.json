@@ -97,7 +97,6 @@
  "Earth": "Tierra",
  "Earth & near-Earth fleet": "Tierra y flota cercana",
  "Earth (ground-based)": "Tierra (desde el suelo)",
- "Earth's View of the Corona: Instrument Fields of View | HelioFleet": "La corona vista desde la Tierra: campos de visión de los instrumentos | HelioFleet",
  "Earth's view": "Vista desde la Tierra",
  "Earth-fixed": "Fijo a la Tierra",
  "Earth-fixed (HEE)": "Fijo a la Tierra (HEE)",
@@ -561,5 +560,6 @@
  "Draws these footprints over AIA or HMI FITS from JSOC and saves a PDF": "Dibuja estos campos sobre FITS de AIA o HMI de JSOC y guarda un PDF",
  "Every footprint drawn: instrument, times and outline": "Cada campo dibujado: instrumento, horas y contorno",
  "Footprints (CSV)": "Campos (CSV)",
- "SunPy script": "Script de SunPy"
+ "SunPy script": "Script de SunPy",
+ "Sky View: Instrument Fields of View and Coordinated Observations | HelioFleet": "Vista del cielo: campos de visión de los instrumentos y observaciones coordinadas | HelioFleet"
 }

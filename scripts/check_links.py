@@ -18,7 +18,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-FILES = ["index.html", "sky.html", "methods.html", "help.html", "README.md", "CITATION.cff", ".zenodo.json", *sorted(p.as_posix() for p in Path(ROOT / "js").glob("*.js"))]
+FILES = ["index.html", "sky.html", "methods.html", "help.html", "llms.txt", "README.md", "CITATION.cff", ".zenodo.json", *sorted(p.as_posix() for p in Path(ROOT / "js").glob("*.js"))]
 URL = re.compile(r"https?://[^\s\"'<>)`\]\\]+")
 # Not pages: script and font hosts, analytics, schema identifiers, API bases
 SKIP = re.compile(

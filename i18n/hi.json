@@ -97,7 +97,6 @@
  "Earth": "पृथ्वी",
  "Earth & near-Earth fleet": "पृथ्वी और निकटवर्ती यान",
  "Earth (ground-based)": "पृथ्वी (भू-आधारित)",
- "Earth's View of the Corona: Instrument Fields of View | HelioFleet": "पृथ्वी से कोरोना का दृश्य: उपकरणों के दृष्टि-क्षेत्र | HelioFleet",
  "Earth's view": "पृथ्वी से दृश्य",
  "Earth-fixed": "पृथ्वी-स्थिर",
  "Earth-fixed (HEE)": "पृथ्वी-स्थिर (HEE)",
@@ -561,5 +560,6 @@
  "Draws these footprints over AIA or HMI FITS from JSOC and saves a PDF": "इन क्षेत्रों को JSOC की AIA या HMI FITS छवियों पर बनाकर PDF सहेजता है",
  "Every footprint drawn: instrument, times and outline": "बनाया गया हर क्षेत्र: उपकरण, समय और रूपरेखा",
  "Footprints (CSV)": "क्षेत्र (CSV)",
- "SunPy script": "SunPy स्क्रिप्ट"
+ "SunPy script": "SunPy स्क्रिप्ट",
+ "Sky View: Instrument Fields of View and Coordinated Observations | HelioFleet": "आकाश दृश्य: उपकरणों के दृष्टि-क्षेत्र और समन्वित प्रेक्षण | HelioFleet"
 }

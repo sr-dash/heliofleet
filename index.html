@@ -13,8 +13,8 @@
     gtag('config', 'G-8X5BSNF3VV');
   </script>
 
-  <meta name="description" content="Interactive map of SDO, SOHO, Aditya-L1, Solar Orbiter, Parker Solar Probe, STEREO, BepiColombo and more around the Sun and Earth on any date since 2010: coordinates, viewing geometry, alignment search, solar coverage over HMI magnetograms, and IRIS, Hinode/EIS, DKIST and Solar Orbiter observation footprints, from JPL Horizons ephemerides.">
-  <meta name="keywords" content="HelioFleet, spacecraft positions, where is STEREO, Parker Solar Probe location, Solar Orbiter location, Aditya-L1, SDO, heliophysics, solar eclipse, Stonyhurst coordinates, Carrington longitude, Parker spiral, JPL Horizons, heliospheric orbit map">
+  <meta name="description" content="Where SDO, SOHO, Aditya-L1, Solar Orbiter, Parker, STEREO and the fleet are on any date since 2010, with viewing geometry, alignments and coordinated observations.">
+  <meta name="keywords" content="HelioFleet, spacecraft positions, heliophysics, where is Parker Solar Probe, Solar Orbiter position, STEREO-A position, Aditya-L1, SDO, SOHO, BepiColombo, Carrington longitude, Stonyhurst coordinates, Parker spiral footpoint, viewing geometry, light travel time, B0 L0, quadrature, radial alignment, magnetic connectivity, coordinated observations, solar eclipse">
   <meta name="author" content="Soumyaranjan Dash">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="canonical" href="https://sr-dash.github.io/heliofleet/">
@@ -22,6 +22,7 @@
   <link rel="alternate" hreflang="hi" href="https://sr-dash.github.io/heliofleet/?lang=hi">
   <link rel="alternate" hreflang="es" href="https://sr-dash.github.io/heliofleet/?lang=es">
   <link rel="alternate" hreflang="x-default" href="https://sr-dash.github.io/heliofleet/">
+  <link rel="alternate" type="text/plain" title="HelioFleet guide for automated readers" href="https://sr-dash.github.io/heliofleet/llms.txt">
   <link rel="author" href="https://sr-dash.github.io/">
   <link rel="license" href="https://github.com/sr-dash/heliofleet/blob/main/LICENSE">
   <meta name="google-site-verification" content="wNt-P7enH5ZTT0cjYYqXEN9GRrj-0_OcbZSER57FIK4">
@@ -47,7 +48,7 @@
   <meta property="og:locale:alternate" content="hi_IN">
   <meta property="og:locale:alternate" content="es_ES">
   <meta property="og:title" content="HelioFleet: where the Sun-watching spacecraft are">
-  <meta property="og:description" content="SDO, SOHO, Aditya-L1, Solar Orbiter, Parker, STEREO, BepiColombo and more around the Sun and Earth on any date since 2010, with viewing geometry, alignment search and coordinated IRIS, Hinode/EIS, DKIST and Solar Orbiter observations.">
+  <meta property="og:description" content="Where the heliophysics fleet is on any date since 2010: coordinates, viewing geometry, alignment search, solar coverage over HMI magnetograms and coordinated IRIS, Hinode/EIS, DKIST and Solar Orbiter observations.">
   <meta property="og:url" content="https://sr-dash.github.io/heliofleet/">
   <meta property="og:image" content="https://sr-dash.github.io/heliofleet/assets/og-image.png">
   <meta property="og:image:secure_url" content="https://sr-dash.github.io/heliofleet/assets/og-image.png">
@@ -60,7 +61,7 @@
   <meta name="twitter:site" content="@soumyatheory">
   <meta name="twitter:creator" content="@soumyatheory">
   <meta name="twitter:title" content="HelioFleet: where the Sun-watching spacecraft are">
-  <meta name="twitter:description" content="SDO, SOHO, Aditya-L1, Solar Orbiter, Parker, STEREO, BepiColombo and more around the Sun and Earth on any date since 2010, with viewing geometry and coordinated-observation search.">
+  <meta name="twitter:description" content="Where the heliophysics fleet is on any date since 2010, with viewing geometry, alignments and coordinated observations.">
   <meta name="twitter:image" content="https://sr-dash.github.io/heliofleet/assets/og-image.png">
   <meta name="twitter:image:alt" content="HelioFleet map of spacecraft around the Sun during the 8 April 2024 total solar eclipse">
 
@@ -95,7 +96,9 @@
         "@id": "https://sr-dash.github.io/#website",
         "url": "https://sr-dash.github.io/",
         "name": "Soumyaranjan Dash Portfolio",
-        "publisher": { "@id": "https://sr-dash.github.io/#person" }
+        "publisher": {
+          "@id": "https://sr-dash.github.io/#person"
+        }
       },
       {
         "@type": "WebApplication",
@@ -108,9 +111,17 @@
         "applicationSubCategory": "Heliophysics visualization",
         "operatingSystem": "Any (web browser)",
         "browserRequirements": "Requires JavaScript and HTML5 canvas",
-        "inLanguage": ["en", "hi", "es"],
+        "inLanguage": [
+          "en",
+          "hi",
+          "es"
+        ],
         "isAccessibleForFree": true,
-        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
         "datePublished": "2026-10-09",
         "image": "https://sr-dash.github.io/heliofleet/assets/og-image.png",
         "screenshot": "https://sr-dash.github.io/heliofleet/assets/og-image.png",
@@ -153,9 +164,42 @@
               "name": "Community Coordinated Modeling Center, NASA Goddard Space Flight Center",
               "url": "https://ccmc.gsfc.nasa.gov/"
             }
+          },
+          {
+            "@type": "Dataset",
+            "name": "DKIST Data Center datasets",
+            "url": "https://dkist.data.nso.edu/"
+          },
+          {
+            "@type": "Dataset",
+            "name": "LMSAL Heliophysics Coverage Registry (IRIS)",
+            "url": "https://www.lmsal.com/hek/hcr"
+          },
+          {
+            "@type": "Dataset",
+            "name": "Hinode/EIS as-run catalogue",
+            "url": "https://eis.nrl.navy.mil/"
+          },
+          {
+            "@type": "Dataset",
+            "name": "Solar Orbiter Archive",
+            "url": "https://soar.esac.esa.int/"
+          },
+          {
+            "@type": "Dataset",
+            "name": "Helioviewer SDO images",
+            "url": "https://helioviewer.org/"
+          },
+          {
+            "@type": "Dataset",
+            "name": "SDO/HMI synoptic maps (JSOC)",
+            "url": "http://jsoc.stanford.edu/"
           }
         ],
-        "sameAs": ["https://github.com/sr-dash/heliofleet", "https://doi.org/10.5281/zenodo.23328187"],
+        "sameAs": [
+          "https://github.com/sr-dash/heliofleet",
+          "https://doi.org/10.5281/zenodo.23328187"
+        ],
         "identifier": {
           "@type": "PropertyValue",
           "propertyID": "DOI",
@@ -165,31 +209,101 @@
         "softwareVersion": "1.1.1",
         "dateModified": "2026-10-29",
         "license": "https://opensource.org/licenses/MIT",
-        "author": { "@id": "https://sr-dash.github.io/#person" },
-        "creator": { "@id": "https://sr-dash.github.io/#person" },
-        "publisher": { "@id": "https://sr-dash.github.io/#person" },
-        "isPartOf": { "@id": "https://sr-dash.github.io/#website" }
+        "author": {
+          "@id": "https://sr-dash.github.io/#person"
+        },
+        "creator": {
+          "@id": "https://sr-dash.github.io/#person"
+        },
+        "publisher": {
+          "@id": "https://sr-dash.github.io/#person"
+        },
+        "isPartOf": {
+          "@id": "https://sr-dash.github.io/#website"
+        },
+        "hasPart": [
+          {
+            "@id": "https://sr-dash.github.io/heliofleet/sky.html#page"
+          },
+          {
+            "@id": "https://sr-dash.github.io/heliofleet/methods.html#article"
+          },
+          {
+            "@id": "https://sr-dash.github.io/heliofleet/help.html#article"
+          }
+        ],
+        "softwareHelp": {
+          "@type": "CreativeWork",
+          "url": "https://sr-dash.github.io/heliofleet/help.html"
+        }
       },
       {
         "@type": "WebPage",
         "@id": "https://sr-dash.github.io/heliofleet/#page",
         "url": "https://sr-dash.github.io/heliofleet/",
         "name": "HelioFleet: Spacecraft Positions Around the Sun and Earth",
-        "description": "Interactive map of SDO, SOHO, Aditya-L1, Solar Orbiter, Parker Solar Probe, STEREO, BepiColombo and more around the Sun and Earth on any date since 2010.",
+        "description": "Where SDO, SOHO, Aditya-L1, Solar Orbiter, Parker, STEREO and the fleet are on any date since 2010, with viewing geometry, alignments and coordinated observations.",
         "inLanguage": "en",
         "primaryImageOfPage": "https://sr-dash.github.io/heliofleet/assets/og-image.png",
-        "mainEntity": { "@id": "https://sr-dash.github.io/heliofleet/#app" },
-        "isPartOf": { "@id": "https://sr-dash.github.io/#website" },
-        "about": { "@id": "https://sr-dash.github.io/heliofleet/#app" },
-        "author": { "@id": "https://sr-dash.github.io/#person" },
+        "mainEntity": {
+          "@id": "https://sr-dash.github.io/heliofleet/#app"
+        },
+        "isPartOf": {
+          "@id": "https://sr-dash.github.io/#website"
+        },
+        "about": {
+          "@id": "https://sr-dash.github.io/heliofleet/#app"
+        },
+        "author": {
+          "@id": "https://sr-dash.github.io/#person"
+        },
         "breadcrumb": {
           "@type": "BreadcrumbList",
           "itemListElement": [
-            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://sr-dash.github.io/" },
-            { "@type": "ListItem", "position": 2, "name": "Software", "item": "https://sr-dash.github.io/software/" },
-            { "@type": "ListItem", "position": 3, "name": "HelioFleet", "item": "https://sr-dash.github.io/heliofleet/" }
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://sr-dash.github.io/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Software",
+              "item": "https://sr-dash.github.io/software/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "HelioFleet",
+              "item": "https://sr-dash.github.io/heliofleet/"
+            }
           ]
-        }
+        },
+        "dateModified": "2026-10-29"
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Soumyaranjan Dash",
+            "item": "https://sr-dash.github.io/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Software",
+            "item": "https://sr-dash.github.io/software/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "HelioFleet",
+            "item": "https://sr-dash.github.io/heliofleet/"
+          }
+        ]
       }
     ]
   }

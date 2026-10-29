@@ -13,10 +13,12 @@
     gtag('config', 'G-8X5BSNF3VV');
   </script>
 
-  <meta name="description" content="How HelioFleet computes spacecraft positions, heliographic coordinates, viewing geometry, Parker-spiral footpoints, alignments, instrument fields of view, observation footprints and the sky view, how it is checked against JPL Horizons and SunPy, and its known limits.">
+  <meta name="description" content="How HelioFleet computes positions, heliographic coordinates, viewing geometry, Parker-spiral footpoints and fields of view, and how it is checked against JPL Horizons and SunPy.">
+  <meta name="keywords" content="HelioFleet methods, Stonyhurst heliographic, Carrington longitude, IAU solar rotation, Parker spiral footpoint, light travel time, RSUN_OBS, CRLN_OBS, plane-of-sky projection, JPL Horizons, SunPy validation">
   <meta name="author" content="Soumyaranjan Dash">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="canonical" href="https://sr-dash.github.io/heliofleet/methods.html">
+  <link rel="alternate" type="text/plain" title="HelioFleet guide for automated readers" href="https://sr-dash.github.io/heliofleet/llms.txt">
   <link rel="author" href="https://sr-dash.github.io/">
   <meta name="google-site-verification" content="wNt-P7enH5ZTT0cjYYqXEN9GRrj-0_OcbZSER57FIK4">
   <meta name="color-scheme" content="dark light">
@@ -26,17 +28,92 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="site.webmanifest">
+  <meta property="og:locale" content="en_US">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Soumyaranjan Dash Portfolio">
   <meta property="og:title" content="HelioFleet: methods and accuracy">
-  <meta property="og:description" content="Data, coordinate frames, derived quantities, validation against JPL Horizons and SunPy, and known limits of HelioFleet.">
+  <meta property="og:description" content="Data, coordinate frames, derived quantities, viewing geometry, validation against JPL Horizons and SunPy, and known limits of HelioFleet.">
   <meta property="og:url" content="https://sr-dash.github.io/heliofleet/methods.html">
   <meta property="og:image" content="https://sr-dash.github.io/heliofleet/assets/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="HelioFleet map of spacecraft around the Sun during the 8 April 2024 total solar eclipse">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="HelioFleet: methods and accuracy">
   <meta name="twitter:description" content="Data, coordinate frames, derived quantities, validation against JPL Horizons and SunPy, and known limits of HelioFleet.">
+  <meta name="twitter:image" content="https://sr-dash.github.io/heliofleet/assets/og-image.png">
   <meta name="twitter:site" content="@soumyatheory">
   <meta name="twitter:creator" content="@soumyatheory">
+
+  <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "@id": "https://sr-dash.github.io/heliofleet/methods.html#article",
+        "url": "https://sr-dash.github.io/heliofleet/methods.html",
+        "headline": "HelioFleet: methods and accuracy",
+        "description": "How HelioFleet computes positions, heliographic coordinates, viewing geometry, Parker-spiral footpoints and fields of view, and how it is checked against JPL Horizons and SunPy.",
+        "inLanguage": "en",
+        "author": {
+          "@type": "Person",
+          "@id": "https://sr-dash.github.io/#person",
+          "name": "Soumyaranjan Dash",
+          "url": "https://sr-dash.github.io/"
+        },
+        "publisher": {
+          "@id": "https://sr-dash.github.io/#person"
+        },
+        "datePublished": "2026-10-13",
+        "dateModified": "2026-10-29",
+        "isPartOf": {
+          "@id": "https://sr-dash.github.io/heliofleet/#app"
+        },
+        "proficiencyLevel": "Expert",
+        "about": [
+          "Heliographic coordinates",
+          "Carrington longitude",
+          "Parker spiral",
+          "Viewing geometry",
+          "Plane-of-sky projection",
+          "Validation against JPL Horizons and SunPy"
+        ],
+        "image": "https://sr-dash.github.io/heliofleet/assets/og-image.png"
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Soumyaranjan Dash",
+            "item": "https://sr-dash.github.io/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Software",
+            "item": "https://sr-dash.github.io/software/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "HelioFleet",
+            "item": "https://sr-dash.github.io/heliofleet/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "name": "Methods",
+            "item": "https://sr-dash.github.io/heliofleet/methods.html"
+          }
+        ]
+      }
+    ]
+  }
+  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
