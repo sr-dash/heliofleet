@@ -115,6 +115,13 @@ function syncNav(t, lang) {
   }
 }
 
+// HelioField covers May 2010 to today; other moments open its latest day
+const FIELD_URL = 'https://sr-dash.github.io/heliofield/';
+function fieldDate(jd) {
+  const d = isoMinute(jd).slice(0, 10);
+  return d >= '2010-05-01' && d <= new Date().toISOString().slice(0, 10) ? d : 'latest';
+}
+
 let urlTimer;
 function writeURL() {
   clearTimeout(urlTimer);
@@ -143,6 +150,10 @@ function writeURL() {
     if (q.has('lang')) sky.set('lang', q.get('lang'));
     $('sky-link').href = `sky.html?${sky}`;
     syncNav(q.get('t'), q.get('lang'));
+    // HelioField's 3D field and fleet at this date, with the spirals' wind speed
+    const field = new URLSearchParams({ date: fieldDate(S.jd), view: 'fleet' });
+    if (S.spirals && S.wind !== 400) field.set('v', Math.min(800, Math.max(300, Math.round(S.wind / 100) * 100)));
+    $('field-link').href = `${FIELD_URL}?${field}`;
     if (EMBED) {
       const full = new URLSearchParams(q);
       full.delete('embed');

@@ -739,11 +739,14 @@ tbody tr:hover td { background: var(--surface); }
 .sitenav a:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .sitenav .sitenav-help { margin-left: auto; padding-right: 0; color: var(--accent); font-weight: 600; }
 .sitenav .sitenav-help:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.sitenav .sitenav-field { align-self: center; margin: 0 0 0 16px; padding: 3px 12px; border: 1px solid var(--accent); border-radius: 999px; color: var(--accent); font-weight: 600; }
+.sitenav .sitenav-field:hover { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); }
 /* Narrow screens: the bar scrolls sideways; the faded edge shows there is more, and the guide comes first */
 @media (max-width: 860px) {
   .sitenav { padding: 0 16px; -webkit-mask-image: linear-gradient(to right, #000 82%, transparent); mask-image: linear-gradient(to right, #000 82%, transparent); }
   .sitenav a { padding: 9px 11px 7px; }
   .sitenav .sitenav-help { order: -1; margin-left: 0; padding-left: 0; }
+  .sitenav .sitenav-field { order: -1; margin: 0 6px 0 4px; padding: 2px 10px; }
   .sitenav a:first-child { padding-left: 11px; }
   .sitenav::after { content: ""; flex: none; width: 40px; }
 }

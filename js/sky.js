@@ -90,6 +90,13 @@ function syncNav(t, lang) {
   }
 }
 
+// HelioField covers May 2010 to today; other moments open its latest day
+const FIELD_URL = 'https://sr-dash.github.io/heliofield/';
+function fieldDate(jd) {
+  const d = isoMinute(jd).slice(0, 10);
+  return d >= '2010-05-01' && d <= new Date().toISOString().slice(0, 10) ? d : 'latest';
+}
+
 let urlTimer;
 function writeURL() {
   clearTimeout(urlTimer);
@@ -120,6 +127,10 @@ function writeURL() {
     $('map-back').href = `./?${map}`;
     $('map-link').href = `./?${map}`;
     syncNav(q.get('t'), cur.get('lang'));
+    // HelioField's connectivity at this date, followed from this observer
+    const field = new URLSearchParams({ date: fieldDate(S.jd) });
+    if (['solo', 'bepi', 'sta', 'stb', 'earth'].includes(S.obs)) field.set('focus', S.obs);
+    $('field-link').href = `${FIELD_URL}connect.html?${field}`;
   }, 200);
 }
 

@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parent.parent
 ATTRS = {"title", "aria-label", "placeholder", "alt"}
 SKIP_TEXT = re.compile(r"^[\d\s.,:+\-−±×°/()]*(au|d|h|CR|fps|km/s)?[\d\s.,:+\-−±×°/()]*$")
 # Proper nouns, units and codes that stay as they are in every language
-KEEP = {"HelioFleet", "HelioFleet ↗", "JPL Horizons", "Soumyaranjan Dash", "Dr. Soumyaranjan Dash",
+KEEP = {"HelioFleet", "HelioFleet ↗", "HelioField ↗", "JPL Horizons", "Soumyaranjan Dash", "Dr. Soumyaranjan Dash",
         "CSV", "JSON", "GIF", "μ", "r", "au", "H-alpha", "1.6 R☉", "4 R☉", "32 R☉"}
 
 
