@@ -155,7 +155,7 @@
  "HGS lon": "HGS देशांतर",
  "HGS longitude, latitude": "HGS देशांतर, अक्षांश",
  "HGS/Carrington from Earth": "HGS/कैरिंगटन, पृथ्वी से",
- "HelioFleet: Spacecraft Positions Around the Sun and Earth | Soumyaranjan Dash": "HelioFleet: सूर्य और पृथ्वी के चारों ओर अंतरिक्ष यानों की स्थितियाँ | Soumyaranjan Dash",
+ "HelioFleet: Solar and Spacecraft Geometry": "HelioFleet: सूर्य और अंतरिक्ष यानों की ज्यामिति",
  "Heliocentric Earth Ecliptic: Earth held fixed at the bottom": "सूर्यकेंद्रीय पृथ्वी क्रांतिवृत्तीय (HEE): पृथ्वी नीचे स्थिर",
  "Heliocentric speed": "सूर्यकेंद्रीय वेग",
  "Hide on map": "मानचित्र पर छिपाएँ",
@@ -562,5 +562,5 @@
  "Every footprint drawn: instrument, times and outline": "बनाया गया हर क्षेत्र: उपकरण, समय और रूपरेखा",
  "Footprints (CSV)": "क्षेत्र (CSV)",
  "SunPy script": "SunPy स्क्रिप्ट",
- "Sky View: Instrument Fields of View and Coordinated Observations | HelioFleet": "आकाश दृश्य: उपकरणों के दृष्टि-क्षेत्र और समन्वित प्रेक्षण | HelioFleet"
+ "HelioFleet Sky View: Instrument Coverage": "HelioFleet आकाश दृश्य: उपकरणों का कवरेज"
 }

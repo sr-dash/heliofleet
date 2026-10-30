@@ -155,7 +155,7 @@
  "HGS lon": "Lon. HGS",
  "HGS longitude, latitude": "Longitud y latitud HGS",
  "HGS/Carrington from Earth": "HGS/Carrington desde la Tierra",
- "HelioFleet: Spacecraft Positions Around the Sun and Earth | Soumyaranjan Dash": "HelioFleet: posiciones de naves espaciales alrededor del Sol y la Tierra | Soumyaranjan Dash",
+ "HelioFleet: Solar and Spacecraft Geometry": "HelioFleet: geometría del Sol y de las naves espaciales",
  "Heliocentric Earth Ecliptic: Earth held fixed at the bottom": "Heliocéntrico eclíptico terrestre (HEE): la Tierra fija abajo",
  "Heliocentric speed": "Velocidad heliocéntrica",
  "Hide on map": "Ocultar en el mapa",
@@ -562,5 +562,5 @@
  "Every footprint drawn: instrument, times and outline": "Cada campo dibujado: instrumento, horas y contorno",
  "Footprints (CSV)": "Campos (CSV)",
  "SunPy script": "Script de SunPy",
- "Sky View: Instrument Fields of View and Coordinated Observations | HelioFleet": "Vista del cielo: campos de visión de los instrumentos y observaciones coordinadas | HelioFleet"
+ "HelioFleet Sky View: Instrument Coverage": "Vista del cielo de HelioFleet: cobertura de los instrumentos"
 }
