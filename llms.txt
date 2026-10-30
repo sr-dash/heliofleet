@@ -65,6 +65,7 @@ print(psp.radius.to("AU"), psp.lon, psp.lat, l0)
 ## Figures
 
 - [assets/og-image.png](https://sr-dash.github.io/heliofleet/assets/og-image.png): the map during the total solar eclipse of 8 April 2024 (1200 × 630).
+- [assets/og-sky.jpg](https://sr-dash.github.io/heliofleet/assets/og-sky.jpg): the sky view on 16 October 2023, DKIST, IRIS, Hinode/EIS and Solar Orbiter footprints over SDO/AIA 171 Å with a zoomed inset (1200 × 630).
 - The map and the sky view save PNG and PDF snapshots with a key of every layer; the map also records MP4 or GIF animations. Archived Cryo-NIRSP runs save as PNG with a caption; other observation figures are made with the SunPy script above from JSOC FITS.
 - SDO images in the sky view come from Helioviewer (SDO/AIA and SDO/HMI, courtesy of NASA/SDO and the AIA and HMI science teams).
 
