@@ -72,7 +72,7 @@ print(psp.radius.to("AU"), psp.lon, psp.lat, l0)
 
 ## Citation
 
-- Dash, S. (2026). HelioFleet: an interactive map of heliophysics spacecraft positions [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.23328187 (all versions; version 1.1.1 is https://doi.org/10.5281/zenodo.23752828).
+- Dash, S. (2026). HelioFleet: an interactive map of heliophysics spacecraft positions [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.23328187 (all versions; version 1.1.2 is https://doi.org/10.5281/zenodo.23818629).
 - [CITATION.cff](https://github.com/sr-dash/heliofleet/blob/main/CITATION.cff). Licence: MIT.
 
 ## Optional
