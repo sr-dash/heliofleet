@@ -329,7 +329,7 @@ export function visibility(scene, spot, hidden) {
 // ---------- citation ----------
 
 export const CITATION = {
-  version: '1.1.1',
+  version: '1.1.2',
   year: 2026,
   title: 'HelioFleet: an interactive map of heliophysics spacecraft positions',
   // Zenodo concept DOI: resolves to the latest release.
