@@ -28,7 +28,7 @@ repository-code: "https://github.com/sr-dash/heliofleet"
 license: MIT
 abstract: >-
   HelioFleet is a web tool that shows where heliophysics spacecraft (SDO,
-  SOHO, Aditya-L1, ACE, Wind, DSCOVR, IMAP, SWFO-L1, Carruthers, Solar
+  SOHO, Aditya-L1, ACE, Wind, DSCOVR, IMAP, SOLAR-1, Carruthers, Solar
   Orbiter, Parker Solar Probe,
   BepiColombo, STEREO-A/B and MAVEN) are relative to the Sun and Earth on
   any date since 2010. It reports Stonyhurst and Carrington coordinates and

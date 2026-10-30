@@ -71,7 +71,7 @@ README_ROWS = [
     ("wind_geo", "Wind", "-8", "Sun-Earth L1"),
     ("dscovr_geo", "DSCOVR", "-78", "Sun-Earth L1"),
     ("imap_geo", "IMAP", "-43", "Sun-Earth L1"),
-    ("swfo_geo", "SWFO-L1", "-231", "Sun-Earth L1"),
+    ("swfo_geo", "SOLAR-1 (SWFO-L1)", "-231", "Sun-Earth L1"),
     ("cgo_geo", "Carruthers", "-171", "Sun-Earth L1"),
     ("solo", "Solar Orbiter", "-144", ""),
     ("psp", "Parker Solar Probe", "-96", ""),

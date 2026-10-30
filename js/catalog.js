@@ -63,9 +63,9 @@ export const BODIES = {
     data: 'https://imap.princeton.edu/data',
   },
   swfo: {
-    name: 'Space Weather Follow On-Lagrange 1', short: 'SWFO-L1', tag: 'SWFO', agency: 'NOAA', kind: 'sc',
+    name: 'Space Weather Observations at L1 to Advance Readiness-1 (SOLAR-1, formerly SWFO-L1)', short: 'SOLAR-1', tag: 'SOLAR-1', agency: 'NOAA', kind: 'sc',
     hid: '-231', launch: '2025-09-24T11:30Z', near: true, geoKey: 'swfo_geo', derived: true,
-    site: 'https://www.nesdis.noaa.gov/OPPA/swfo-L1.php',
+    site: 'https://www.nesdis.noaa.gov/our-satellites/future-programs/swfo/space-weather-observations-l1-advance-readiness-solar-1',
     data: 'https://www.swpc.noaa.gov/',
   },
   cgo: {
@@ -158,6 +158,7 @@ export const MILESTONES = [
   { t: '2024-12-24T11:53Z', label: 'Parker closest perihelion', body: 'psp' },
   { t: '2025-09-24T11:30Z', label: 'IMAP, SWFO-L1 and Carruthers launch', body: 'imap' },
   { t: '2025-12-06T00:00Z', label: 'MAVEN contact lost', body: 'maven' },
+  { t: '2026-01-23T00:00Z', label: 'SWFO-L1 reaches L1 and is renamed SOLAR-1', body: 'swfo' },
 ];
 
 export const SPACE_WEATHER = [

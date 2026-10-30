@@ -6,19 +6,19 @@ Where the Sun-watching spacecraft are, on any date since 2010.
 
 **Live:** https://sr-dash.github.io/heliofleet
 
-HelioFleet places SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, IMAP, SWFO-L1, Carruthers, Solar Orbiter, Parker Solar Probe, BepiColombo, STEREO-A, STEREO-B and MAVEN around the Sun and Earth for any moment you choose. Pick a date and time in UTC, drag the timeline, or jump to a preset: every total and hybrid solar eclipse since 2010, mission milestones, and major space-weather events.
+HelioFleet places SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, IMAP, SOLAR-1 (SWFO-L1), Carruthers, Solar Orbiter, Parker Solar Probe, BepiColombo, STEREO-A, STEREO-B and MAVEN around the Sun and Earth for any moment you choose. Pick a date and time in UTC, drag the timeline, or jump to a preset: every total and hybrid solar eclipse since 2010, mission milestones, and major space-weather events.
 
 ## Features
 
 - **Spacecraft cards:** hover any body on the map or in the near-Earth panel for its distance, longitude and angle from Earth; click it for a card with heliocentric speed, distance and light time to Earth, the Sun's apparent size, the Sun–spacecraft–Earth angle, the previous and next perihelion, launch date, and links to the mission page and data archive. The card's buttons open the alignment search or data export for that spacecraft, hide it, or highlight its view of the Sun.
-- **Instrument fields of view:** toggle the white-light coronagraphs and heliospheric imagers (SOHO LASCO C2/C3; STEREO COR1, COR2, HI-1, HI-2; Solar Orbiter Metis and SoloHI; Parker WISPR-I and WISPR-O; Aditya-L1 VELC; SWFO-L1 CCOR-2; and, in Earth orbit, Proba-3 ASPIICS, GOES-19 CCOR-1 and PUNCH NFI and WFI, each from its launch date) to see which parts of the heliosphere each one images. They are drawn in the ecliptic plane from the published elongation ranges: coronagraphs centred on the Sun, STEREO HI toward the Earth side of the Sun (the 2015 and 2023 spacecraft rolls kept them there), SoloHI to solar east and WISPR along Parker's direction of travel. Share a view with `fov=c3,hi1a,...`.
+- **Instrument fields of view:** toggle the white-light coronagraphs and heliospheric imagers (SOHO LASCO C2/C3; STEREO COR1, COR2, HI-1, HI-2; Solar Orbiter Metis and SoloHI; Parker WISPR-I and WISPR-O; Aditya-L1 VELC; SOLAR-1 CCOR-2; and, in Earth orbit, Proba-3 ASPIICS, GOES-19 CCOR-1 and PUNCH NFI and WFI, each from its launch date) to see which parts of the heliosphere each one images. They are drawn in the ecliptic plane from the published elongation ranges: coronagraphs centred on the Sun, STEREO HI toward the Earth side of the Sun (the 2015 and 2023 spacecraft rolls kept them there), SoloHI to solar east and WISPR along Parker's direction of travel. Share a view with `fov=c3,hi1a,...`.
 - **Helioviewer:** "Solar images in Helioviewer" opens [Helioviewer.org](https://helioviewer.org) at the selected moment (AIA 193, or EIT 195 before SDO). Spacecraft cards link straight to their own layers: SDO AIA and HMI; SOHO EIT and LASCO C2/C3; STEREO EUVI and COR2; Solar Orbiter EUI; and, from Earth's card, GONG H-alpha and MLSO K-Cor. Helioviewer shows the image nearest to that time.
 - **Solar surface map:** under the map, the SDO/HMI synoptic radial magnetic field for the Carrington rotation of the chosen moment (the daily-updated synoptic frame for the rotation in progress; blank for future dates and for rotations JSOC does not publish), on HMI's native grid in Carrington or Stonyhurst longitude and sine latitude, coloured blue to red with a fixed ±20 G range, lightly smoothed and drawn partly transparent so the observers stand out. Earth's limb is drawn as a dark curve and the limbs of the other observers with a solar-disk imager (STEREO, Solar Orbiter) as dashed curves, with a marker at each disk centre. Rings mark the nominal Parker-spiral footpoints of Earth and the L1 fleet, Parker Solar Probe, BepiColombo, MAVEN, Solar Orbiter and STEREO at the chosen solar-wind speed. Hovering greys out Earth's far side, or another imager's when the pointer is on its limb or disk centre, and lists the field, the coordinates, the observers that see the point (with μ) and any footpoint under it; clicking marks the point on the map. Below it, the share of the solar equator seen by the disk imagers and the largest unseen stretch. STEREO-B is left out after contact was lost.
 - **Event search:** one box above the presets searches eclipses, mission milestones, every DONKI flare, CME and storm, and the upcoming calendar. It matches flare classes (`X9`), locations (`S07W33`), active regions (`12673`), dates (`2024-05`), names (`Gannon`, `Parker perihelion`) and storm levels (`G5`); every word must match, case and accents are ignored, and the nearest events come first.
 - **Two frames:** Earth-fixed (Heliocentric Earth Ecliptic, Earth at the bottom) or inertial ecliptic J2000.
 - **Two views:** from ecliptic north, or edge-on to show orbital inclination (Solar Orbiter's climb out of the ecliptic).
 - **Trails:** the past path fades and the future path is dotted. In the Earth-fixed frame the trail is the true co-rotating track.
-- **Near-Earth inset:** Earth, the Moon, the Sun–Earth L1 point and the orbits of SOHO, Aditya-L1, ACE, Wind, DSCOVR, IMAP, SWFO-L1 and Carruthers around it, with the Sun straight up.
+- **Near-Earth inset:** Earth, the Moon, the Sun–Earth L1 point and the orbits of SOHO, Aditya-L1, ACE, Wind, DSCOVR, IMAP, SOLAR-1 (SWFO-L1) and Carruthers around it, with the Sun straight up.
 - **Coordinates:** Stonyhurst heliographic longitude and latitude, Carrington longitude, separation from Earth, and the nominal Parker-spiral footpoint for a solar-wind speed you choose.
 - **Parker spirals:** optional field lines through Earth and each spacecraft.
 - **Snapshots:** download the current view as PNG or PDF, with the map, inset and coordinate table on one page.
@@ -73,7 +73,7 @@ Positions come from [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/), as helio
 | Wind | -8 | 2010-01-01 to 2026-12-11; Sun-Earth L1 |
 | DSCOVR | -78 | 2015-02-12 to 2026-10-25; Sun-Earth L1 |
 | IMAP | -43 | 2025-09-25 to 2026-11-08; Sun-Earth L1 |
-| SWFO-L1 | -231 | 2025-09-25 to 2028-02-24; Sun-Earth L1 |
+| SOLAR-1 (SWFO-L1) | -231 | 2025-09-25 to 2028-02-24; Sun-Earth L1 |
 | Carruthers | -171 | 2025-09-25 to 2028-03-19; Sun-Earth L1 |
 | Solar Orbiter | -144 | 2020-02-11 to 2030-11-20 |
 | Parker Solar Probe | -96 | 2018-08-12 to 2029-12-31 |
@@ -182,7 +182,7 @@ Heliospheric imagers are modelled as fields of their published size (HI-1 a 20°
 
 ### Instrument field-of-view sources
 
-Brueckner et al. 1995, Solar Physics 162, 357 (LASCO); Howard et al. 2008, Space Science Reviews 136, 67 (SECCHI COR2); Eyles et al. 2009, Solar Physics 254, 387 (STEREO HI); Antonucci et al. 2020, A&A 642, A10 (Metis); Howard et al. 2020, A&A 642, A13 (SoloHI); Vourlidas et al. 2016, Space Science Reviews 204, 83 (WISPR); Thompson et al. 2003, Proc. SPIE 4853, 1 (SECCHI COR1); DeForest et al. 2025, arXiv:2509.15131 (PUNCH NFI 1.5–8°, WFI 3–45°); ESA/SIDC Proba-3 pages (ASPIICS 1.1–3 R☉); NOAA SWPC (GOES-19 CCOR-1 3.7–17 R☉); NOAA NCEI (SWFO-L1 CCOR-2 3–22 R☉); Singh et al. 2025, arXiv:2503.21184 (Aditya-L1 VELC imaging channel 1.05–3 R☉). Instruments in Earth orbit are drawn from Earth's position.
+Brueckner et al. 1995, Solar Physics 162, 357 (LASCO); Howard et al. 2008, Space Science Reviews 136, 67 (SECCHI COR2); Eyles et al. 2009, Solar Physics 254, 387 (STEREO HI); Antonucci et al. 2020, A&A 642, A10 (Metis); Howard et al. 2020, A&A 642, A13 (SoloHI); Vourlidas et al. 2016, Space Science Reviews 204, 83 (WISPR); Thompson et al. 2003, Proc. SPIE 4853, 1 (SECCHI COR1); DeForest et al. 2025, arXiv:2509.15131 (PUNCH NFI 1.5–8°, WFI 3–45°); ESA/SIDC Proba-3 pages (ASPIICS 1.1–3 R☉); NOAA SWPC (GOES-19 CCOR-1 3.7–17 R☉); NOAA NCEI (SOLAR-1 CCOR-2 3–22 R☉); Singh et al. 2025, arXiv:2503.21184 (Aditya-L1 VELC imaging channel 1.05–3 R☉). Instruments in Earth orbit are drawn from Earth's position.
 
 ## Maintenance
 

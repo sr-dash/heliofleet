@@ -4,7 +4,7 @@
 
 This file is a guide for automated readers and search tools: where each method is described, which data files hold what, how to link to an exact view, and where code and figures come from. All pages are static and public. The interface is in English, Hindi and Spanish (`?lang=hi`, `?lang=es`); the methods and help pages are in English.
 
-Spacecraft covered: SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, IMAP, SWFO-L1, Carruthers, Solar Orbiter, Parker Solar Probe, BepiColombo, STEREO-A, STEREO-B (contact lost 2014-10-01) and MAVEN (contact lost 2025-12-06), with the planets.
+Spacecraft covered: SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, IMAP, SOLAR-1 (SWFO-L1), Carruthers, Solar Orbiter, Parker Solar Probe, BepiColombo, STEREO-A, STEREO-B (contact lost 2014-10-01) and MAVEN (contact lost 2025-12-06), with the planets.
 
 ## Pages
 
