@@ -1,6 +1,6 @@
 {
  "source": "SDO/AIA and SDO/HMI cutouts from the Helioviewer API (https://api.helioviewer.org/)",
- "generated": "2026-10-22T00:19:26Z",
+ "generated": "2026-11-01T13:24:55Z",
  "channels": [
   "aia171",
   "aia193",

@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-29T03:06:05Z",
+ "generated": "2026-11-01T13:34:09Z",
  "sources": {
   "iris": "LMSAL Heliophysics Coverage Registry",
   "eis": "Hinode/EIS as-run catalogue",
@@ -954,7 +954,7 @@
    "eis": 346,
    "euihri": 8,
    "euilya": 5,
-   "iris": 460,
+   "iris": 459,
    "spice": 110
   },
   "2026-01": {
@@ -976,7 +976,8 @@
    "eis": 789,
    "euihri": 45,
    "iris": 274,
-   "phihrt": 11
+   "phihrt": 11,
+   "spice": 16
   },
   "2026-04": {
    "eis": 837,
@@ -986,7 +987,7 @@
   "2026-05": {
    "dlnirsp": 20,
    "eis": 754,
-   "iris": 280,
+   "iris": 281,
    "vbi": 10,
    "visp": 30
   },
@@ -1017,16 +1018,16 @@
   "2026-09": {
    "dlnirsp": 20,
    "eis": 793,
-   "iris": 262,
+   "iris": 263,
    "vbi": 10,
    "visp": 30
   },
   "2026-10": {
-   "dlnirsp": 80,
-   "eis": 683,
-   "iris": 274,
-   "vbi": 36,
-   "visp": 111
+   "dlnirsp": 92,
+   "eis": 791,
+   "iris": 336,
+   "vbi": 43,
+   "visp": 129
   }
  }
 }
