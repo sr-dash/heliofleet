@@ -1,7 +1,7 @@
 {
  "source": "SDO/HMI synoptic radial-field maps (hmi.Synoptic_Mr_small) and daily-updated synoptic frame, from JSOC",
  "encoding": "8-bit PNG, 360 x 180, Carrington longitude 0-360 left to right, sine latitude +1 to -1 top to bottom in uniform steps; 0 = no data, 1-255 = -20 to +20 G",
- "generated": "2026-11-01T13:24:51Z",
+ "generated": "2026-11-02T23:50:25Z",
  "maps": [
   {
    "cr": 2096,
@@ -1279,7 +1279,7 @@
  "daily": {
   "file": "daily.png",
   "t0": 2461336.817025,
-  "t1": 2461345.12453,
+  "t1": 2461347.162026,
   "cr": 2317
  }
 }

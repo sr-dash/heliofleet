@@ -284,7 +284,7 @@
   },
   "sdo": {
    "center": "sun",
-   "end": 2461380.5,
+   "end": 2461387.5,
    "start": 2455239.5,
    "step": 1.0,
    "units": "au",
@@ -469,7 +469,7 @@
    ]
   }
  },
- "generated": "2026-11-01T13:24:22Z",
+ "generated": "2026-11-02T23:50:00Z",
  "next_update": "2026-12-01T06:17:00Z",
  "source": "JPL Horizons, ICRF ecliptic J2000, UT sample grid",
  "timeline": {

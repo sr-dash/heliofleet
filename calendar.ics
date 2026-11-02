@@ -11,21 +11,35 @@ REFRESH-INTERVAL;VALUE=DURATION:P7D
 X-PUBLISHED-TTL:P7D
 BEGIN:VEVENT
 UID:alignment-bepi-earth-20261104@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20261104T163400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20261104T145900Z
 DURATION:PT1H
 SUMMARY:BepiColombo on the Sun–Earth line
 DESCRIPTION:BepiColombo lies between the Sun and Earth\, 0.8° off the Sun
- –Earth line at 0.316 au. Within 3° from 2026-11-04 04:34 to 2026-11-05 
- 04:34 UTC. Open in HelioFleet: https://sr-dash.github.io/heliofleet/?t=202
- 6-11-04T16:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2026-11-04T16:34Z
+ –Earth line at 0.316 au. Within 3° from 2026-11-04 02:59 to 2026-11-05 
+ 02:59 UTC. Open in HelioFleet: https://sr-dash.github.io/heliofleet/?t=202
+ 6-11-04T14:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2026-11-04T14:59Z
+CATEGORIES:Alignment
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:alignment-psp-earth-20261201@sr-dash.github.io
+DTSTAMP:20261102T235935Z
+DTSTART:20261201T055900Z
+DURATION:PT1H
+SUMMARY:Parker Solar Probe on the Sun–Earth line
+DESCRIPTION:Parker Solar Probe lies between the Sun and Earth\, 0.9° off t
+ he Sun–Earth line at 0.072 au. Within 3° from 2026-12-01 05:59 to 2026-
+ 12-01 05:59 UTC. Open in HelioFleet: https://sr-dash.github.io/heliofleet/
+ ?t=2026-12-01T05:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2026-12-01T05:59Z
 CATEGORIES:Alignment
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:perihelion-psp-20261202@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20261202T004300Z
 DURATION:PT1H
 SUMMARY:Parker Solar Probe perihelion
@@ -37,49 +51,49 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:conjunction-psp-20261203@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20261203T163400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20261203T145900Z
 DURATION:PT1H
 SUMMARY:Solar conjunction: Parker Solar Probe behind the Sun
-DESCRIPTION:Parker Solar Probe is 0.14° from the Sun's centre as seen from
+DESCRIPTION:Parker Solar Probe is 0.03° from the Sun's centre as seen from
   Earth\; communications are often limited near conjunction. Within 2° fro
  m 2026-12-02 to 2026-12-04. Open in HelioFleet: https://sr-dash.github.io/
- heliofleet/?t=2026-12-03T16:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2026-12-03T16:34Z
+ heliofleet/?t=2026-12-03T14:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2026-12-03T14:59Z
 CATEGORIES:Conjunction
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:conjunction-bepi-20270101@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20270101T103400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20270101T085900Z
 DURATION:PT1H
 SUMMARY:Solar conjunction: BepiColombo behind the Sun
 DESCRIPTION:BepiColombo is 1.75° from the Sun's centre as seen from Earth\
  ; communications are often limited near conjunction. Within 2° from 2026-
  12-30 to 2027-01-02. Open in HelioFleet: https://sr-dash.github.io/heliofl
- eet/?t=2027-01-01T10:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2027-01-01T10:34Z
+ eet/?t=2027-01-01T08:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2027-01-01T08:59Z
 CATEGORIES:Conjunction
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:quadrature-solo-earth-20270129@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20270129T193400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20270129T205900Z
 DURATION:PT1H
 SUMMARY:Solar Orbiter in quadrature with Earth
 DESCRIPTION:Solar Orbiter is 90° from Earth as seen from the Sun (west\, a
  head of Earth)\, at 0.332 au. Earth-facing activity appears on its limb. O
- pen in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2027-01-29T19:3
- 4Z
-URL:https://sr-dash.github.io/heliofleet/?t=2027-01-29T19:34Z
+ pen in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2027-01-29T20:5
+ 9Z
+URL:https://sr-dash.github.io/heliofleet/?t=2027-01-29T20:59Z
 CATEGORIES:Quadrature
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:perihelion-solo-20270206@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20270206T214600Z
 DURATION:PT1H
 SUMMARY:Solar Orbiter perihelion
@@ -91,35 +105,21 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:conjunction-solo-20270212@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20270212T223400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20270212T235900Z
 DURATION:PT1H
 SUMMARY:Solar conjunction: Solar Orbiter behind the Sun
 DESCRIPTION:Solar Orbiter is 0.46° from the Sun's centre as seen from Eart
  h\; communications are often limited near conjunction. Within 2° from 202
  7-02-11 to 2027-02-14. Open in HelioFleet: https://sr-dash.github.io/helio
- fleet/?t=2027-02-12T22:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2027-02-12T22:34Z
+ fleet/?t=2027-02-12T23:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2027-02-12T23:59Z
 CATEGORIES:Conjunction
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
-UID:quadrature-psp-earth-20270227@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20270227T163400Z
-DURATION:PT1H
-SUMMARY:Parker Solar Probe in quadrature with Earth
-DESCRIPTION:Parker Solar Probe is 90° from Earth as seen from the Sun (eas
- t\, trailing Earth)\, at 0.071 au. Earth-facing activity appears on its li
- mb. Open in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2027-02-27
- T16:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2027-02-27T16:34Z
-CATEGORIES:Quadrature
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:perihelion-psp-20270228@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20270228T110000Z
 DURATION:PT1H
 SUMMARY:Parker Solar Probe perihelion
@@ -130,50 +130,22 @@ CATEGORIES:Perihelion
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
-UID:quadrature-psp-earth-20270302@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20270302T013400Z
-DURATION:PT1H
-SUMMARY:Parker Solar Probe in quadrature with Earth
-DESCRIPTION:Parker Solar Probe is 90° from Earth as seen from the Sun (wes
- t\, ahead of Earth)\, at 0.114 au. Earth-facing activity appears on its li
- mb. Open in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2027-03-02
- T01:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2027-03-02T01:34Z
-CATEGORIES:Quadrature
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
-UID:conjunction-psp-20270527@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20270527T013400Z
+UID:conjunction-psp-20270526@sr-dash.github.io
+DTSTAMP:20261102T235935Z
+DTSTART:20270526T235900Z
 DURATION:PT1H
 SUMMARY:Solar conjunction: Parker Solar Probe behind the Sun
-DESCRIPTION:Parker Solar Probe is 0.06° from the Sun's centre as seen from
+DESCRIPTION:Parker Solar Probe is 0.19° from the Sun's centre as seen from
   Earth\; communications are often limited near conjunction. Within 2° fro
  m 2027-05-26 to 2027-05-27. Open in HelioFleet: https://sr-dash.github.io/
- heliofleet/?t=2027-05-27T01:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2027-05-27T01:34Z
+ heliofleet/?t=2027-05-26T23:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2027-05-26T23:59Z
 CATEGORIES:Conjunction
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
-UID:alignment-psp-solo-20270527@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20270527T193400Z
-DURATION:PT1H
-SUMMARY:Parker Solar Probe and Solar Orbiter radially aligned
-DESCRIPTION:Sun-centred separation 2.0° at closest\; Parker Solar Probe at
-  0.046 au\, Solar Orbiter at 0.688 au. Within 3° from 2027-05-27 19:34 to
-  2027-05-27 19:34 UTC. Open in HelioFleet: https://sr-dash.github.io/helio
- fleet/?t=2027-05-27T19:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2027-05-27T19:34Z
-CATEGORIES:Alignment
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:perihelion-psp-20270527@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20270527T211200Z
 DURATION:PT1H
 SUMMARY:Parker Solar Probe perihelion
@@ -185,35 +157,35 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:alignment-psp-earth-20270529@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20270529T073400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20270529T085900Z
 DURATION:PT1H
 SUMMARY:Parker Solar Probe on the Sun–Earth line
-DESCRIPTION:Parker Solar Probe lies between the Sun and Earth\, 0.6° off t
- he Sun–Earth line at 0.105 au. Within 3° from 2027-05-29 07:34 to 2027-
- 05-29 10:34 UTC. Open in HelioFleet: https://sr-dash.github.io/heliofleet/
- ?t=2027-05-29T07:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2027-05-29T07:34Z
+DESCRIPTION:Parker Solar Probe lies between the Sun and Earth\, 1.3° off t
+ he Sun–Earth line at 0.108 au. Within 3° from 2027-05-29 05:59 to 2027-
+ 05-29 08:59 UTC. Open in HelioFleet: https://sr-dash.github.io/heliofleet/
+ ?t=2027-05-29T08:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2027-05-29T08:59Z
 CATEGORIES:Alignment
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:quadrature-solo-earth-20270619@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20270619T013400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20270619T025900Z
 DURATION:PT1H
 SUMMARY:Solar Orbiter in quadrature with Earth
 DESCRIPTION:Solar Orbiter is 90° from Earth as seen from the Sun (east\, t
- railing Earth)\, at 0.453 au. Earth-facing activity appears on its limb. O
- pen in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2027-06-19T01:3
- 4Z
-URL:https://sr-dash.github.io/heliofleet/?t=2027-06-19T01:34Z
+ railing Earth)\, at 0.452 au. Earth-facing activity appears on its limb. O
+ pen in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2027-06-19T02:5
+ 9Z
+URL:https://sr-dash.github.io/heliofleet/?t=2027-06-19T02:59Z
 CATEGORIES:Quadrature
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:perihelion-solo-20270706@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20270706T170000Z
 DURATION:PT1H
 SUMMARY:Solar Orbiter perihelion
@@ -225,7 +197,7 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:eclipse-earth-20270802@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20270802T100700Z
 DURATION:PT1H
 SUMMARY:Total solar eclipse: Egypt
@@ -237,21 +209,35 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:quadrature-solo-earth-20270803@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20270803T073400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20270803T055900Z
 DURATION:PT1H
 SUMMARY:Solar Orbiter in quadrature with Earth
 DESCRIPTION:Solar Orbiter is 90° from Earth as seen from the Sun (west\, a
- head of Earth)\, at 0.573 au. Earth-facing activity appears on its limb. O
- pen in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2027-08-03T07:3
- 4Z
-URL:https://sr-dash.github.io/heliofleet/?t=2027-08-03T07:34Z
+ head of Earth)\, at 0.572 au. Earth-facing activity appears on its limb. O
+ pen in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2027-08-03T05:5
+ 9Z
+URL:https://sr-dash.github.io/heliofleet/?t=2027-08-03T05:59Z
+CATEGORIES:Quadrature
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:quadrature-psp-earth-20270823@sr-dash.github.io
+DTSTAMP:20261102T235935Z
+DTSTART:20270823T085900Z
+DURATION:PT1H
+SUMMARY:Parker Solar Probe in quadrature with Earth
+DESCRIPTION:Parker Solar Probe is 90° from Earth as seen from the Sun (wes
+ t\, ahead of Earth)\, at 0.080 au. Earth-facing activity appears on its li
+ mb. Open in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2027-08-23
+ T08:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2027-08-23T08:59Z
 CATEGORIES:Quadrature
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:perihelion-psp-20270824@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20270824T071500Z
 DURATION:PT1H
 SUMMARY:Parker Solar Probe perihelion
@@ -263,49 +249,35 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:conjunction-psp-20270824@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20270824T073400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20270824T085900Z
 DURATION:PT1H
 SUMMARY:Solar conjunction: Parker Solar Probe behind the Sun
-DESCRIPTION:Parker Solar Probe is 0.21° from the Sun's centre as seen from
+DESCRIPTION:Parker Solar Probe is 0.24° from the Sun's centre as seen from
   Earth\; communications are often limited near conjunction. Within 2° fro
- m 2027-08-24 to 2027-08-24. Open in HelioFleet: https://sr-dash.github.io/
- heliofleet/?t=2027-08-24T07:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2027-08-24T07:34Z
+ m 2027-08-23 to 2027-08-24. Open in HelioFleet: https://sr-dash.github.io/
+ heliofleet/?t=2027-08-24T08:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2027-08-24T08:59Z
 CATEGORIES:Conjunction
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
-UID:quadrature-psp-earth-20270825@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20270825T133400Z
-DURATION:PT1H
-SUMMARY:Parker Solar Probe in quadrature with Earth
-DESCRIPTION:Parker Solar Probe is 90° from Earth as seen from the Sun (eas
- t\, trailing Earth)\, at 0.097 au. Earth-facing activity appears on its li
- mb. Open in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2027-08-25
- T13:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2027-08-25T13:34Z
-CATEGORIES:Quadrature
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:alignment-psp-earth-20271119@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20271119T163400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20271119T175900Z
 DURATION:PT1H
 SUMMARY:Parker Solar Probe on the Sun–Earth line
-DESCRIPTION:Parker Solar Probe lies between the Sun and Earth\, 1.3° off t
- he Sun–Earth line at 0.085 au. Within 3° from 2027-11-19 16:34 to 2027-
- 11-19 16:34 UTC. Open in HelioFleet: https://sr-dash.github.io/heliofleet/
- ?t=2027-11-19T16:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2027-11-19T16:34Z
+DESCRIPTION:Parker Solar Probe lies between the Sun and Earth\, 2.1° off t
+ he Sun–Earth line at 0.082 au. Within 3° from 2027-11-19 17:59 to 2027-
+ 11-19 17:59 UTC. Open in HelioFleet: https://sr-dash.github.io/heliofleet/
+ ?t=2027-11-19T17:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2027-11-19T17:59Z
 CATEGORIES:Alignment
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:perihelion-psp-20271120@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20271120T171700Z
 DURATION:PT1H
 SUMMARY:Parker Solar Probe perihelion
@@ -317,21 +289,21 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:conjunction-psp-20271121@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20271121T223400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20271121T205900Z
 DURATION:PT1H
 SUMMARY:Solar conjunction: Parker Solar Probe behind the Sun
-DESCRIPTION:Parker Solar Probe is 0.19° from the Sun's centre as seen from
+DESCRIPTION:Parker Solar Probe is 0.09° from the Sun's centre as seen from
   Earth\; communications are often limited near conjunction. Within 2° fro
  m 2027-11-21 to 2027-11-22. Open in HelioFleet: https://sr-dash.github.io/
- heliofleet/?t=2027-11-21T22:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2027-11-21T22:34Z
+ heliofleet/?t=2027-11-21T20:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2027-11-21T20:59Z
 CATEGORIES:Conjunction
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:perihelion-solo-20271203@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20271203T121200Z
 DURATION:PT1H
 SUMMARY:Solar Orbiter perihelion
@@ -343,35 +315,49 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:alignment-psp-solo-20271207@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20271207T043400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20271207T025900Z
 DURATION:PT1H
 SUMMARY:Parker Solar Probe and Solar Orbiter radially aligned
-DESCRIPTION:Sun-centred separation 1.4° at closest\; Parker Solar Probe at
-  0.525 au\, Solar Orbiter at 0.293 au. Within 3° from 2027-12-06 19:34 to
-  2027-12-07 10:34 UTC. Open in HelioFleet: https://sr-dash.github.io/helio
- fleet/?t=2027-12-07T04:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2027-12-07T04:34Z
+DESCRIPTION:Sun-centred separation 1.3° at closest\; Parker Solar Probe at
+  0.524 au\, Solar Orbiter at 0.292 au. Within 3° from 2027-12-06 17:59 to
+  2027-12-07 11:59 UTC. Open in HelioFleet: https://sr-dash.github.io/helio
+ fleet/?t=2027-12-07T02:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2027-12-07T02:59Z
 CATEGORIES:Alignment
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:quadrature-solo-earth-20271215@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20271215T043400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20271215T025900Z
 DURATION:PT1H
 SUMMARY:Solar Orbiter in quadrature with Earth
 DESCRIPTION:Solar Orbiter is 90° from Earth as seen from the Sun (east\, t
- railing Earth)\, at 0.376 au. Earth-facing activity appears on its limb. O
- pen in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2027-12-15T04:3
- 4Z
-URL:https://sr-dash.github.io/heliofleet/?t=2027-12-15T04:34Z
+ railing Earth)\, at 0.375 au. Earth-facing activity appears on its limb. O
+ pen in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2027-12-15T02:5
+ 9Z
+URL:https://sr-dash.github.io/heliofleet/?t=2027-12-15T02:59Z
+CATEGORIES:Quadrature
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:quadrature-psp-earth-20280216@sr-dash.github.io
+DTSTAMP:20261102T235935Z
+DTSTART:20280216T025900Z
+DURATION:PT1H
+SUMMARY:Parker Solar Probe in quadrature with Earth
+DESCRIPTION:Parker Solar Probe is 90° from Earth as seen from the Sun (eas
+ t\, trailing Earth)\, at 0.084 au. Earth-facing activity appears on its li
+ mb. Open in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2028-02-16
+ T02:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2028-02-16T02:59Z
 CATEGORIES:Quadrature
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:perihelion-psp-20280217@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20280217T031900Z
 DURATION:PT1H
 SUMMARY:Parker Solar Probe perihelion
@@ -382,22 +368,8 @@ CATEGORIES:Perihelion
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
-UID:quadrature-psp-earth-20280218@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20280218T073400Z
-DURATION:PT1H
-SUMMARY:Parker Solar Probe in quadrature with Earth
-DESCRIPTION:Parker Solar Probe is 90° from Earth as seen from the Sun (wes
- t\, ahead of Earth)\, at 0.092 au. Earth-facing activity appears on its li
- mb. Open in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2028-02-18
- T07:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2028-02-18T07:34Z
-CATEGORIES:Quadrature
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:perihelion-solo-20280508@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20280508T052600Z
 DURATION:PT1H
 SUMMARY:Solar Orbiter perihelion
@@ -409,21 +381,21 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:conjunction-psp-20280514@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20280514T103400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20280514T115900Z
 DURATION:PT1H
 SUMMARY:Solar conjunction: Parker Solar Probe behind the Sun
-DESCRIPTION:Parker Solar Probe is 0.13° from the Sun's centre as seen from
+DESCRIPTION:Parker Solar Probe is 0.14° from the Sun's centre as seen from
   Earth\; communications are often limited near conjunction. Within 2° fro
  m 2028-05-13 to 2028-05-15. Open in HelioFleet: https://sr-dash.github.io/
- heliofleet/?t=2028-05-14T10:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2028-05-14T10:34Z
+ heliofleet/?t=2028-05-14T11:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2028-05-14T11:59Z
 CATEGORIES:Conjunction
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:perihelion-psp-20280515@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20280515T132200Z
 DURATION:PT1H
 SUMMARY:Parker Solar Probe perihelion
@@ -435,35 +407,35 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:quadrature-solo-earth-20280515@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20280515T193400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20280515T205900Z
 DURATION:PT1H
 SUMMARY:Solar Orbiter in quadrature with Earth
 DESCRIPTION:Solar Orbiter is 90° from Earth as seen from the Sun (west\, a
- head of Earth)\, at 0.357 au. Earth-facing activity appears on its limb. O
- pen in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2028-05-15T19:3
- 4Z
-URL:https://sr-dash.github.io/heliofleet/?t=2028-05-15T19:34Z
+ head of Earth)\, at 0.358 au. Earth-facing activity appears on its limb. O
+ pen in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2028-05-15T20:5
+ 9Z
+URL:https://sr-dash.github.io/heliofleet/?t=2028-05-15T20:59Z
 CATEGORIES:Quadrature
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:alignment-psp-earth-20280516@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20280516T163400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20280516T145900Z
 DURATION:PT1H
 SUMMARY:Parker Solar Probe on the Sun–Earth line
-DESCRIPTION:Parker Solar Probe lies between the Sun and Earth\, 2.4° off t
- he Sun–Earth line at 0.090 au. Within 3° from 2028-05-16 13:34 to 2028-
- 05-16 16:34 UTC. Open in HelioFleet: https://sr-dash.github.io/heliofleet/
- ?t=2028-05-16T16:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2028-05-16T16:34Z
+DESCRIPTION:Parker Solar Probe lies between the Sun and Earth\, 1.2° off t
+ he Sun–Earth line at 0.087 au. Within 3° from 2028-05-16 14:59 to 2028-
+ 05-16 14:59 UTC. Open in HelioFleet: https://sr-dash.github.io/heliofleet/
+ ?t=2028-05-16T14:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2028-05-16T14:59Z
 CATEGORIES:Alignment
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:eclipse-earth-20280722@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20280722T025600Z
 DURATION:PT1H
 SUMMARY:Total solar eclipse: Australia
@@ -475,35 +447,35 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:quadrature-psp-earth-20280810@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20280810T163400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20280810T175900Z
 DURATION:PT1H
 SUMMARY:Parker Solar Probe in quadrature with Earth
 DESCRIPTION:Parker Solar Probe is 90° from Earth as seen from the Sun (wes
- t\, ahead of Earth)\, at 0.098 au. Earth-facing activity appears on its li
+ t\, ahead of Earth)\, at 0.095 au. Earth-facing activity appears on its li
  mb. Open in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2028-08-10
- T16:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2028-08-10T16:34Z
+ T17:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2028-08-10T17:59Z
 CATEGORIES:Quadrature
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:conjunction-psp-20280811@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20280811T223400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20280811T205900Z
 DURATION:PT1H
 SUMMARY:Solar conjunction: Parker Solar Probe behind the Sun
-DESCRIPTION:Parker Solar Probe is 0.14° from the Sun's centre as seen from
+DESCRIPTION:Parker Solar Probe is 0.36° from the Sun's centre as seen from
   Earth\; communications are often limited near conjunction. Within 2° fro
  m 2028-08-11 to 2028-08-12. Open in HelioFleet: https://sr-dash.github.io/
- heliofleet/?t=2028-08-11T22:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2028-08-11T22:34Z
+ heliofleet/?t=2028-08-11T20:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2028-08-11T20:59Z
 CATEGORIES:Conjunction
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:perihelion-psp-20280811@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20280811T232200Z
 DURATION:PT1H
 SUMMARY:Parker Solar Probe perihelion
@@ -515,21 +487,21 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:quadrature-solo-earth-20281004@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20281004T133400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20281004T145900Z
 DURATION:PT1H
 SUMMARY:Solar Orbiter in quadrature with Earth
 DESCRIPTION:Solar Orbiter is 90° from Earth as seen from the Sun (east\, t
  railing Earth)\, at 0.328 au. Earth-facing activity appears on its limb. O
- pen in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2028-10-04T13:3
- 4Z
-URL:https://sr-dash.github.io/heliofleet/?t=2028-10-04T13:34Z
+ pen in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2028-10-04T14:5
+ 9Z
+URL:https://sr-dash.github.io/heliofleet/?t=2028-10-04T14:59Z
 CATEGORIES:Quadrature
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:perihelion-solo-20281005@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20281005T004100Z
 DURATION:PT1H
 SUMMARY:Solar Orbiter perihelion
@@ -540,36 +512,22 @@ CATEGORIES:Perihelion
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
-UID:alignment-psp-earth-20281107@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20281107T013400Z
+UID:alignment-psp-earth-20281106@sr-dash.github.io
+DTSTAMP:20261102T235935Z
+DTSTART:20281106T235900Z
 DURATION:PT1H
 SUMMARY:Parker Solar Probe on the Sun–Earth line
-DESCRIPTION:Parker Solar Probe lies between the Sun and Earth\, 2.2° off t
- he Sun–Earth line at 0.100 au. Within 3° from 2028-11-06 22:34 to 2028-
- 11-07 01:34 UTC. Open in HelioFleet: https://sr-dash.github.io/heliofleet/
- ?t=2028-11-07T01:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2028-11-07T01:34Z
+DESCRIPTION:Parker Solar Probe lies between the Sun and Earth\, 1.8° off t
+ he Sun–Earth line at 0.103 au. Within 3° from 2028-11-06 23:59 to 2028-
+ 11-06 23:59 UTC. Open in HelioFleet: https://sr-dash.github.io/heliofleet/
+ ?t=2028-11-06T23:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2028-11-06T23:59Z
 CATEGORIES:Alignment
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
-UID:quadrature-psp-earth-20281108@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20281108T073400Z
-DURATION:PT1H
-SUMMARY:Parker Solar Probe in quadrature with Earth
-DESCRIPTION:Parker Solar Probe is 90° from Earth as seen from the Sun (wes
- t\, ahead of Earth)\, at 0.046 au. Earth-facing activity appears on its li
- mb. Open in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2028-11-08
- T07:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2028-11-08T07:34Z
-CATEGORIES:Quadrature
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:perihelion-psp-20281108@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20281108T091800Z
 DURATION:PT1H
 SUMMARY:Parker Solar Probe perihelion
@@ -581,35 +539,21 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:conjunction-psp-20281109@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20281109T073400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20281109T055900Z
 DURATION:PT1H
 SUMMARY:Solar conjunction: Parker Solar Probe behind the Sun
-DESCRIPTION:Parker Solar Probe is 0.23° from the Sun's centre as seen from
+DESCRIPTION:Parker Solar Probe is 0.12° from the Sun's centre as seen from
   Earth\; communications are often limited near conjunction. Within 2° fro
  m 2028-11-08 to 2028-11-09. Open in HelioFleet: https://sr-dash.github.io/
- heliofleet/?t=2028-11-09T07:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2028-11-09T07:34Z
+ heliofleet/?t=2028-11-09T05:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2028-11-09T05:59Z
 CATEGORIES:Conjunction
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
-UID:quadrature-psp-earth-20290203@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20290203T103400Z
-DURATION:PT1H
-SUMMARY:Parker Solar Probe in quadrature with Earth
-DESCRIPTION:Parker Solar Probe is 90° from Earth as seen from the Sun (eas
- t\, trailing Earth)\, at 0.102 au. Earth-facing activity appears on its li
- mb. Open in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2029-02-03
- T10:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2029-02-03T10:34Z
-CATEGORIES:Quadrature
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:perihelion-psp-20290204@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20290204T191200Z
 DURATION:PT1H
 SUMMARY:Parker Solar Probe perihelion
@@ -621,21 +565,21 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:quadrature-solo-earth-20290225@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20290225T193400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20290225T175900Z
 DURATION:PT1H
 SUMMARY:Solar Orbiter in quadrature with Earth
 DESCRIPTION:Solar Orbiter is 90° from Earth as seen from the Sun (west\, a
  head of Earth)\, at 0.347 au. Earth-facing activity appears on its limb. O
- pen in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2029-02-25T19:3
- 4Z
-URL:https://sr-dash.github.io/heliofleet/?t=2029-02-25T19:34Z
+ pen in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2029-02-25T17:5
+ 9Z
+URL:https://sr-dash.github.io/heliofleet/?t=2029-02-25T17:59Z
 CATEGORIES:Quadrature
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:perihelion-solo-20290303@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20290303T195500Z
 DURATION:PT1H
 SUMMARY:Solar Orbiter perihelion
@@ -647,21 +591,35 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:conjunction-psp-20290502@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20290502T163400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20290502T175900Z
 DURATION:PT1H
 SUMMARY:Solar conjunction: Parker Solar Probe behind the Sun
-DESCRIPTION:Parker Solar Probe is 0.23° from the Sun's centre as seen from
+DESCRIPTION:Parker Solar Probe is 0.18° from the Sun's centre as seen from
   Earth\; communications are often limited near conjunction. Within 2° fro
  m 2029-05-01 to 2029-05-03. Open in HelioFleet: https://sr-dash.github.io/
- heliofleet/?t=2029-05-02T16:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2029-05-02T16:34Z
+ heliofleet/?t=2029-05-02T17:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2029-05-02T17:59Z
 CATEGORIES:Conjunction
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
+UID:quadrature-psp-earth-20290504@sr-dash.github.io
+DTSTAMP:20261102T235935Z
+DTSTART:20290504T025900Z
+DURATION:PT1H
+SUMMARY:Parker Solar Probe in quadrature with Earth
+DESCRIPTION:Parker Solar Probe is 90° from Earth as seen from the Sun (eas
+ t\, trailing Earth)\, at 0.046 au. Earth-facing activity appears on its li
+ mb. Open in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2029-05-04
+ T02:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2029-05-04T02:59Z
+CATEGORIES:Quadrature
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
 UID:perihelion-psp-20290504@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20290504T050900Z
 DURATION:PT1H
 SUMMARY:Parker Solar Probe perihelion
@@ -672,64 +630,64 @@ CATEGORIES:Perihelion
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
-UID:alignment-psp-earth-20290505@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20290505T013400Z
+UID:alignment-psp-earth-20290504@sr-dash.github.io
+DTSTAMP:20261102T235935Z
+DTSTART:20290504T235900Z
 DURATION:PT1H
 SUMMARY:Parker Solar Probe on the Sun–Earth line
-DESCRIPTION:Parker Solar Probe lies between the Sun and Earth\, 2.4° off t
- he Sun–Earth line at 0.076 au. Within 3° from 2029-05-05 01:34 to 2029-
- 05-05 01:34 UTC. Open in HelioFleet: https://sr-dash.github.io/heliofleet/
- ?t=2029-05-05T01:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2029-05-05T01:34Z
+DESCRIPTION:Parker Solar Probe lies between the Sun and Earth\, 2.6° off t
+ he Sun–Earth line at 0.072 au. Within 3° from 2029-05-04 23:59 to 2029-
+ 05-04 23:59 UTC. Open in HelioFleet: https://sr-dash.github.io/heliofleet/
+ ?t=2029-05-04T23:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2029-05-04T23:59Z
 CATEGORIES:Alignment
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:quadrature-solo-earth-20290724@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20290724T013400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20290724T025900Z
 DURATION:PT1H
 SUMMARY:Solar Orbiter in quadrature with Earth
 DESCRIPTION:Solar Orbiter is 90° from Earth as seen from the Sun (east\, t
  railing Earth)\, at 0.465 au. Earth-facing activity appears on its limb. O
- pen in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2029-07-24T01:3
- 4Z
-URL:https://sr-dash.github.io/heliofleet/?t=2029-07-24T01:34Z
+ pen in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2029-07-24T02:5
+ 9Z
+URL:https://sr-dash.github.io/heliofleet/?t=2029-07-24T02:59Z
 CATEGORIES:Quadrature
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:quadrature-psp-earth-20290729@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20290729T223400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20290729T205900Z
 DURATION:PT1H
 SUMMARY:Parker Solar Probe in quadrature with Earth
 DESCRIPTION:Parker Solar Probe is 90° from Earth as seen from the Sun (wes
- t\, ahead of Earth)\, at 0.118 au. Earth-facing activity appears on its li
+ t\, ahead of Earth)\, at 0.121 au. Earth-facing activity appears on its li
  mb. Open in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2029-07-29
- T22:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2029-07-29T22:34Z
+ T20:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2029-07-29T20:59Z
 CATEGORIES:Quadrature
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:conjunction-psp-20290731@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20290731T103400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20290731T115900Z
 DURATION:PT1H
 SUMMARY:Solar conjunction: Parker Solar Probe behind the Sun
-DESCRIPTION:Parker Solar Probe is 0.37° from the Sun's centre as seen from
+DESCRIPTION:Parker Solar Probe is 0.12° from the Sun's centre as seen from
   Earth\; communications are often limited near conjunction. Within 2° fro
  m 2029-07-31 to 2029-07-31. Open in HelioFleet: https://sr-dash.github.io/
- heliofleet/?t=2029-07-31T10:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2029-07-31T10:34Z
+ heliofleet/?t=2029-07-31T11:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2029-07-31T11:59Z
 CATEGORIES:Conjunction
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:perihelion-psp-20290731@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20290731T150300Z
 DURATION:PT1H
 SUMMARY:Parker Solar Probe perihelion
@@ -741,7 +699,7 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:perihelion-solo-20290811@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20290811T183500Z
 DURATION:PT1H
 SUMMARY:Solar Orbiter perihelion
@@ -753,21 +711,21 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:alignment-psp-earth-20291026@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20291026T013400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20291026T025900Z
 DURATION:PT1H
 SUMMARY:Parker Solar Probe on the Sun–Earth line
 DESCRIPTION:Parker Solar Probe lies between the Sun and Earth\, 2.4° off t
- he Sun–Earth line at 0.132 au. Within 3° from 2029-10-26 01:34 to 2029-
- 10-26 04:34 UTC. Open in HelioFleet: https://sr-dash.github.io/heliofleet/
- ?t=2029-10-26T01:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2029-10-26T01:34Z
+ he Sun–Earth line at 0.129 au. Within 3° from 2029-10-25 23:59 to 2029-
+ 10-26 02:59 UTC. Open in HelioFleet: https://sr-dash.github.io/heliofleet/
+ ?t=2029-10-26T02:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2029-10-26T02:59Z
 CATEGORIES:Alignment
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:perihelion-psp-20291028@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20291028T005500Z
 DURATION:PT1H
 SUMMARY:Parker Solar Probe perihelion
@@ -779,35 +737,35 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:conjunction-psp-20291028@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20291028T163400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20291028T175900Z
 DURATION:PT1H
 SUMMARY:Solar conjunction: Parker Solar Probe behind the Sun
-DESCRIPTION:Parker Solar Probe is 0.15° from the Sun's centre as seen from
+DESCRIPTION:Parker Solar Probe is 0.24° from the Sun's centre as seen from
   Earth\; communications are often limited near conjunction. Within 2° fro
  m 2029-10-28 to 2029-10-29. Open in HelioFleet: https://sr-dash.github.io/
- heliofleet/?t=2029-10-28T16:34Z
-URL:https://sr-dash.github.io/heliofleet/?t=2029-10-28T16:34Z
+ heliofleet/?t=2029-10-28T17:59Z
+URL:https://sr-dash.github.io/heliofleet/?t=2029-10-28T17:59Z
 CATEGORIES:Conjunction
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:quadrature-solo-earth-20291125@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20291125T013400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20291125T025900Z
 DURATION:PT1H
 SUMMARY:Solar Orbiter in quadrature with Earth
 DESCRIPTION:Solar Orbiter is 90° from Earth as seen from the Sun (west\, a
  head of Earth)\, at 0.650 au. Earth-facing activity appears on its limb. O
- pen in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2029-11-25T01:3
- 4Z
-URL:https://sr-dash.github.io/heliofleet/?t=2029-11-25T01:34Z
+ pen in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2029-11-25T02:5
+ 9Z
+URL:https://sr-dash.github.io/heliofleet/?t=2029-11-25T02:59Z
 CATEGORIES:Quadrature
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:perihelion-solo-20300108@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20300108T134600Z
 DURATION:PT1H
 SUMMARY:Solar Orbiter perihelion
@@ -819,21 +777,21 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:quadrature-solo-earth-20300211@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20300211T223400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20300211T235900Z
 DURATION:PT1H
 SUMMARY:Solar Orbiter in quadrature with Earth
 DESCRIPTION:Solar Orbiter is 90° from Earth as seen from the Sun (east\, t
  railing Earth)\, at 0.587 au. Earth-facing activity appears on its limb. O
- pen in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2030-02-11T22:3
- 4Z
-URL:https://sr-dash.github.io/heliofleet/?t=2030-02-11T22:34Z
+ pen in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2030-02-11T23:5
+ 9Z
+URL:https://sr-dash.github.io/heliofleet/?t=2030-02-11T23:59Z
 CATEGORIES:Quadrature
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:perihelion-solo-20300607@sr-dash.github.io
-DTSTAMP:20261101T133409Z
+DTSTAMP:20261102T235935Z
 DTSTART:20300607T085700Z
 DURATION:PT1H
 SUMMARY:Solar Orbiter perihelion
@@ -845,15 +803,15 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:quadrature-solo-earth-20300624@sr-dash.github.io
-DTSTAMP:20261101T133409Z
-DTSTART:20300624T043400Z
+DTSTAMP:20261102T235935Z
+DTSTART:20300624T025900Z
 DURATION:PT1H
 SUMMARY:Solar Orbiter in quadrature with Earth
 DESCRIPTION:Solar Orbiter is 90° from Earth as seen from the Sun (west\, a
- head of Earth)\, at 0.451 au. Earth-facing activity appears on its limb. O
- pen in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2030-06-24T04:3
- 4Z
-URL:https://sr-dash.github.io/heliofleet/?t=2030-06-24T04:34Z
+ head of Earth)\, at 0.450 au. Earth-facing activity appears on its limb. O
+ pen in HelioFleet: https://sr-dash.github.io/heliofleet/?t=2030-06-24T02:5
+ 9Z
+URL:https://sr-dash.github.io/heliofleet/?t=2030-06-24T02:59Z
 CATEGORIES:Quadrature
 TRANSP:TRANSPARENT
 END:VEVENT

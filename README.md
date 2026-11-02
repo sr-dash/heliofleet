@@ -66,7 +66,7 @@ Positions come from [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/), as helio
 <!-- coverage:start -->
 | Spacecraft | Horizons ID | Coverage in this site |
 |---|---|---|
-| SDO | -136395 | 2010-02-12 to 2026-12-06; shown at Earth after its ephemeris ends (geosynchronous orbit) |
+| SDO | -136395 | 2010-02-12 to 2026-12-13; shown at Earth after its ephemeris ends (geosynchronous orbit) |
 | SOHO | -21 | 2010-01-01 to 2026-11-02; Sun-Earth L1 |
 | Aditya-L1 | -156 | 2023-09-03 to 2027-01-21; Sun-Earth L1 |
 | ACE | -92 | 2010-01-01 to 2026-12-20; Sun-Earth L1 |
@@ -82,7 +82,7 @@ Positions come from [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/), as helio
 | BepiColombo | -121 | 2018-10-21 to 2027-04-10 |
 | MAVEN | -202 | 2013-11-19 to 2026-03-01; Mars orbit; no contact since 2025-12-06, later positions are predictions |
 
-Timeline: 2010-01-01 to 2030-11-19. Data last updated 2026-11-01; next scheduled update 2026-12-01.
+Timeline: 2010-01-01 to 2030-11-19. Data last updated 2026-11-02; next scheduled update 2026-12-01.
 <!-- coverage:end -->
 
 Positions past each mission's latest tracking data are planning trajectories.

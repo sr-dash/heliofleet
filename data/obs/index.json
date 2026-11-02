@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-01T13:34:09Z",
+ "generated": "2026-11-02T23:59:34Z",
  "sources": {
   "iris": "LMSAL Heliophysics Coverage Registry",
   "eis": "Hinode/EIS as-run catalogue",
@@ -1023,9 +1023,9 @@
    "visp": 30
   },
   "2026-10": {
-   "dlnirsp": 92,
+   "dlnirsp": 98,
    "eis": 791,
-   "iris": 336,
+   "iris": 350,
    "vbi": 43,
    "visp": 129
   }
