@@ -13,6 +13,7 @@ import {
 import { ALIGN_KINDS } from './tools.js';
 import { initWorkbench } from './workbench.js';
 import { initCards } from './cards.js';
+import { enhance as datePicker } from './datepicker.js';
 import {
   coverageRows, coverageSummary, coverageNote,
   drawSurface, surfaceHeight, loadSynopticIndex, synopticFor, loadSynoptic, fieldAt, seenBy, surfaceFeet, isVisible,
@@ -980,6 +981,8 @@ async function main() {
     marks: ribbonMarks(),
   });
 
+  // The site's own calendar on every date field (the time of day is typed).
+  for (const id of ['dt', 'align-from', 'align-to', 'series-from', 'series-to', 'anim-from', 'anim-to']) datePicker($(id));
   $('dt').addEventListener('change', (ev) => {
     const t = Date.parse(`${ev.target.value}Z`);
     if (Number.isNaN(t)) return;

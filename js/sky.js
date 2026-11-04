@@ -13,6 +13,7 @@ import { downloadPNG, downloadPDF } from './export.js';
 import { CHANNELS, loadContext, contextRuns, drawContext, contextNote, hitTest, contextPNG, contextView } from './context.js';
 import { OBS_INST, observationsNear, earthShape, earthRsun, liveRun } from './observations.js';
 import { LANGUAGES, detectLang, loadLang, lang, saveLang, tr, translatePage } from './i18n.js';
+import { enhance as datePicker } from './datepicker.js';
 
 const $ = (id) => document.getElementById(id);
 const jdOf = (iso) => Date.parse(iso) / 864e5 + 2440587.5;
@@ -1245,6 +1246,7 @@ async function main() {
   initContext();
   initFinder();
   initDownloads();
+  for (const id of ['dt', 'find-from', 'find-to']) datePicker($(id));      // the site's own calendar
   $('dt').addEventListener('change', (e) => {
     const t = Date.parse(`${e.target.value}Z`);
     if (!Number.isNaN(t)) { S.jd = t / 864e5 + 2440587.5; update(); }

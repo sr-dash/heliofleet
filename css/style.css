@@ -280,15 +280,19 @@ button, input, select { font: inherit; color: inherit; }
 .field { display: grid; gap: 6px; margin-bottom: 12px; }
 .field-label { font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; }
 .field-label output { font-family: "IBM Plex Mono", monospace; color: var(--ink); }
-input[type="datetime-local"], select {
+input[type="datetime-local"], input[type="date"], select {
   width: 100%;
   background: var(--surface-2);
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 8px 10px;
   font-family: "IBM Plex Mono", monospace;
-  font-size: 14px;
+  font-size: 16px;
+  min-height: 40px;
 }
+/* The calendar's wrapper (js/datepicker.js) fills the field like the input did. */
+.field .dp-wrap, .tool-form .dp-wrap { display: flex; width: 100%; }
+.dp-btn { background: var(--surface-2); }
 select { font-family: inherit; }
 input[type="range"] { width: 100%; accent-color: var(--accent); }
 
@@ -521,7 +525,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .tool-form .field { margin: 0; min-width: 120px; }
 .tool-form select, .tool-form input[type="number"], .tool-form input[type="date"] {
   width: 100%; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px;
-  padding: 7px 9px; font: 14px "IBM Plex Mono", monospace;
+  padding: 7px 9px; font: 16px "IBM Plex Mono", monospace; min-height: 40px;
 }
 .tool-form select { font-family: "Instrument Sans", sans-serif; }
 .tool-form input[type="number"] { width: 110px; }
