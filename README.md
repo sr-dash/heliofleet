@@ -1,10 +1,16 @@
 # HelioFleet
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23328187.svg)](https://doi.org/10.5281/zenodo.23328187)
+[![GitHub stars](https://img.shields.io/github/stars/sr-dash/heliofleet?style=social)](https://github.com/sr-dash/heliofleet/stargazers)
+[![Using it? Tell me](https://img.shields.io/badge/using%20it%3F-tell%20me-2ea44f)](https://github.com/sr-dash/heliofleet/issues/new?template=i_use_this.yml)
+[![Show and tell](https://img.shields.io/badge/discussions-show%20and%20tell-8250df)](https://github.com/sr-dash/heliofleet/discussions/categories/show-and-tell)
 
 Where the Sun-watching spacecraft are, on any date since 2010.
 
 **Live:** https://sr-dash.github.io/heliofleet
+
+> [!TIP]
+> **Using HelioFleet?** Please [star the repository](https://github.com/sr-dash/heliofleet/stargazers) (the ☆ Star button at the top of this page). Clones and page views reach me without names, so a star is the only way I can tell who finds it useful, and it helps others find it too. Even better, [say what you use it for](https://github.com/sr-dash/heliofleet/issues/new?template=i_use_this.yml) in a two-minute form, or post an example in [Show and tell](https://github.com/sr-dash/heliofleet/discussions/categories/show-and-tell). If it helps your research, please cite it ([doi:10.5281/zenodo.23328187](https://doi.org/10.5281/zenodo.23328187)). I am not asking for money: there is no paid tier, and none of this changes what the tool does for you.
 
 HelioFleet places SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, IMAP, SOLAR-1 (SWFO-L1), Carruthers, Solar Orbiter, Parker Solar Probe, BepiColombo, STEREO-A, STEREO-B and MAVEN around the Sun and Earth for any moment you choose. Pick a date and time in UTC, drag the timeline, or jump to a preset: every total and hybrid solar eclipse since 2010, mission milestones, and major space-weather events.
 

@@ -3,3 +3,6 @@ contact_links:
   - name: Questions and ideas
     url: https://github.com/sr-dash/heliofleet/discussions
     about: Ask how to use HelioFleet, share how you use it, or float an idea before filing a request.
+  - name: Show and tell
+    url: https://github.com/sr-dash/heliofleet/discussions/categories/show-and-tell
+    about: Share a figure, a talk or a lesson that uses HelioFleet.
