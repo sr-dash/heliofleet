@@ -595,6 +595,8 @@ tbody tr:hover td { background: var(--surface); }
   display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 24px;
 }
 .colophon p { margin: 0; max-width: 90ch; }
+/* The request for a star: the one line here that asks something of the reader. */
+.colophon .colophon-star { color: var(--ink); font-weight: 600; }
 
 .toast {
   position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
