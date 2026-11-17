@@ -47,7 +47,7 @@ def check(url):
     for method in ("HEAD", "GET"):
         try:
             req = urllib.request.Request(url, method=method, headers=HEADERS)
-            with urllib.request.urlopen(req, timeout=25) as r:
+            with urllib.request.urlopen(req, timeout=100) as r:
                 return url, r.status, None
         except urllib.error.HTTPError as e:
             last = (e.code, None)
