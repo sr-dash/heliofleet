@@ -2,10 +2,12 @@
 """Check the external links on the site and in its documentation.
 
 Collects every http(s) URL from the pages, the JavaScript modules, the README
-and the citation files, and requests each one. A link that is missing (404,
-410), failing on the server (5xx) or unreachable is an error. Sites that turn
-away automated requests (401, 403, 405, 429) are listed as warnings, since
-they usually work in a browser.
+and the citation files, and requests each one. Only a link that is gone is an
+error: 404 or 410, or a host name that no longer resolves. Everything a site
+can do to a GitHub runner without the link being broken is a warning: turning
+away automated requests (401, 403, 405, 429, LinkedIn's 999), server errors
+(5xx), timeouts and refused or reset connections. Those usually work in a
+browser, and a warning does not fail the health check.
 
 Exit status 1 on any error. Usage:  python scripts/check_links.py
 """
@@ -26,8 +28,9 @@ SKIP = re.compile(
     r"\$\{|ssd\.jpl\.nasa\.gov/api|ccmc\.gsfc\.nasa\.gov/DONKI-API|calendar\.google\.com/calendar/render|"
     r"img\.shields\.io|zenodo\.org/badge|localhost)"
 )
-# 999 is LinkedIn's answer to any automated request
-SOFT = {401, 403, 405, 429, 999}
+# Gone for good; anything else that fails is a warning
+GONE = {404, 410}
+DNS = ("Name or service not known", "nodename nor servname", "No address associated", "getaddrinfo failed")
 HEADERS = {"User-Agent": "Mozilla/5.0 (HelioFleet link check; https://github.com/sr-dash/heliofleet)"}
 
 
@@ -43,18 +46,22 @@ def collect():
 
 
 def check(url):
+    """HEAD, then GET (some servers reject HEAD), then GET once more after a
+    timeout or network error."""
     last = None
-    for method in ("HEAD", "GET"):
+    for method in ("HEAD", "GET", "GET"):
         try:
             req = urllib.request.Request(url, method=method, headers=HEADERS)
-            with urllib.request.urlopen(req, timeout=100) as r:
+            with urllib.request.urlopen(req, timeout=30) as r:
                 return url, r.status, None
         except urllib.error.HTTPError as e:
             last = (e.code, None)
-            if e.code not in (403, 405, 404, 429, 500, 501, 503):
+            if method == "GET":
                 break
         except Exception as e:  # DNS, TLS, timeout
             last = (None, str(e)[:120])
+            if any(m in last[1] for m in DNS):
+                break
     return url, last[0], last[1]
 
 
@@ -67,12 +74,12 @@ def main():
         where = urls[url]
         if status and status < 400:
             continue
-        if status in SOFT:
-            warnings += 1
-            print(f"warning: {status} {url} ({where})")
-        else:
+        if status in GONE or (err and any(m in err for m in DNS)):
             errors += 1
             print(f"error: {status or err} {url} ({where})")
+        else:
+            warnings += 1
+            print(f"warning: {status or err} {url} ({where})")
     print(f"{len(urls)} links checked: {errors} errors, {warnings} warnings")
     sys.exit(1 if errors else 0)
 
