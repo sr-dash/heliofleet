@@ -29,6 +29,7 @@ HelioFleet places SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, IMAP, SOLAR-1 (SWFO-L
 - **Coordinates:** Stonyhurst heliographic longitude and latitude, Carrington longitude, separation from Earth, and the nominal Parker-spiral footpoint for a solar-wind speed you choose.
 - **Parker spirals:** optional field lines through Earth and each spacecraft.
 - **Snapshots:** download the current view as PNG or PDF, with the map, inset and coordinate table on one page.
+- **Figure code and data:** a ZIP with the positions, trails, planet orbits and Parker spirals behind the current view as CSV files, a short Python script (`plot_heliofleet.py`, NumPy and Matplotlib only) that redraws the map without the page's annotations, so it can be restyled for a paper, a README that explains the files, and the snapshot to compare with. The script and README template live in `download/`.
 - **Shareable links:** the URL keeps the moment and display settings, for example [the 2024 North American eclipse](https://sr-dash.github.io/heliofleet/?t=2024-04-08T18:17Z).
 - **Four themes:** Night, Totality, H-alpha and Plate (light).
 - **Three languages:** English, हिन्दी (Hindi) and Español (Spanish), chosen from the header, remembered per visitor, picked up from the browser's language, or set in a link with `lang=hi` or `lang=es`.
@@ -128,6 +129,7 @@ js/scene.js              positions, trails and readouts for one moment
 js/render.js             canvas drawing for the map and inset
 js/ribbon.js             timeline with mission lanes and presets
 js/export.js             PNG / PDF snapshot
+js/bundle.js             figure code and data ZIP (files from download/)
 js/catalog.js            spacecraft, eclipses, milestones, events
 js/tools.js              exports, SunPy code, alignment search, spot visibility
 js/workbench.js          the research-tools tabs and the code/citation sheet

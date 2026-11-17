@@ -89,6 +89,8 @@
  "Download CSV": "Descargar CSV",
  "Download PDF": "Descargar PDF",
  "Download PNG": "Descargar PNG",
+ "Figure code and data (ZIP)": "Código y datos de la figura (ZIP)",
+ "Positions as CSV, a Python script that redraws the map without the annotations, a README and the snapshot": "Posiciones en CSV, un script de Python que vuelve a dibujar el mapa sin las anotaciones, un README y la instantánea",
  "Download {name}": "Descargar {name}",
  "Drawn in the ecliptic plane. Coronagraphs are centred on the Sun; STEREO HI looks toward the Earth side of the Sun, SoloHI to solar east and WISPR along Parker’s direction of travel.": "Dibujado en el plano de la eclíptica. Los coronógrafos están centrados en el Sol; STEREO HI mira hacia el lado del Sol donde está la Tierra, SoloHI al este solar y WISPR en la dirección de avance de Parker.",
  "E": "E",

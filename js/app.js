@@ -7,6 +7,7 @@ import { buildScene, needs } from './scene.js';
 import { drawMap, drawInset, readTheme, mapGeometry } from './render.js';
 import { createRibbon } from './ribbon.js';
 import { composeSnapshot, downloadPNG, downloadPDF } from './export.js';
+import { figureBundle } from './bundle.js';
 import {
   BODIES, SPACECRAFT, PLANETS, PRESET_GROUPS, SPACE_WEATHER, ECLIPSES, MILESTONES,
 } from './catalog.js';
@@ -852,7 +853,12 @@ async function snapshot(kind) {
   try {
     const cv = await composeSnapshot(scene, S, theme, S, meta);
     if (kind === 'png') await downloadPNG(cv, base);
-    else await downloadPDF(cv, base, `HelioFleet ${meta.date} ${meta.time}`);
+    else if (kind === 'pdf') await downloadPDF(cv, base, `HelioFleet ${meta.date} ${meta.time}`);
+    else {
+      const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(await figureBundle(scene, S, theme, cv, base)), download: `${base}.zip` });
+      document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    }
     toast(tr('Saved {file}', { file: `${base}.${kind}` }));
   } catch (err) {
     toast(err.message);
@@ -1026,6 +1032,7 @@ async function main() {
   }));
   $('dl-png').addEventListener('click', () => snapshot('png'));
   $('dl-pdf').addEventListener('click', () => snapshot('pdf'));
+  $('dl-bundle').addEventListener('click', () => snapshot('zip'));
   $('copy-link').addEventListener('click', async () => {
     clearTimeout(urlTimer);
     writeURL();

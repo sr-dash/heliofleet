@@ -18,6 +18,8 @@ jobs:
           node-version: "22"
       - name: JavaScript syntax
         run: for f in js/*.js; do node --input-type=module --check < "$f" || exit 1; done
+      - name: Figure script compiles
+        run: python -m py_compile download/plot_heliofleet.py
       - name: Translations complete
         run: python scripts/check_i18n.py
       - name: Asset stamps current

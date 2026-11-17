@@ -89,6 +89,8 @@
  "Download CSV": "CSV डाउनलोड करें",
  "Download PDF": "PDF डाउनलोड करें",
  "Download PNG": "PNG डाउनलोड करें",
+ "Figure code and data (ZIP)": "चित्र का कोड और डेटा (ZIP)",
+ "Positions as CSV, a Python script that redraws the map without the annotations, a README and the snapshot": "स्थितियाँ CSV के रूप में, बिना टिप्पणियों के मानचित्र दोबारा बनाने वाली Python स्क्रिप्ट, एक README और स्नैपशॉट",
  "Download {name}": "{name} डाउनलोड करें",
  "Drawn in the ecliptic plane. Coronagraphs are centred on the Sun; STEREO HI looks toward the Earth side of the Sun, SoloHI to solar east and WISPR along Parker’s direction of travel.": "क्रांतिवृत्त तल में दर्शाया गया। कोरोनाग्राफ़ सूर्य पर केंद्रित हैं; STEREO HI सूर्य के पृथ्वी वाले भाग की ओर, SoloHI सौर पूर्व की ओर और WISPR, Parker की गति की दिशा में देखता है।",
  "E": "पू",
