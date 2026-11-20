@@ -51,7 +51,7 @@ Below the map, six tabs work on the same geometry as the map:
 
 ### Space-weather events
 
-The timeline and the **Space weather** presets carry events from NASA's [DONKI](https://ccmc.gsfc.nasa.gov/DONKI/) catalogue: flares of class M5 and above, CMEs of 1000 km/s and above, and geomagnetic storms of G3 and above. Choosing a flare jumps to its peak and marks its source region in Carrington longitude, so the marker rotates with the Sun as you step through time. CMEs appear on the map as fronts launched along their DONKI cone-model direction and width, moving out at the measured speed from their 21.5 solar-radius time; this constant-speed picture ignores drag, so real arrivals are usually later. `cme=0` in the URL hides them.
+The timeline and the **Space weather** presets carry events from NASA's [DONKI](https://ccmc.gsfc.nasa.gov/DONKI/) catalogue: flares of class M1 and above, CMEs of 500 km/s and above, and geomagnetic storms of G1 and above, refreshed every week. The timeline marks only the largest of them (X-class flares, CMEs of 2000 km/s and above, G4 and G5 storms); the event list and search hold them all. Choosing a flare jumps to its peak and marks its source region in Carrington longitude, so the marker rotates with the Sun as you step through time. CMEs appear on the map as fronts launched along their DONKI cone-model direction and width, moving out at the measured speed from their 21.5 solar-radius time; this constant-speed picture ignores drag, so real arrivals are usually later. The fronts are off by default, since a dozen or more can be in flight at solar maximum: switch on **CME fronts**, or add `cme=1` to the URL. Each front is coloured by its speed (the key in the map's bottom-left corner), and when more than four are in flight only the four fastest are labelled.
 
 ### Calendar
 
@@ -97,7 +97,7 @@ Positions past each mission's latest tracking data are planning trajectories.
 
 ### Monthly updates
 
-The [Update ephemeris](.github/workflows/update-ephemeris.yml) workflow runs at 06:17 UTC on the first day of each month. It also merges the last 150 days of DONKI events (`scripts/fetch_events.py`) and rebuilds the calendar (`scripts/build_calendar.py`). For the ephemerides, it asks Horizons how far each spacecraft's ephemeris now reaches and refetches every year from the previous one onward. That replaces predictions with fitted trajectories and appends new years when a mission publishes a longer prediction. The timeline grows with the latest spacecraft, and the page shows when the data was last updated and when the next update is due. It can also be run by hand from the Actions tab.
+The [Update ephemeris](.github/workflows/update-ephemeris.yml) workflow runs at 06:17 UTC on the first day of each month. It also merges the last 150 days of DONKI events (`scripts/fetch_events.py`) and rebuilds the calendar (`scripts/build_calendar.py`). For the ephemerides, it asks Horizons how far each spacecraft's ephemeris now reaches and refetches every year from the previous one onward. That replaces predictions with fitted trajectories and appends new years when a mission publishes a longer prediction. The timeline grows with the latest spacecraft, and the page shows when the data was last updated and when the next update is due. It can also be run by hand from the Actions tab. Between monthly runs, the [Update events](.github/workflows/update-events.yml) workflow refetches the last 30 days of DONKI every Monday and commits only when something changed.
 
 To run the same update locally:
 

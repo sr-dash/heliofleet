@@ -44,7 +44,7 @@ const S = {
   hidden: new Set(),
   spot: null,
   spotOnMap: true,
-  cmes: true,
+  cmes: false, // CME fronts are off until switched on (busy at solar maximum)
   covsys: 'stonyhurst',
   fov: new Set(),
   tab: 'coords', // research tool open below the map
@@ -85,7 +85,7 @@ function readURL() {
   S.wind = num('wind', 250, 800) ?? S.wind;
   if (q.has('planets')) S.planets = q.get('planets') !== '0';
   if (q.has('spirals')) S.spirals = q.get('spirals') === '1';
-  if (q.has('cme')) S.cmes = q.get('cme') !== '0';
+  if (q.has('cme')) S.cmes = q.get('cme') === '1';
   if (q.has('fov')) q.get('fov').split(',').filter((k) => INSTRUMENT[k]).forEach((k) => S.fov.add(k));
   if (q.has('hide')) q.get('hide').split(',').filter((k) => BODIES[k]).forEach((k) => S.hidden.add(k));
   // spot=c,LON,LAT (Carrington) or s,LON,LAT (Stonyhurst); a trailing ,0 hides it on the map
@@ -138,7 +138,7 @@ function writeURL() {
     if (S.spirals) q.set('spirals', '1');
     if (S.wind !== 400) q.set('wind', S.wind);
     if (S.hidden.size) q.set('hide', [...S.hidden].join(','));
-    if (!S.cmes) q.set('cme', '0');
+    if (S.cmes) q.set('cme', '1');
     if (S.fov.size) q.set('fov', [...S.fov].join(','));
     // Embed and theme come from whoever wrote the link; keep them as they are.
     const cur = new URLSearchParams(location.search);

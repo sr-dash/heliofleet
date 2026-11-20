@@ -1,0 +1,67 @@
+# Weekly refresh of the DONKI space-weather events (flares, CMEs and storms)
+# between the monthly data updates: refetches the last 30 days and commits
+# only when an event was added or revised.
+
+name: Update events
+
+on:
+  schedule:
+    - cron: "23 5 * * 1"  # 05:23 UTC every Monday
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  issues: write
+
+concurrency:
+  group: update-ephemeris  # never at the same time as the monthly update
+  cancel-in-progress: false
+
+jobs:
+  events:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fetch the last 30 days from DONKI
+        run: python scripts/fetch_events.py --days 30
+
+      - name: Check the data
+        run: python scripts/check_data.py --no-stale
+
+      # The generated stamp changes on every run; commit only real changes
+      - name: Commit and push
+        id: commit
+        run: |
+          git config user.name "Soumyaranjan Dash"
+          git config user.email "sdash@nso.edu"
+          if git diff --quiet -I '"generated"' data/events.json; then
+            echo "No new events."
+            git checkout data/events.json
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git add data/events.json
+          git commit -m "Update DONKI events for $(date -u +%Y-%m-%d)"
+          git push
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Rebuild the site
+        if: steps.commit.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api -X POST "repos/${{ github.repository }}/pages/builds" --silent \
+            || echo "::warning::Could not request a Pages build; it will publish on the next push."
+
+      - name: Report a failed update
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/report_failure.sh "Weekly events update failed"

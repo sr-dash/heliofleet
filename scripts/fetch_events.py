@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """Collect notable space-weather events from NASA's DONKI catalogue.
 
-Writes data/events.json with large flares (M5 and above), fast CMEs (1000 km/s
-and above, with the most accurate cone-model analysis) and strong
-geomagnetic storms (G3 and above, Kp 7- or more). DONKI serves at most 60 days
+Writes data/events.json with flares of class M1 and above, CMEs of 500 km/s
+and above (DONKI types C, O, R and ER, with the most accurate cone-model
+analysis) and geomagnetic storms of G1 and above (Kp 5- or more). DONKI serves at most 60 days
 per request and does not allow cross-origin browser requests, so the page reads
 this static file instead.
 
 Usage:
   python scripts/fetch_events.py               # everything since 2010
   python scripts/fetch_events.py --incremental # the last 150 days, merged in
+  python scripts/fetch_events.py --days 30     # the last 30 days (weekly update)
 """
 
 import argparse
@@ -27,9 +28,9 @@ OUT = ROOT / "data" / "events.json"
 START = date(2010, 1, 1)
 WINDOW = 59  # DONKI rejects ranges longer than 60 days
 
-MIN_FLARE = 5e-5    # M5.0 in W m^-2
-MIN_CME_SPEED = 1000
-MIN_KP = 6.67       # Kp 7- marks a G3 storm
+MIN_FLARE = 1e-5    # M1.0 in W m^-2
+MIN_CME_SPEED = 500  # DONKI type C (common) and faster
+MIN_KP = 4.67       # Kp 5- marks a G1 storm
 CLASS_FLUX = {"A": 1e-8, "B": 1e-7, "C": 1e-6, "M": 1e-5, "X": 1e-4}
 
 
@@ -52,7 +53,7 @@ def flux(cls):
 
 
 def g_scale(kp):
-    return 5 if kp >= 8.67 else 4 if kp >= 7.67 else 3
+    return 5 if kp >= 8.67 else 4 if kp >= 7.67 else 3 if kp >= 6.67 else 2 if kp >= 5.67 else 1
 
 
 def flares(rows):
@@ -120,11 +121,13 @@ def windows(a, b):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--incremental", action="store_true")
+    ap.add_argument("--days", type=int, help="refetch only the last DAYS days, merged in")
     ap.add_argument("--workers", type=int, default=3)
     args = ap.parse_args()
     today = datetime.now(timezone.utc).date()
     old = json.loads(OUT.read_text()) if OUT.exists() else {}
-    start = today - timedelta(days=150) if args.incremental and old else START
+    recent = args.days or (150 if args.incremental else None)
+    start = today - timedelta(days=recent) if recent and old else START
 
     spans = list(windows(start, today))
     parsers = {"FLR": ("flares", flares), "CME": ("cmes", cmes), "GST": ("storms", storms)}
@@ -146,8 +149,8 @@ def main():
     merged = {
         "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source": "NASA CCMC DONKI (https://ccmc.gsfc.nasa.gov/DONKI/)",
-        "criteria": {"flares": "class M5.0 and above", "cmes": f"speed {MIN_CME_SPEED} km/s and above",
-                     "storms": "G3 and above (Kp 7- or more)"},
+        "criteria": {"flares": "class M1.0 and above", "cmes": f"speed {MIN_CME_SPEED} km/s and above",
+                     "storms": "G1 and above (Kp 5- or more)"},
         **merged,
     }
     OUT.write_text(json.dumps(merged, separators=(",", ":")))

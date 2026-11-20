@@ -1,5 +1,5 @@
 // Space-weather events from NASA's DONKI catalogue (data/events.json, built
-// monthly by scripts/fetch_events.py) and the upcoming-geometry calendar
+// weekly by scripts/fetch_events.py) and the upcoming-geometry calendar
 // (data/upcoming.json, built by scripts/build_calendar.py).
 
 import { AU_KM, R_SUN_AU } from './frames.js';
@@ -44,7 +44,7 @@ export function flareFlux(cls) {
   return m ? base[m[1]] * +m[2] : 0;
 }
 
-export const G_LABEL = { 3: 'G3 strong', 4: 'G4 severe', 5: 'G5 extreme' };
+export const G_LABEL = { 1: 'G1 minor', 2: 'G2 moderate', 3: 'G3 strong', 4: 'G4 severe', 5: 'G5 extreme' };
 
 // CMEs whose leading edge is between 21.5 solar radii and `maxAU` at jd,
 // assuming constant speed after the 21.5 Rs time (the cone-model inputs).

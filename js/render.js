@@ -106,6 +106,54 @@ function drawSun(ctx, x, y, r, th) {
   ctx.fillStyle = th.sun; ctx.beginPath(); ctx.arc(x, y, r, 0, 2 * Math.PI); ctx.fill();
 }
 
+// CME speed colour: the theme's CME hue at a lightness that rises with speed
+// in contrast against the plot background (log scale, 500 to 2500 km/s and
+// above), so the fastest fronts stand out in every theme. `text` keeps the
+// colour dark or bright enough to read as a label.
+const CME_V0 = 500;
+const CME_V1 = 2500;
+const CME_LABELS = 4;
+function hexHsl(hex) {
+  const n = parseInt(hex.replace('#', '').slice(0, 6), 16);
+  const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((x) => x / 255);
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
+  if (!d) return [0, 0, l];
+  const s = d / (1 - Math.abs(2 * l - 1));
+  const h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  return [(h * 60 + 360) % 360, s, l];
+}
+const isDark = (th) => (th.bg && th.bg.startsWith('#') ? hexHsl(th.bg)[2] < 0.45 : false);
+export function cmeColor(v, th, text = false) {
+  const [h, s] = th.cme?.startsWith('#') ? hexHsl(th.cme) : [20, 0.85];
+  const t = Math.min(1, Math.max(0, Math.log(v / CME_V0) / Math.log(CME_V1 / CME_V0)));
+  let l = isDark(th) ? 0.34 + 0.46 * t : 0.78 - 0.5 * t;
+  if (text) l = isDark(th) ? Math.max(l, 0.62) : Math.min(l, 0.42);
+  return `hsl(${h.toFixed(0)} ${Math.round(Math.max(s, 0.7) * 100)}% ${Math.round(l * 100)}%)`;
+}
+
+// Speed key for the CME fronts, bottom left (the frame caption is top left);
+// returns its box so labels avoid it
+function drawCmeKey(ctx, th, k, H) {
+  const w = 120 * k, h = 7 * k, x = 12 * k, y = H - 14 * k - h - 22 * k;
+  ctx.save();
+  ctx.font = `${10.5 * k}px ${FONT_SANS}`;
+  ctx.textBaseline = 'alphabetic';
+  ctx.textAlign = 'left';
+  ctx.fillStyle = th.muted;
+  ctx.fillText(tr('CME speed (km/s)'), x, y + 9 * k);
+  const n = 24;
+  for (let i = 0; i < n; i++) {
+    ctx.fillStyle = cmeColor(CME_V0 * (CME_V1 / CME_V0) ** ((i + 0.5) / n), th);
+    ctx.fillRect(x + (w * i) / n, y + 14 * k, w / n + 0.5, h);
+  }
+  ctx.fillStyle = th.muted;
+  ctx.fillText(String(CME_V0), x, y + 14 * k + h + 11 * k);
+  ctx.textAlign = 'right';
+  ctx.fillText(`${CME_V1}+`, x + w, y + 14 * k + h + 11 * k);
+  ctx.restore();
+  return { x: x - 4 * k, y: y - 2 * k, w: w + 8 * k, h: 14 * k + h + 16 * k };
+}
+
 // Pixels per au and the Sun's pixel position. `reserve` is width kept free
 // on the right for the inset when the map is wide enough to spare it.
 export function mapGeometry(W, H, view, reserve = 0, k = 1) {
@@ -230,27 +278,34 @@ export function drawMap(ctx, W, H, scene, s, th, view, opts = {}) {
     ctx.globalAlpha = 1;
   }
 
-  // CME fronts: faint wedge from the Sun, solid leading edge
+  // CME fronts: faint wedge from the Sun, solid leading edge, coloured by
+  // speed. Slow fronts are drawn first so fast ones sit on top; when many are
+  // in flight only the fastest are labelled.
   const cmeLabels = [];
-  for (const c of scene.cmes ?? []) {
+  const cmes = [...(scene.cmes ?? [])].sort((a, b) => a.speed - b.speed);
+  const labelFrom = cmes.length > CME_LABELS ? cmes.length - CME_LABELS : 0;
+  cmes.forEach((c, i) => {
+    const col = cmeColor(c.speed, th);
     ctx.beginPath();
     ctx.moveTo(ox, oy);
     for (const p of c.arc) { const [x, y] = map(p); ctx.lineTo(x, y); }
     ctx.closePath();
-    ctx.fillStyle = th.cme;
-    ctx.globalAlpha = 0.09;
+    ctx.fillStyle = col;
+    ctx.globalAlpha = Math.max(0.025, Math.min(0.07, 0.28 / cmes.length)); // overlapping wedges stay faint
     ctx.fill();
-    ctx.globalAlpha = 0.9;
+    ctx.globalAlpha = 0.95;
     polyline(ctx, c.arc, map);
-    ctx.strokeStyle = th.cme;
+    ctx.strokeStyle = col;
     ctx.lineWidth = 2.2 * k;
     ctx.stroke();
     ctx.globalAlpha = 1;
     const [ax, ay] = map(c.apex);
-    if (ax > 0 && ax < W && ay > 0 && ay < H) {
-      cmeLabels.push({ text: c.label, x: ax, y: ay, r: 6 * k, size: 11 * k, key: 'cme', color: th.cme, cme: true });
+    if (i >= labelFrom && ax > 0 && ax < W && ay > 0 && ay < H) {
+      cmeLabels.push({ text: c.label, x: ax, y: ay, r: 6 * k, size: 11 * k, key: 'cme', color: cmeColor(c.speed, th, true), cme: true });
     }
-  }
+  });
+  const avoid = [...(opts.avoid ?? [])];
+  if (cmes.length) avoid.push(drawCmeKey(ctx, th, k, H));
 
   // Sun–Earth line
   const earth = scene.bodies[0];
@@ -345,7 +400,7 @@ export function drawMap(ctx, W, H, scene, s, th, view, opts = {}) {
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     ctx.font = `600 ${12 * k}px ${FONT_SANS}`;
-    for (const l of placeLabels(ctx, labels, W, H, opts.avoid)) {
+    for (const l of placeLabels(ctx, labels, W, H, avoid)) {
       const { rect } = l;
       const cx = Math.max(rect.x, Math.min(l.x, rect.x + rect.w));
       const cy = Math.max(rect.y, Math.min(l.y, rect.y + rect.h));
