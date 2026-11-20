@@ -78,7 +78,7 @@ export const BODIES = {
     name: 'Solar Orbiter', short: 'Solar Orbiter', tag: 'SolO', agency: 'ESA / NASA', kind: 'sc',
     imager: true,
     hid: '-144', launch: '2020-02-10T04:03Z',
-    site: 'https://www.esa.int/Science_Exploration/Space_Science/Solar_Orbiter',
+    site: 'https://sci.esa.int/web/solar-orbiter',
     data: 'https://soar.esac.esa.int/soar/',
   },
   psp: {
@@ -90,7 +90,7 @@ export const BODIES = {
   bepi: {
     name: 'BepiColombo', short: 'BepiColombo', tag: 'Bepi', agency: 'ESA / JAXA', kind: 'sc',
     hid: '-121', launch: '2018-10-20T01:45Z',
-    site: 'https://www.esa.int/Science_Exploration/Space_Science/BepiColombo',
+    site: 'https://sci.esa.int/web/bepicolombo',
     data: 'https://psa.esa.int/',
   },
   sta: {
