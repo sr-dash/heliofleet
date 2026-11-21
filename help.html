@@ -68,7 +68,7 @@
           "@id": "https://sr-dash.github.io/#person"
         },
         "datePublished": "2026-10-29",
-        "dateModified": "2026-10-29",
+        "dateModified": "2026-11-20",
         "isPartOf": {
           "@id": "https://sr-dash.github.io/heliofleet/#app"
         },
@@ -178,6 +178,7 @@
       <a href="#finder">Coordinated observations</a>
       <a href="#share">Sharing a view</a>
       <a href="#recipes">Examples</a>
+      <a href="#outside">Command line, Python and MCP</a>
       <a href="#data">Data and updates</a>
     </nav>
 
@@ -276,6 +277,16 @@
         <li><a href="./?t=2025-03-22T22:25Z&amp;tab=geom#tools">The viewing geometry of every observer at that perihelion</a></li>
         <li><a href="./?t=2025-06-01T00:00Z&amp;tab=align&amp;align=radial,solo,psp,5,2025-01-01,2025-12-31#tools">Radial alignments of Solar Orbiter and Parker in 2025</a></li>
         <li><a href="./?t=2024-04-08T18:18Z#coverage">The solar surface seen by each observer during the total eclipse of 8 April 2024</a></li>
+      </ul>
+    </section>
+
+    <section id="outside">
+      <h2>Command line, Python and MCP</h2>
+      <p>The positions, alignment searches, event calendar and viewing geometry are also available outside the browser from <a href="https://github.com/sr-dash/heliofleet-mcp">heliofleet-mcp</a>, a free Python package. It reads this site's data files and uses the same frame and alignment code, so its numbers match the page, and every answer includes a link that opens the same moment here.</p>
+      <ul>
+        <li><b>Command line</b>: <code>uvx heliofleet-mcp align psp solo --tol 10 --after 2026-11-19 --next</code> prints the next radial alignment of Parker and Solar Orbiter as JSON. <code>uvx heliofleet-mcp --help</code> lists the other commands, including HelioField's magnetic connectivity.</li>
+        <li><b>Python</b>: <code>pip install heliofleet-mcp</code>, then <code>from heliofleet_mcp import Fleet</code>.</li>
+        <li><b>Assistants and other MCP clients</b>: <code>uvx heliofleet-mcp</code> runs it as a Model Context Protocol server, listed in the MCP Registry as <code>io.github.sr-dash/heliofleet-mcp</code>.</li>
       </ul>
     </section>
 

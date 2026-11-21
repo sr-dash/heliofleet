@@ -67,6 +67,17 @@ Add `embed=1` to any HelioFleet link to get the map alone, with a small time bar
 
 Keyboard: `←` / `→` step a day (`Shift` for an hour), `Space` plays and pauses, and the timeline takes arrow keys when focused.
 
+### Command line, Python and MCP clients
+
+[heliofleet-mcp](https://github.com/sr-dash/heliofleet-mcp) ([PyPI](https://pypi.org/project/heliofleet-mcp/)) answers the same questions outside the browser: positions, alignment windows, the event calendar and viewing geometry, plus HelioField's magnetic connectivity. It reads this site's data files and ports its frame and alignment code, so its numbers match the page, and every answer carries a HelioFleet link to the same moment.
+
+```bash
+uvx heliofleet-mcp align psp solo --tol 10 --after 2026-11-19 --next   # one answer as JSON
+uvx heliofleet-mcp                                                       # Model Context Protocol server
+```
+
+In Python: `pip install heliofleet-mcp`, then `from heliofleet_mcp import Fleet`. It is listed in the MCP Registry as `io.github.sr-dash/heliofleet-mcp`.
+
 ## Data
 
 Positions come from [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/), as heliocentric vectors in the ICRF ecliptic frame on a uniform UT grid. Most bodies are sampled daily and Parker every 3 hours. Geocentric Moon and Aditya-L1 vectors for the inset are sampled every 6 h and 2 h. The browser interpolates them with a 4-point Lagrange polynomial. Heliographic coordinates use the IAU solar rotation model and agree with SunPy to better than 0.01°.

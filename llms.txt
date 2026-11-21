@@ -63,6 +63,13 @@ l0 = psp.transform_to(frames.HeliographicCarrington(obstime=t, observer=psp)).lo
 print(psp.radius.to("AU"), psp.lon, psp.lat, l0)
 ```
 
+## Command line, Python and MCP
+
+- [heliofleet-mcp](https://github.com/sr-dash/heliofleet-mcp) (MIT, on [PyPI](https://pypi.org/project/heliofleet-mcp/)) answers questions from these data files outside the browser: positions, fleet state, alignment windows (radial, quadrature, conjunction, magnetic connection), the event calendar, viewing geometry, and HelioField's magnetic connectivity. Its frame and alignment code is a port of this site's, so its numbers match the page, and every answer includes a HelioFleet link to the same view.
+- Command line, one answer as JSON: `uvx heliofleet-mcp align psp solo --tol 10 --after 2026-11-19 --next`; `uvx heliofleet-mcp --help` lists the commands.
+- Python: `pip install heliofleet-mcp`, then `from heliofleet_mcp import Fleet`.
+- Model Context Protocol server over stdio: `uvx heliofleet-mcp`; MCP Registry name `io.github.sr-dash/heliofleet-mcp`. Usage notes for assistants: [AGENTS.md](https://github.com/sr-dash/heliofleet-mcp/blob/main/AGENTS.md) and [llms.txt](https://github.com/sr-dash/heliofleet-mcp/blob/main/llms.txt).
+
 ## Figures
 
 - [assets/og-image.png](https://sr-dash.github.io/heliofleet/assets/og-image.png): the map during the total solar eclipse of 8 April 2024 (1200 × 630).
