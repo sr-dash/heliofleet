@@ -112,8 +112,9 @@ function show() {
   track('shown');
 }
 
+const framed = (() => { try { return window.self !== window.top; } catch { return true; } })();
 const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-if (!seen() && !standalone && !document.documentElement.classList.contains('embed')) {
+if (!seen() && !framed && !standalone && !document.documentElement.classList.contains('embed')) {
   // Keep the browser's install offer for the card's button (only on visits that may show the card).
   addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvent = e; });
 
