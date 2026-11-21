@@ -9,11 +9,107 @@
   "background_color": "#0B1026",
   "theme_color": "#0B1026",
   "lang": "en",
-  "categories": ["education", "science"],
+  "categories": [
+    "education",
+    "science"
+  ],
   "icons": [
-    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "assets/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
-    { "src": "assets/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "launch_handler": {
+    "client_mode": [
+      "navigate-existing",
+      "auto"
+    ]
+  },
+  "shortcuts": [
+    {
+      "name": "Map: the fleet now",
+      "short_name": "Map",
+      "url": "./",
+      "description": "Where the spacecraft are around the Sun and Earth right now",
+      "icons": [
+        {
+          "src": "assets/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Sky view",
+      "short_name": "Sky view",
+      "url": "sky.html",
+      "description": "Instrument fields of view and observation footprints on the plane of the sky",
+      "icons": [
+        {
+          "src": "assets/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Alignment search",
+      "short_name": "Alignments",
+      "url": "./?tab=align#tools",
+      "description": "Radial alignments, quadratures and magnetic connections between spacecraft",
+      "icons": [
+        {
+          "src": "assets/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "How to use",
+      "short_name": "Help",
+      "url": "help.html",
+      "description": "What every tool does, link parameters and examples",
+      "icons": [
+        {
+          "src": "assets/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/screenshot-wide.jpg",
+      "sizes": "1280x800",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "HelioFleet map on 1 December 2026: the fleet around the Sun, with mission timelines"
+    },
+    {
+      "src": "assets/screenshot-narrow.jpg",
+      "sizes": "824x1760",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "HelioFleet on a phone: mission timelines and the map of the inner heliosphere"
+    }
   ]
 }
