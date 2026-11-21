@@ -569,5 +569,12 @@
  "SunPy script": "SunPy स्क्रिप्ट",
  "HelioFleet Sky View: Instrument Coverage": "HelioFleet आकाश दृश्य: उपकरणों का कवरेज",
  "The same date on HelioField: the coronal magnetic field in 3D": "वही तिथि HelioField पर: 3D में कोरोनल चुंबकीय क्षेत्र",
- "html:colophon-star": "<span aria-hidden=\"true\">☆</span> HelioFleet उपयोगी लगा? <a href=\"https://github.com/sr-dash/heliofleet\">GitHub पर इसे स्टार दें</a> · <a href=\"https://github.com/sr-dash/heliofleet/issues/new?template=i_use_this.yml\">बताएँ कि आप इसका उपयोग कैसे करते हैं</a>"
+ "html:colophon-star": "<span aria-hidden=\"true\">☆</span> HelioFleet उपयोगी लगा? <a href=\"https://github.com/sr-dash/heliofleet\">GitHub पर इसे स्टार दें</a> · <a href=\"https://github.com/sr-dash/heliofleet/issues/new?template=i_use_this.yml\">बताएँ कि आप इसका उपयोग कैसे करते हैं</a>",
+ "Find HelioFleet useful?": "HelioFleet उपयोगी लगा?",
+ "Bookmark it with {key}, so it is one click away next time.": "{key} दबाकर इसे बुकमार्क करें, ताकि अगली बार यह एक क्लिक पर खुले।",
+ "Add it to your home screen from the browser menu, so it is one tap away next time.": "ब्राउज़र मेनू से इसे होम स्क्रीन पर जोड़ें, ताकि अगली बार यह एक टैप पर खुले।",
+ "A star helps other researchers find HelioFleet.": "एक स्टार से दूसरे शोधकर्ताओं को HelioFleet खोजने में मदद मिलती है।",
+ "Star it on GitHub": "GitHub पर इसे स्टार दें",
+ "Install as app": "ऐप के रूप में इंस्टॉल करें",
+ "Not now": "अभी नहीं"
 }

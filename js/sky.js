@@ -14,6 +14,7 @@ import { CHANNELS, loadContext, contextRuns, drawContext, contextNote, hitTest, 
 import { OBS_INST, observationsNear, earthShape, earthRsun, liveRun } from './observations.js';
 import { LANGUAGES, detectLang, loadLang, lang, saveLang, tr, translatePage } from './i18n.js';
 import { enhance as datePicker } from './datepicker.js';
+import './nudge.js'; // one-time first-visit card: bookmark, install, star
 
 const $ = (id) => document.getElementById(id);
 const jdOf = (iso) => Date.parse(iso) / 864e5 + 2440587.5;
