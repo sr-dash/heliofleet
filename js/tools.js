@@ -335,7 +335,7 @@ export const CITATION = {
   // Zenodo concept DOI: resolves to the latest release.
   doi: '10.5281/zenodo.23328187',
   // DOI of this version alone
-  versionDoi: '10.5281/zenodo.23818629',
+  versionDoi: '10.5281/zenodo.24479917',
 };
 
 export function citationText() {
