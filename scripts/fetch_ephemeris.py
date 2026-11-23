@@ -60,6 +60,12 @@ BODIES = {
     "cgo_geo":    dict(cmd="-171",    center="500@399", step=12, units="km", start="2025-09-25",       end=None),
     "bepi":       dict(cmd="-121",    center="500@10",  step=24, units="au", start="2018-10-21",       end=None),
     "maven":      dict(cmd="-202",    center="500@10",  step=24, units="au", start="2013-11-19",       end=None),
+    # Planetary missions used as in situ solar-wind observers; the ended ones
+    # have fixed end dates, so the monthly update leaves their data alone.
+    "messenger":  dict(cmd="-236",    center="500@10",  step=24, units="au", start=APP_START,          end="2015-04-30"),
+    "vex":        dict(cmd="-248",    center="500@10",  step=24, units="au", start=APP_START,          end="2014-12-16"),
+    "rosetta":    dict(cmd="-226",    center="500@10",  step=24, units="au", start=APP_START,          end="2016-09-30"),
+    "juno":       dict(cmd="-61",     center="500@10",  step=24, units="au", start="2011-08-06",       end=None),
 }
 
 # Rows of the coverage table in README.md.
@@ -78,6 +84,10 @@ README_ROWS = [
     ("sta", "STEREO-A", "-234", ""),
     ("stb", "STEREO-B", "-235", "contact lost 2014-10-01; later positions are predictions"),
     ("bepi", "BepiColombo", "-121", ""),
+    ("messenger", "MESSENGER", "-236", "Mercury orbit from 2011-03-18; mission ended 2015-04-30"),
+    ("vex", "Venus Express", "-248", "Venus orbit; contact lost 2014-11-28, mission ended 2014-12-16"),
+    ("juno", "Juno", "-61", "cruise to Jupiter orbit insertion 2016-07-05"),
+    ("rosetta", "Rosetta", "-226", "hibernation 2011-06-08 to 2014-01-20; at comet 67P from 2014-08-06; mission ended 2016-09-30"),
     ("maven", "MAVEN", "-202", "Mars orbit; no contact since 2025-12-06, later positions are predictions"),
 ]
 

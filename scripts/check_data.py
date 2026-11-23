@@ -32,6 +32,8 @@ AU_KM = 149597870.7
 MAX_SPEED = {"au": 260.0, "km": 12.0}
 # Distance ranges: heliocentric au; geocentric km (Moon, L1 and transfer orbits)
 RANGE = {"au": (0.03, 1.8), "km": (6.0e3, 2.2e6)}
+# Missions that travel beyond Mars: Juno to Jupiter, Rosetta to comet 67P
+RANGE_BODY = {"juno": (0.8, 5.6), "rosetta": (0.9, 5.4)}
 MAX_SPEED_GEO_LAUNCH_DAYS = 10  # launch phase: fast near Earth
 
 
@@ -62,7 +64,7 @@ def main():
     today = now_jd()
     for key, b in sorted(manifest["bodies"].items()):
         units, step = b["units"], b["step"]
-        lo, hi = RANGE[units]
+        lo, hi = RANGE_BODY.get(key, RANGE[units])
         prev = None
         first = last = None
         for year in b["years"]:

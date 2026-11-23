@@ -5,6 +5,7 @@
 export const SPACECRAFT = [
   'sdo', 'soho', 'aditya', 'ace', 'wind', 'dscovr', 'imap', 'swfo', 'cgo',
   'solo', 'psp', 'bepi', 'sta', 'stb', 'maven',
+  'messenger', 'vex', 'juno', 'rosetta',
 ];
 export const PLANETS = ['mercury', 'venus', 'mars'];
 // Spacecraft drawn in the near-Earth inset, around the Sun-Earth L1 point.
@@ -117,6 +118,36 @@ export const BODIES = {
     site: 'https://science.nasa.gov/mission/maven/',
     data: 'https://lasp.colorado.edu/maven/sdc/public/',
   },
+  // Planetary missions with solar-wind and energetic-particle instruments,
+  // used as in situ observers in multi-spacecraft CME studies
+  messenger: {
+    name: 'MESSENGER', short: 'MESSENGER', tag: 'MESS', agency: 'NASA', kind: 'sc',
+    hid: '-236', launch: '2004-08-03T06:15Z', note: 'Mercury orbit from 2011-03-18',
+    ended: '2015-04-30T19:26Z',
+    site: 'https://messenger.jhuapl.edu/',
+    data: 'https://pds-ppi.igpp.ucla.edu/mission/MESSENGER',
+  },
+  vex: {
+    name: 'Venus Express', short: 'Venus Express', tag: 'VEX', agency: 'ESA', kind: 'sc',
+    hid: '-248', launch: '2005-11-09T03:33Z', note: 'Venus orbit',
+    lost: '2014-11-28T00:00Z',
+    ended: '2014-12-16T00:00Z',
+    site: 'https://sci.esa.int/web/venus-express',
+    data: 'https://psa.esa.int/',
+  },
+  juno: {
+    name: 'Juno', short: 'Juno', tag: 'Juno', agency: 'NASA', kind: 'sc',
+    hid: '-61', launch: '2011-08-05T16:25Z', note: 'Jupiter orbit from 2016-07-05',
+    site: 'https://science.nasa.gov/mission/juno/',
+    data: 'https://pds-ppi.igpp.ucla.edu/mission/JUNO',
+  },
+  rosetta: {
+    name: 'Rosetta', short: 'Rosetta', tag: 'Ros', agency: 'ESA', kind: 'sc',
+    hid: '-226', launch: '2004-03-02T07:17Z', note: 'At comet 67P from 2014-08-06',
+    ended: '2016-09-30T10:39Z',
+    site: 'https://sci.esa.int/web/rosetta',
+    data: 'https://psa.esa.int/',
+  },
   mercury: { name: 'Mercury', short: 'Mercury', kind: 'planet', hid: '199', period: 88 },
   venus: { name: 'Venus', short: 'Venus', kind: 'planet', hid: '299', period: 225 },
   mars: { name: 'Mars', short: 'Mars', kind: 'planet', hid: '499', period: 687 },
@@ -158,6 +189,12 @@ export const MILESTONES = [
   { t: '2024-12-24T11:53Z', label: 'Parker closest perihelion', body: 'psp' },
   { t: '2025-09-24T11:30Z', label: 'IMAP, SWFO-L1 and Carruthers launch', body: 'imap' },
   { t: '2025-12-06T00:00Z', label: 'MAVEN contact lost', body: 'maven' },
+  { t: '2011-03-18T01:00Z', label: 'MESSENGER enters Mercury orbit', body: 'messenger' },
+  { t: '2014-08-06T09:06Z', label: 'Rosetta arrives at comet 67P', body: 'rosetta' },
+  { t: '2014-11-28T00:00Z', label: 'Venus Express contact lost', body: 'vex' },
+  { t: '2015-04-30T19:26Z', label: 'MESSENGER mission ends', body: 'messenger' },
+  { t: '2016-07-05T03:53Z', label: 'Juno enters Jupiter orbit', body: 'juno' },
+  { t: '2016-09-30T10:39Z', label: 'Rosetta mission ends', body: 'rosetta' },
   { t: '2026-01-23T00:00Z', label: 'SWFO-L1 reaches L1 and is renamed SOLAR-1', body: 'swfo' },
 ];
 

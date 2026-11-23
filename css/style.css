@@ -33,6 +33,10 @@
   --c-cgo: #D6D68A;
   --c-bepi: #E6E9F2;
   --c-maven: #FFB4A2;
+  --c-messenger: #4FD67A;
+  --c-vex: #FFC46B;
+  --c-juno: #D98BF5;
+  --c-rosetta: #7FE0D0;
   --c-mercury: #A79F95;
   --c-venus: #D9C08C;
   --c-mars: #D8775A;
@@ -125,6 +129,10 @@
   --c-cgo: #6B6B1F;
   --c-bepi: #3D4A63;
   --c-maven: #AA4E28;
+  --c-messenger: #1E8A47;
+  --c-vex: #9A6A00;
+  --c-juno: #A0329C;
+  --c-rosetta: #0F7F73;
   --c-mercury: #70675E;
   --c-venus: #7C6535;
   --c-mars: #AC4C2D;
@@ -230,7 +238,7 @@ button, input, select { font: inherit; color: inherit; }
   border-bottom: 1px solid var(--line);
 }
 /* Same as H in js/ribbon.js (52px + 11.5px per spacecraft lane after the first, plus 42px), so the page does not jump when it is drawn */
-#ribbon { display: block; width: 100%; height: 255px; cursor: ew-resize; touch-action: none; user-select: none; }
+#ribbon { display: block; width: 100%; height: 301px; cursor: ew-resize; touch-action: none; user-select: none; }
 #ribbon text { font-family: "IBM Plex Mono", monospace; }
 .ribbon-tip {
   position: absolute; top: 4px; pointer-events: none; z-index: 5;
