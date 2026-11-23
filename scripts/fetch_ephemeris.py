@@ -66,6 +66,11 @@ BODIES = {
     "vex":        dict(cmd="-248",    center="500@10",  step=24, units="au", start=APP_START,          end="2014-12-16"),
     "rosetta":    dict(cmd="-226",    center="500@10",  step=24, units="au", start=APP_START,          end="2016-09-30"),
     "juno":       dict(cmd="-61",     center="500@10",  step=24, units="au", start="2011-08-06",       end=None),
+    # Cruise missions; follow=True stops them at the timeline's end, so a long
+    # prediction (Europa Clipper's runs to 2034) does not stretch the timeline
+    "juice":      dict(cmd="-28",     center="500@10",  step=24, units="au", start="2023-04-15",       end=None, follow=True),
+    "clipper":    dict(cmd="-159",    center="500@10",  step=24, units="au", start="2024-10-15",       end=None, follow=True),
+    "psyche":     dict(cmd="-255",    center="500@10",  step=24, units="au", start="2023-10-14",       end=None, follow=True),
 }
 
 # Rows of the coverage table in README.md.
@@ -87,6 +92,9 @@ README_ROWS = [
     ("messenger", "MESSENGER", "-236", "Mercury orbit from 2011-03-18; mission ended 2015-04-30"),
     ("vex", "Venus Express", "-248", "Venus orbit; contact lost 2014-11-28, mission ended 2014-12-16"),
     ("juno", "Juno", "-61", "cruise to Jupiter orbit insertion 2016-07-05"),
+    ("juice", "JUICE", "-28", "cruise to Jupiter (arrival 2031); shown to the end of the timeline"),
+    ("clipper", "Europa Clipper", "-159", "cruise to Jupiter (arrival 2030); shown to the end of the timeline"),
+    ("psyche", "Psyche", "-255", "cruise to asteroid 16 Psyche (arrival 2029)"),
     ("rosetta", "Rosetta", "-226", "hibernation 2011-06-08 to 2014-01-20; at comet 67P from 2014-08-06; mission ended 2016-09-30"),
     ("maven", "MAVEN", "-202", "Mars orbit; no contact since 2025-12-06, later positions are predictions"),
 ]
@@ -181,9 +189,11 @@ def resolve_ends(keys):
     for key, b in BODIES.items():
         if b["end"] not in (None, "timeline") and b["end"] not in BODIES:
             ends[key] = parse(b["end"])
-    timeline = max(v for k, v in ends.items() if BODIES[k]["end"] is None)
+    timeline = max(v for k, v in ends.items() if BODIES[k]["end"] is None and not BODIES[k].get("follow"))
     timeline = timeline.replace(hour=0, minute=0, second=0, microsecond=0)
     for key, b in BODIES.items():
+        if b.get("follow"):
+            ends[key] = min(ends[key], timeline + timedelta(days=1))
         if b["end"] == "timeline":
             ends[key] = timeline
         elif b["end"] in BODIES:

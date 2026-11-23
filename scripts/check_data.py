@@ -33,7 +33,7 @@ MAX_SPEED = {"au": 260.0, "km": 12.0}
 # Distance ranges: heliocentric au; geocentric km (Moon, L1 and transfer orbits)
 RANGE = {"au": (0.03, 1.8), "km": (6.0e3, 2.2e6)}
 # Missions that travel beyond Mars: Juno to Jupiter, Rosetta to comet 67P
-RANGE_BODY = {"juno": (0.8, 5.6), "rosetta": (0.9, 5.4)}
+RANGE_BODY = {"juno": (0.8, 5.6), "rosetta": (0.9, 5.4), "juice": (0.6, 5.4), "clipper": (0.8, 5.6), "psyche": (0.9, 3.3)}
 MAX_SPEED_GEO_LAUNCH_DAYS = 10  # launch phase: fast near Earth
 
 

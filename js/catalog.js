@@ -5,7 +5,7 @@
 export const SPACECRAFT = [
   'sdo', 'soho', 'aditya', 'ace', 'wind', 'dscovr', 'imap', 'swfo', 'cgo',
   'solo', 'psp', 'bepi', 'sta', 'stb', 'maven',
-  'messenger', 'vex', 'juno', 'rosetta',
+  'messenger', 'vex', 'juno', 'rosetta', 'juice', 'clipper', 'psyche',
 ];
 export const PLANETS = ['mercury', 'venus', 'mars'];
 // Spacecraft drawn in the near-Earth inset, around the Sun-Earth L1 point.
@@ -148,6 +148,24 @@ export const BODIES = {
     site: 'https://sci.esa.int/web/rosetta',
     data: 'https://psa.esa.int/',
   },
+  juice: {
+    name: 'JUICE (Jupiter Icy Moons Explorer)', short: 'JUICE', tag: 'JUICE', agency: 'ESA', kind: 'sc',
+    hid: '-28', launch: '2023-04-14T12:14Z', note: 'Cruise to Jupiter (arrival 2031)',
+    site: 'https://sci.esa.int/web/juice',
+    data: 'https://psa.esa.int/',
+  },
+  clipper: {
+    name: 'Europa Clipper', short: 'Europa Clipper', tag: 'Clipper', agency: 'NASA', kind: 'sc',
+    hid: '-159', launch: '2024-10-14T16:06Z', note: 'Cruise to Jupiter (arrival 2030)',
+    site: 'https://science.nasa.gov/mission/europa-clipper/',
+    data: 'https://pds.nasa.gov/',
+  },
+  psyche: {
+    name: 'Psyche', short: 'Psyche', tag: 'Psyche', agency: 'NASA', kind: 'sc',
+    hid: '-255', launch: '2023-10-13T14:19Z', note: 'Cruise to asteroid 16 Psyche (arrival 2029)',
+    site: 'https://science.nasa.gov/mission/psyche/',
+    data: 'https://pds.nasa.gov/',
+  },
   mercury: { name: 'Mercury', short: 'Mercury', kind: 'planet', hid: '199', period: 88 },
   venus: { name: 'Venus', short: 'Venus', kind: 'planet', hid: '299', period: 225 },
   mars: { name: 'Mars', short: 'Mars', kind: 'planet', hid: '499', period: 687 },
@@ -195,6 +213,9 @@ export const MILESTONES = [
   { t: '2015-04-30T19:26Z', label: 'MESSENGER mission ends', body: 'messenger' },
   { t: '2016-07-05T03:53Z', label: 'Juno enters Jupiter orbit', body: 'juno' },
   { t: '2016-09-30T10:39Z', label: 'Rosetta mission ends', body: 'rosetta' },
+  { t: '2023-04-14T12:14Z', label: 'JUICE launch', body: 'juice' },
+  { t: '2023-10-13T14:19Z', label: 'Psyche launch', body: 'psyche' },
+  { t: '2024-10-14T16:06Z', label: 'Europa Clipper launch', body: 'clipper' },
   { t: '2026-01-23T00:00Z', label: 'SWFO-L1 reaches L1 and is renamed SOLAR-1', body: 'swfo' },
 ];
 

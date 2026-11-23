@@ -13,7 +13,7 @@ Where the Sun-watching spacecraft are, on any date since 2010.
 > [!TIP]
 > **Using HelioFleet?** Please [star the repository](https://github.com/sr-dash/heliofleet) (the ☆ Star button at the top of this page). Clones and page views reach me without names, so a star is the only way I can tell who finds it useful, and it helps others find it too. Even better, [say what you use it for](https://github.com/sr-dash/heliofleet/issues/new?template=i_use_this.yml) in a two-minute form, or post an example in [Show and tell](https://github.com/sr-dash/heliofleet/discussions/categories/show-and-tell). If it helps your research, please cite it ([doi:10.5281/zenodo.23328187](https://doi.org/10.5281/zenodo.23328187)). I am not asking for money: there is no paid tier, and none of this changes what the tool does for you.
 
-HelioFleet places SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, IMAP, SOLAR-1 (SWFO-L1), Carruthers, Solar Orbiter, Parker Solar Probe, BepiColombo, STEREO-A, STEREO-B and MAVEN, with MESSENGER, Venus Express, Juno and Rosetta as in situ observers, around the Sun and Earth for any moment you choose. Pick a date and time in UTC, drag the timeline, or jump to a preset: every total and hybrid solar eclipse since 2010, mission milestones, and major space-weather events.
+HelioFleet places SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, IMAP, SOLAR-1 (SWFO-L1), Carruthers, Solar Orbiter, Parker Solar Probe, BepiColombo, STEREO-A, STEREO-B and MAVEN, with MESSENGER, Venus Express, Juno, Rosetta, JUICE, Europa Clipper and Psyche as in situ observers, around the Sun and Earth for any moment you choose. Pick a date and time in UTC, drag the timeline, or jump to a preset: every total and hybrid solar eclipse since 2010, mission milestones, and major space-weather events.
 
 ## Features
 
@@ -102,6 +102,9 @@ Positions come from [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/), as helio
 | MESSENGER | -236 | 2010-01-01 to 2015-04-29; Mercury orbit from 2011-03-18; mission ended 2015-04-30 |
 | Venus Express | -248 | 2010-01-01 to 2014-12-15; Venus orbit; contact lost 2014-11-28, mission ended 2014-12-16 |
 | Juno | -61 | 2011-08-06 to 2028-09-02; cruise to Jupiter orbit insertion 2016-07-05 |
+| JUICE | -28 | 2023-04-15 to 2030-11-20; cruise to Jupiter (arrival 2031); shown to the end of the timeline |
+| Europa Clipper | -159 | 2024-10-15 to 2030-11-20; cruise to Jupiter (arrival 2030); shown to the end of the timeline |
+| Psyche | -255 | 2023-10-14 to 2029-02-24; cruise to asteroid 16 Psyche (arrival 2029) |
 | Rosetta | -226 | 2010-01-01 to 2016-09-29; hibernation 2011-06-08 to 2014-01-20; at comet 67P from 2014-08-06; mission ended 2016-09-30 |
 | MAVEN | -202 | 2013-11-19 to 2026-03-01; Mars orbit; no contact since 2025-12-06, later positions are predictions |
 
