@@ -848,7 +848,7 @@ function selectObservation(d) {
 }
 
 // ---------- coordinated-dataset finder ----------
-const FACILITY = { dkist: 'DKIST', iris: 'IRIS', eis: 'Hinode/EIS', solo: 'Solar Orbiter' };
+const FACILITY = { dkist: 'DKIST', iris: 'IRIS', eis: 'Hinode/EIS', solo: 'Solar Orbiter', rocket: 'Sounding rockets' };
 let coordinated = null;
 async function loadCoordinated() {
   coordinated ??= fetch('data/obs/coordinated.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);

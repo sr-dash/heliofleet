@@ -13,6 +13,9 @@ writes them by year to data/obs/<year>.json for the sky view. Sources:
                   grouped by pointing; these fields are in Solar Orbiter's own
                   helioprojective frame, with the observer position kept so the
                   page can carry them over to Earth's view
+  Rockets         sounding-rocket and balloon flights in data/flights.json, a
+                  hand-curated list with pointing read from each flight's FITS
+                  headers (the flights are finished, so the list rarely changes)
 
 Usage:
   python scripts/fetch_observations.py                      # the last twelve months (late releases)
@@ -47,7 +50,8 @@ SOAR = "https://soar.esac.esa.int/soar-sl-tap/tap/sync"
 EIS_CAT = "https://hesperia.gsfc.nasa.gov/ssw/hinode/eis/database/catalog/eis_cat.sqlite"
 CACHE = ROOT / ".cache"
 AU_M = 149597870700.0
-START = {"iris": date(2013, 7, 1), "eis": date(2010, 1, 1), "dkist": date(2021, 1, 1), "solo": date(2020, 2, 1)}
+START = {"iris": date(2013, 7, 1), "eis": date(2010, 1, 1), "dkist": date(2021, 1, 1), "solo": date(2020, 2, 1),
+         "rockets": date(2010, 1, 1)}
 
 
 def get(url, tries=4, timeout=300):
@@ -110,6 +114,23 @@ def iris(m0, m1):
                 "n": (e.get("obsTitle") or "").strip()[:80] + (f" · {e['goal'][:70]}" if e.get("goal") else ""),
                 "u": e.get("parentUrl")})
         print(f"  IRIS {m:%Y-%m}: {sum(r['t0'][:7] == f'{m:%Y-%m}' for r in rows)}", flush=True)
+    return rows
+
+
+# ---------- Sounding rockets and balloons ----------
+FLIGHT_INSTS = {"hic", "clasp"}
+
+
+def rockets(m0, m1):
+    """Flights in data/flights.json whose start falls in the months asked for."""
+    rows = []
+    for f in json.loads((ROOT / "data" / "flights.json").read_text())["flights"]:
+        if not (f"{m0:%Y-%m}" <= f["t0"][:7] <= f"{month_end(m1):%Y-%m}"):
+            continue
+        x, y = box(f["xc"], f["yc"], f["w"], f["h"], f.get("roll", 0.0))
+        rows.append({"i": f["i"], "t0": f["t0"], "t1": f["t1"], "f": "E", "x": x, "y": y,
+                     "id": f["id"], "n": f["n"], "u": f.get("u")})
+    print(f"  rockets: {len(rows)}", flush=True)
     return rows
 
 
@@ -278,8 +299,9 @@ def merge(rows, tol=30.0, gap=1800):
 
 THREADS = 4
 FAILED = []  # sources or months that could not be fetched; the run then exits with an error
-SOURCES = {"iris": iris, "eis": eis, "dkist": dkist, "solo": solo}
-INSTS = {"iris": {"iris"}, "eis": {"eis"}, "dkist": None, "solo": {"euihri", "euilya", "phihrt", "spice"}}
+SOURCES = {"iris": iris, "eis": eis, "dkist": dkist, "solo": solo, "rockets": rockets}
+INSTS = {"iris": {"iris"}, "eis": {"eis"}, "dkist": None, "solo": {"euihri", "euilya", "phihrt", "spice"},
+         "rockets": FLIGHT_INSTS}
 
 
 def main():
@@ -348,7 +370,8 @@ def write_index():
 
 
 # ---------- coordinated observations ----------
-GROUP = {"iris": "iris", "eis": "eis", "euihri": "solo", "euilya": "solo", "phihrt": "solo", "spice": "solo"}
+GROUP = {"iris": "iris", "eis": "eis", "euihri": "solo", "euilya": "solo", "phihrt": "solo", "spice": "solo",
+         "hic": "rocket", "clasp": "rocket"}
 R_SUN_AU = 695700 / 149597870.7
 ARC = math.pi / 648000
 

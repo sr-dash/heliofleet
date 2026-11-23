@@ -1,0 +1,40 @@
+{
+ "about": "Sounding-rocket and balloon flights with public pointing, read from the FITS headers of each flight's data (XCEN, YCEN, NAXIS x CDELT, CROTA2, first and last DATE_OBS). Fields are in helioprojective arcsec as seen from Earth; roll in degrees counter-clockwise. A flight with several fixed pointings has one entry per pointing. Flights whose pointing is published only for the payload pointing system, or only in figures, are not listed.",
+ "flights": [
+  {
+   "i": "hic", "id": "hic-2012", "t0": "2012-07-11T18:52:10Z", "t1": "2012-07-11T18:57:33Z",
+   "xc": -129.9, "yc": -453.3, "w": 471.7, "h": 463.4, "roll": -1.82,
+   "n": "Hi-C, 193 Å, AR 11520 · first flight",
+   "u": "https://msfc.virtualsolar.org/Hi-C/",
+   "source": "Hi-C 4K Level 1.5 v2 (field) and 1K Level 1.5 (time range), MSFC VSO"
+  },
+  {
+   "i": "clasp", "id": "clasp-2015-cal", "t0": "2015-09-03T17:02:58Z", "t1": "2015-09-03T17:03:08Z",
+   "xc": -16.1, "yc": -12.0, "w": 543.8, "h": 552.1, "roll": 37.71,
+   "n": "CLASP, Lyman-α slit-jaw · disk-centre pointing before the science target",
+   "u": "https://msfc.virtualsolar.org/CLASP1/",
+   "source": "CLASP slit-jaw level 1, MSFC VSO"
+  },
+  {
+   "i": "clasp", "id": "clasp-2015", "t0": "2015-09-03T17:03:41Z", "t1": "2015-09-03T17:08:20Z",
+   "xc": 466.0, "yc": -626.8, "w": 543.8, "h": 552.1, "roll": 37.71,
+   "n": "CLASP, Lyman-α spectropolarimetry across the limb · slit-jaw field",
+   "u": "https://msfc.virtualsolar.org/CLASP1/",
+   "source": "CLASP slit-jaw level 1, MSFC VSO"
+  },
+  {
+   "i": "hic", "id": "hic21-2018", "t0": "2018-05-29T18:56:22Z", "t1": "2018-05-29T19:01:57Z",
+   "xc": -114.5, "yc": 259.3, "w": 266.1, "h": 264.3, "roll": 0.985,
+   "n": "Hi-C 2.1, 172 Å · second flight",
+   "u": "https://msfc.virtualsolar.org/Hi-C2.1/",
+   "source": "Hi-C 2.1 2k Level 1.5, MSFC VSO"
+  },
+  {
+   "i": "clasp", "id": "clasp2-2019", "t0": "2019-04-11T16:52:53Z", "t1": "2019-04-11T16:58:46Z",
+   "xc": -603.5, "yc": 225.8, "w": 542.5, "h": 550.7, "roll": 73.45,
+   "n": "CLASP2, Mg II h & k spectropolarimetry, active-region plage · slit-jaw field",
+   "u": "https://msfc.virtualsolar.org/CLASP2/",
+   "source": "CLASP2 slit-jaw level 1 (2020-05-29 release), MSFC VSO"
+  }
+ ]
+}

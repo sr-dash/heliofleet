@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-02T23:59:34Z",
+ "generated": "2026-11-23T19:10:36Z",
  "sources": {
   "iris": "LMSAL Heliophysics Coverage Registry",
   "eis": "Hinode/EIS as-run catalogue",
@@ -98,7 +98,8 @@
    "eis": 1331
   },
   "2012-07": {
-   "eis": 1356
+   "eis": 1356,
+   "hic": 1
   },
   "2012-08": {
    "eis": 2438
@@ -238,6 +239,7 @@
    "iris": 287
   },
   "2015-09": {
+   "clasp": 2,
    "eis": 1806,
    "iris": 220
   },
@@ -364,6 +366,7 @@
   },
   "2018-05": {
    "eis": 126,
+   "hic": 1,
    "iris": 374
   },
   "2018-06": {
@@ -406,6 +409,7 @@
    "iris": 349
   },
   "2019-04": {
+   "clasp": 1,
    "eis": 764,
    "iris": 298
   },

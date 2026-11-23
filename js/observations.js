@@ -21,6 +21,9 @@ export const OBS_INST = {
   euilya: { name: 'Solar Orbiter EUI-HRI Lyα', short: 'HRI Lyα', color: '#b388ff' },
   phihrt: { name: 'Solar Orbiter PHI-HRT', short: 'PHI-HRT', color: '#f4f1a6' },
   spice: { name: 'Solar Orbiter SPICE', short: 'SPICE', color: '#ff5d5d' },
+  // Sounding rockets (data/flights.json)
+  hic: { name: 'Hi-C sounding rocket', short: 'Hi-C', color: '#ffe8a3' },
+  clasp: { name: 'CLASP sounding rockets', short: 'CLASP', color: '#9be7ff' },
 };
 
 let index;
