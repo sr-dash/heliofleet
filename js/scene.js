@@ -186,6 +186,7 @@ export function buildScene(jd, s) {
   if (s.fov?.size && s.view === 'top') {
     for (const id of s.fov) {
       const ins = INSTRUMENT[id];
+      if (ins?.sky) continue; // a Sun-centred full-disk field is a sliver at map scale
       const b = ins && bodies.find((x) => x.key === ins.sc);
       if (!b || b.st === 'lost' || s.hidden.has(ins.sc) || !flyingAt(ins, jd)) continue;
       const p = b.p;

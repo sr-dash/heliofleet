@@ -23,7 +23,13 @@
 // 2020 (Metis); Howard et al. 2020 (SoloHI); Vourlidas et al. 2016 (WISPR);
 // DeForest et al. 2025 (PUNCH NFI, WFI); ESA/SIDC (Proba-3 ASPIICS);
 // NOAA SWPC (GOES-19 CCOR-1); NOAA NCEI (SOLAR-1 CCOR-2); Singh et al. 2025
-// (Aditya-L1 VELC imaging channel).
+// (Aditya-L1 VELC imaging channel). Full-disk imagers (sky view only):
+// Lemen et al. 2012 (SDO/AIA, 41'); Schou et al. 2012 (SDO/HMI, 4096 px at
+// 0.5"); Seaton et al. 2013 (PROBA2/SWAP, 54'); Darnel et al. 2022 (GOES
+// SUVI, 53'); Tripathi et al. 2025 (Aditya-L1 SUIT, 2860"); Chen et al. 2019
+// and Li et al. 2019 (ASO-S/LST: SDI and WST to 1.2 R_sun, SCI 1.1-2.5 R_sun).
+// sky: drawn only in the sky view (on the map a field centred on the Sun is a
+// sliver). range: label for the field when it is not an elongation range.
 
 export const INSTRUMENTS = [
   { id: 'c2', sc: 'soho', name: 'LASCO C2', unit: 'rs', inner: 2.2, outer: 6, side: 'both' },
@@ -48,6 +54,14 @@ export const INSTRUMENTS = [
   { id: 'ccor1', sc: 'earth', mission: 'GOES-19', name: 'CCOR-1', unit: 'rs', inner: 3.7, outer: 17, side: 'both', from: '2024-06-25', color: 'dscovr' },
   { id: 'nfi', sc: 'earth', mission: 'PUNCH', name: 'NFI', unit: 'deg', inner: 1.5, outer: 8, side: 'both', from: '2025-03-12', color: 'ace' },
   { id: 'wfi', sc: 'earth', mission: 'PUNCH', name: 'WFI', unit: 'deg', inner: 3, outer: 45, side: 'both', from: '2025-03-12', color: 'ace' },
+  { id: 'asosci', sc: 'earth', mission: 'ASO-S', name: 'LST SCI', unit: 'rs', inner: 1.1, outer: 2.5, side: 'both', from: '2022-10-08', color: 'psyche' },
+  // Full-disk imagers
+  { id: 'aia', sc: 'sdo', name: 'AIA', unit: 'deg', inner: 0, outer: 0.48, side: 'east', from: '2010-02-11', sky: true, range: '41′ × 41′' },
+  { id: 'hmi', sc: 'sdo', name: 'HMI', unit: 'deg', inner: 0, outer: 0.40, side: 'east', from: '2010-02-11', sky: true, range: '2048″ × 2048″' },
+  { id: 'suit', sc: 'aditya', name: 'SUIT', unit: 'deg', inner: 0, outer: 0.56, side: 'east', from: '2023-09-02', sky: true, range: '2860″ × 2860″' },
+  { id: 'swap', sc: 'earth', mission: 'PROBA2', name: 'SWAP', unit: 'deg', inner: 0, outer: 0.64, side: 'east', from: '2009-11-02', color: 'cgo', sky: true, range: '54′ × 54′' },
+  { id: 'suvi', sc: 'earth', mission: 'GOES', name: 'SUVI', unit: 'deg', inner: 0, outer: 0.62, side: 'east', from: '2016-11-19', color: 'swfo', sky: true, range: '53′ × 53′' },
+  { id: 'asosdi', sc: 'earth', mission: 'ASO-S', name: 'LST SDI/WST', unit: 'rs', inner: 0, outer: 1.2, side: 'both', from: '2022-10-08', color: 'psyche', sky: true },
 ];
 
 export const INSTRUMENT = Object.fromEntries(INSTRUMENTS.map((i) => [i.id, i]));

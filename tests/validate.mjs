@@ -128,8 +128,8 @@ report('timeline height reserved in css/style.css', Math.abs(reserved - drawn), 
         }
       }
       // A direction well past the outer edge must test outside
-      if (f.type === 'annulus') {
-        const out = viewOf(P, [0, 0, 0]).d; // Sun centre: inside no annulus
+      if (f.type === 'annulus' && ins.inner > 0) {
+        const out = viewOf(P, [0, 0, 0]).d; // Sun centre: inside no annulus with a hole
         n++;
         if (inField(f, out)) bad++;
       }

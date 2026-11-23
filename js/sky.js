@@ -610,7 +610,7 @@ function pointReport() {
     const v = place(b.p, X);
     const f = fovFrame(ins, SKY_SHAPES[ins.id], b.p, sideSign(ins, b), b.dist);
     const status = v.hidden ? 'hidden' : inField(f, v.d) ? 'in' : 'out';
-    rows.push({ name: insLabel(ins, BODIES[ins.sc].short), color: insColor(ins), status, v, range: ins.unit === 'rs' ? `${ins.inner}–${ins.outer} R☉` : `${ins.inner}–${ins.outer}°` });
+    rows.push({ name: insLabel(ins, BODIES[ins.sc].short), color: insColor(ins), status, v, range: ins.range ?? (ins.unit === 'rs' ? `${ins.inner}–${ins.outer} R☉` : `${ins.inner}–${ins.outer}°`) });
   }
   const earth = scene.earth;
   const ve = place(earth, X);

@@ -114,7 +114,7 @@ export function initCards(ctx) {
       ${flag ? `<p class="card-flag">${flag}</p>` : ''}
       <dl class="card-facts">${rows.filter((r) => hasPeri || !r[1].includes('peri-')).map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
       ${near.length ? `<div class="card-near"><span>${tr('Near Earth:')}</span>${near.map((k) => `<button data-open="${k}">${BODIES[k].short}</button>`).join('')}</div>` : ''}
-      ${INSTRUMENTS.some((i) => i.sc === key) ? `<div class="card-fov"><span>${tr('Fields of view:')}</span>${INSTRUMENTS.filter((i) => i.sc === key).map((i) => `<button data-fov="${i.id}" aria-pressed="${ctx.S.fov.has(i.id)}">${insShort(i)}</button>`).join('')}</div>` : ''}
+      ${INSTRUMENTS.some((i) => i.sc === key && !i.sky) ? `<div class="card-fov"><span>${tr('Fields of view:')}</span>${INSTRUMENTS.filter((i) => i.sc === key && !i.sky).map((i) => `<button data-fov="${i.id}" aria-pressed="${ctx.S.fov.has(i.id)}">${insShort(i)}</button>`).join('')}</div>` : ''}
       <div class="card-actions">
         <button data-act="coverage">${tr('Its view of the Sun')}</button>
         <button data-act="align">${tr('Find alignments')}</button>

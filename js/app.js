@@ -678,12 +678,13 @@ function ribbonMarks() {
 // Field-of-view checkboxes, one row per spacecraft
 function buildFovList() {
   const box = $('fov-list');
-  const groups = [...new Set(INSTRUMENTS.map((i) => i.sc))];
+  const mapIns = INSTRUMENTS.filter((i) => !i.sky); // full-disk imagers are sky-view only
+  const groups = [...new Set(mapIns.map((i) => i.sc))];
   for (const sc of groups) {
     const row = document.createElement('div');
     row.className = 'fov-group';
     row.style.setProperty('--c', `var(--c-${sc})`);
-    row.innerHTML = `<span class="fov-sc">${sc === 'earth' ? tr('Earth orbit') : BODIES[sc].short}</span>${INSTRUMENTS.filter((i) => i.sc === sc).map((i) => `<label><input type="checkbox" value="${i.id}"${S.fov.has(i.id) ? ' checked' : ''}>${insShort(i)}</label>`).join('')}`;
+    row.innerHTML = `<span class="fov-sc">${sc === 'earth' ? tr('Earth orbit') : BODIES[sc].short}</span>${mapIns.filter((i) => i.sc === sc).map((i) => `<label><input type="checkbox" value="${i.id}"${S.fov.has(i.id) ? ' checked' : ''}>${insShort(i)}</label>`).join('')}`;
     box.appendChild(row);
   }
   box.addEventListener('change', (e) => {

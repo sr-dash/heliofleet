@@ -29,6 +29,14 @@ export const SKY_SHAPES = {
   solohi: { type: 'circle', centre: 25, radius: 20, cut: 5.4 },
   wispri: { type: 'square', centre: 33.5, half: 20, lat: -10 },
   wispro: { type: 'square', centre: 79, half: 29, lat: -10 },
+  asosci: { type: 'annulus' },
+  // Full-disk imagers: squares (half-width in degrees) or a disc, centred on the Sun
+  aia: { type: 'square', centre: 0, half: 41 / 120 },
+  hmi: { type: 'square', centre: 0, half: 2048 / 7200 },
+  suit: { type: 'square', centre: 0, half: 2860 / 7200 },
+  swap: { type: 'square', centre: 0, half: 54 / 120 },
+  suvi: { type: 'square', centre: 0, half: 53 / 120 },
+  asosdi: { type: 'annulus' },
 };
 
 // Ground-based coronagraphs, centred on the Sun in Earth's sky (solar radii)
