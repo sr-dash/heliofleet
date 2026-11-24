@@ -66,10 +66,10 @@ print(psp.radius.to("AU"), psp.lon, psp.lat, l0)
 
 ## Command line, Python and MCP
 
-- [heliofleet-mcp](https://github.com/sr-dash/heliofleet-mcp) (MIT, on [PyPI](https://pypi.org/project/heliofleet-mcp/)) answers questions from these data files outside the browser: positions, fleet state, alignment windows (radial, quadrature, conjunction, magnetic connection), the event calendar, viewing geometry, and HelioField's magnetic connectivity. Its frame and alignment code is a port of this site's, so its numbers match the page, and every answer includes a HelioFleet link to the same view.
+- [heliofleet-mcp](https://github.com/sr-dash/heliofleet-mcp) (MIT, on [PyPI](https://pypi.org/project/heliofleet-mcp/)) answers questions from these data files outside the browser: positions at one time or over a date range (trajectories), fleet state, alignment windows (radial, quadrature, conjunction, magnetic connection), the event calendar, viewing geometry, the IRIS, Hinode/EIS, DKIST, Solar Orbiter and sounding-rocket observations of the sky view (fields of view, archive links, coordinated groups), the list of bodies and instruments, and HelioField's magnetic connectivity. Its frame and alignment code is a port of this site's, so its numbers match the page, and every answer includes a HelioFleet link to the same view.
 - Command line, one answer as JSON: `uvx heliofleet-mcp align psp solo --tol 10 --after 2026-11-19 --next`; `uvx heliofleet-mcp --help` lists the commands.
 - Python: `pip install heliofleet-mcp`, then `from heliofleet_mcp import Fleet`.
-- Model Context Protocol server over stdio: `uvx heliofleet-mcp`; MCP Registry name `io.github.sr-dash/heliofleet-mcp`. Usage notes for assistants: [AGENTS.md](https://github.com/sr-dash/heliofleet-mcp/blob/main/AGENTS.md) and [llms.txt](https://github.com/sr-dash/heliofleet-mcp/blob/main/llms.txt).
+- Model Context Protocol server over stdio: `uvx heliofleet-mcp`; MCP Registry name `io.github.sr-dash/heliofleet-mcp`. Its 15 tools: get_position, get_trajectory, get_fleet_state, find_alignments, list_upcoming_events, get_viewing_geometry, search_observations, find_coordinated_observations, list_bodies, build_heliofleet_link and get_data_status, plus get_magnetic_connection, get_space_weather, get_coronal_field and build_heliofield_link from HelioField. Usage notes for assistants: [AGENTS.md](https://github.com/sr-dash/heliofleet-mcp/blob/main/AGENTS.md) and [llms.txt](https://github.com/sr-dash/heliofleet-mcp/blob/main/llms.txt).
 
 ## Figures
 
